@@ -35,19 +35,28 @@ Enables Claude to run structured Google Ads analysis for law firm accounts — w
 ## Requirements
 
 - [Claude Code](https://claude.ai/code) with skill support
-- Google Ads MCP server (for live data pulls via GAQL)
+- A Google Ads MCP server — see below
 - Access to a Google Ads account or MCC
+
+### Google Ads MCP
+
+This skill is designed for and tested with **[cohnen/mcp-google-ads](https://github.com/cohnen/mcp-google-ads)** — a Google Ads MCP server that connects Claude directly to the Google Ads API.
+
+The GAQL queries in this skill are standard Google Ads Query Language and will work with any MCP that exposes a `run_gaql` or `execute_gaql_query` tool. If you're using a different MCP implementation, update the tool note in `SKILL.md` accordingly.
 
 ---
 
 ## Installation
 
 ```bash
-# Clone into your Claude Code skills directory or any accessible path
-git clone https://github.com/rosenadvertising/legal-ppc-skill
+# 1. Set up cohnen/mcp-google-ads (follow their README for credentials)
+git clone https://github.com/cohnen/mcp-google-ads
 
-# In Claude Code, point to SKILL.md when invoking
-# Or install as a plugin if using a plugin-aware Claude Code setup
+# 2. Clone this skill
+git clone https://github.com/RosenAdvertising/legal-ppc-skill
+
+# 3. Configure your accounts in SKILL.md (Accounts section)
+# 4. Add account-notes/ files for each account (see Versions section below)
 ```
 
 ---
@@ -106,6 +115,22 @@ The skill ships with a test suite of 10 adversarial evals covering:
 ## Versions
 
 This repository contains the **public version** of the skill. The internal version used by Rosen Advertising adds account-specific notes, session logging, and a validated learnings document built from live session history.
+
+---
+
+## Known Limitations / In Progress
+
+**`search_term_view` coverage ceiling (~50%)**
+The Google Ads API withholds low-volume search terms and caps rows per query. Expect to see roughly half of actual campaign spend in any search term pull. The skill discloses this and scales estimates, but it's a platform constraint with no workaround.
+
+**Conversion tracking reads are GAQL-only**
+There's no API endpoint for reading conversion action configuration (primary vs. secondary, attribution model, counting method) as a structured object. The skill reconstructs this from `conversion_action` queries, which requires interpretation. Direct UI verification is often faster for complex setups.
+
+**No asset / creative performance analysis**
+Responsive search ad asset-level performance (individual headline/description scores) is not yet covered. The skill reviews ad copy structurally but doesn't pull asset-level quality scores from the API.
+
+**Multi-account parallel analysis**
+The skill documents a sub-agent pattern for parallel campaign pulls, but cross-account analysis (e.g., comparing two accounts) is handled sequentially. Parallel account pulls across an MCC aren't yet systematized.
 
 ---
 
