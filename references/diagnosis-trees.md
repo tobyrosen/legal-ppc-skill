@@ -402,6 +402,91 @@ The output of a first-review session is a prioritized findings list, not a to-do
 
 ---
 
+### Tree 7: Conversion Tracking Failure / Sudden Drop
+
+**Entry:** Conversions dropped suddenly — especially to near-zero or zero — within a defined recent window, without an obvious account change. The brief is typically "tracking looks broken" or "conversions dropped 10 days ago."
+
+This is not the same as "conversions are generally low" (Tree 1) — that is a performance problem. This is a measurement problem. Until it is confirmed or ruled out, no other analysis is meaningful.
+
+---
+
+**Step 1: Read change history for the relevant window**
+
+Pull: GAQL 8.1 (60-day changes), GAQL 8.2 (auto-applied changes)
+
+Establish exactly when the drop started. Cross-reference that date with any account changes.
+
+- **A bid strategy or budget change occurred around the drop date**: don't assume it's a tracking failure — a learning phase disruption can cause a real conversion drop, not just a measurement problem. See Sub-tree D. But also continue this tree, as tracking failure and learning phase disruption can co-occur.
+- **No account changes around the drop date**: external cause. Continue.
+- **Drop is abrupt (one day to next) rather than gradual**: stronger signal of a tracking change — tag break, integration disconnect, or website change.
+
+---
+
+**Step 2: Break down conversion volume by individual action**
+
+Pull: GAQL 2.2 (recent conversion volume), segmented so each action's volume is visible individually. Compare the 30 days before the drop against the 30 days after.
+
+**All primary actions dropped simultaneously:**
+Suggests a shared root cause — an account-level change, a website change affecting all tags, or a change to how Google is attributing conversions. Continue to Step 3.
+
+**One action dropped while others held:**
+The broken action is isolated. Skip to Step 4 for that action type directly.
+
+**All actions appear to be working but reported volume is lower:**
+Consider whether conversion action settings changed (counting method, attribution window). Also consider Smart Bidding relearning: if tracking was recently fixed or changed, the algorithm may have had a disrupted signal before the fix — the reported "drop" is the period before the fix, not a new failure.
+
+---
+
+**Step 3: Check for never-fired primary actions**
+
+Look at all-time conversion history for each primary action. A primary action with zero all-time conversions has never worked — it is not a new failure, it never functioned. This is distinct from an action that was working and then stopped.
+
+Never-fired primaries are a standing configuration error, not a recent event. Note them separately from the acute drop investigation.
+
+---
+
+**Step 4: Diagnose by action type**
+
+**WEBPAGE (codeless tag or gtag):**
+These fire when a user reaches a specific page URL (typically a thank-you or confirmation page).
+- Has the website been updated recently? Form submission flows change more often than they appear to.
+- Is the thank-you page URL still the same as when the tag was configured?
+- Does the current checkout/form flow actually reach the tagged URL on submission?
+
+> ⚠️ **BLIND SPOT — Tag firing cannot be confirmed via API**
+> → Request a screenshot of the current thank-you page URL and confirm it matches the conversion action's URL rule. If the URL changed, this is the root cause.
+
+**AD_CALL (Google forwarding number):**
+Google-native call tracking. These are the most reliable action type and rarely break without an account-level change. Confirm via GAQL:
+```
+SELECT call_view.call_tracking_display_name, call_view.duration_seconds, call_view.call_status,
+       segments.date
+FROM call_view
+ORDER BY segments.date DESC
+LIMIT 30
+```
+If call_view returns records, Google forwarding is active and confirmed working. If it returns nothing despite call extensions being live, the call extension itself may be missing a Google forwarding number.
+
+**UPLOAD_CLICKS (third-party call tracking platform — CallRail, CTM, etc.):**
+These platforms upload call data to Google Ads via the offline conversions API. Two common silent failure modes:
+1. **No Lead Rule configured**: the integration is connected but has no criteria for what constitutes a conversion. It silently uploads nothing. Fix: add a qualifying filter (e.g., call duration > 60 seconds) in the platform's Google Ads integration settings.
+2. **GCLID not being captured**: if the landing page doesn't capture and store the GCLID parameter from the ad click, the platform cannot attribute the call back to Google Ads. Enhanced Conversions (matching by phone number) is the fallback — check whether it is enabled in both Google Ads and the call tracking platform.
+
+---
+
+**Step 5: After the fix — Smart Bidding relearning**
+
+If the tracking failure affected a campaign running Maximize Conversions or tCPA:
+
+The algorithm has been operating on incomplete or absent conversion signals. After the tracking fix, the algorithm must relearn. This takes 2–4 weeks. During this window:
+- Hold bid strategy and targets constant — do not adjust in response to apparently poor performance
+- The apparent CPA may worsen temporarily as the algorithm recalibrates
+- A "conversion drop" that coincides with a tracking fix being deployed is the algorithm catching up, not a new failure
+
+> *This is the Smart Bidding Post-Tracking-Fix Protocol from SKILL.md. Do not deviate from it.*
+
+---
+
 ### Tree 6: Search Term Waste / Negative Keyword Gaps
 
 **Entry:** The brief is specifically about search term quality — mining for negatives, reviewing match type behavior, or investigating wasted spend on irrelevant queries.

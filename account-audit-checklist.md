@@ -17,12 +17,14 @@ These run before anything else. Pre-flight findings take priority over every oth
 
 - [ ] At least one conversion action is enabled and active
 - [ ] Primary conversion actions (`include_in_conversions_metric = TRUE`) measure real leads — not page views, sessions, or soft engagements
+- [ ] Every enabled primary action has recorded at least one conversion in the last 30 days — flag any that have never fired or have been silent for 30+ days despite meaningful click volume
 - [ ] Conversion volume is plausible given click volume (not zero with >100 clicks/month)
 - [ ] No duplicate primary actions tracking the same event (check for DDA decimal fingerprint: identical fractional conversion tails across two actions)
 - [ ] No deprecated tracking sources present (e.g., PhoneWagon — acquired, unreliable)
 - [ ] GA4 and HubSpot (or other platforms) are not double-counting the same form submissions
 - [ ] `counting_type = ONE_PER_CLICK` for lead-type conversions (not MANY_PER_CLICK)
 - [ ] Attribution model is appropriate (DDA or Last Click acceptable; flag unusual models)
+- [ ] If a third-party call tracking platform is in use (CallRail, CTM, etc.): confirm a Lead Rule or equivalent qualifying filter is configured — without it the integration is a silent no-op
 
 **Blind spot:** Tag firing cannot be confirmed via API. If conversions are zero despite meaningful clicks, request GTM or GA4 debug view screenshot.
 
