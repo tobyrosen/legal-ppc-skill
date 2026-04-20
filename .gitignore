@@ -1,0 +1,5 @@
+# Internal files — not included in public release
+account-notes/
+session-logs/
+references/learnings.md
+skills/
