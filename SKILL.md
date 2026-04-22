@@ -52,7 +52,7 @@ Currently: `run_gaql(customer_id, query, format)` from the `googleAdsServer` MCP
 
 If the MCP changes, update this note only. The query library remains valid.
 
-**Login/MCC customer ID:** 0000000000
+**Login/MCC customer ID:** *(set in your MCP config — replace with your own MCC/manager account ID)*
 **First step in any new session:** `list_accounts()` — confirms which accounts are accessible.
 
 ---
@@ -275,7 +275,7 @@ Before any symptom-specific diagnosis, run the three pre-flight checks from `ref
 - PF-2: Structural red flags
 - PF-3: Change history read
 
-These are not optional and are not deferred by a vague brief. Even if the brief is unclear and you've asked clarifying questions, run PF-1 immediately — conversion tracking issues invalidate every other finding. A vague brief about "performance feeling off" is still a brief. PF-1 runs first.
+All three are mandatory and none are deferred by a vague brief. Run PF-1, PF-2, and PF-3 before any symptom-specific diagnosis, regardless of brief clarity. PF-1 is the most urgent — conversion tracking issues invalidate every other finding and should be checked first. PF-2 and PF-3 follow immediately after, not after the brief is clarified. A vague brief about "performance feeling off" is still a brief. All three pre-flights run.
 
 ### Step 4 — Pull data, flag everything
 Run the relevant queries from the GAQL library. Don't draw conclusions yet — read the account broadly and flag anything that deviates from knowledge base standards or known good-account patterns. A flag is a candidate for investigation, not a confirmed finding.

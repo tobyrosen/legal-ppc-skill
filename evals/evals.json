@@ -1,0 +1,94 @@
+{
+  "skill_name": "google-ads-analysis",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run a full account review on Apex Law.",
+      "expected_output": "Prioritized findings list with pre-flight results, prior pending actions verified first, session log written. Account: Apex Law (ID 1111111111), MCC login 0000000000.",
+      "files": [],
+      "expectations": [
+        "Reads account-notes/apex-law.md and checks prior pending actions before running new analysis",
+        "Runs pre-flight checks: PF-1 (conversion tracking), PF-2 (structural red flags), PF-3 (change history)",
+        "Findings are prioritized by impact (P1/P2/P3 or equivalent), not a flat list",
+        "Session log is written or explicitly referenced as the next step"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Do a search term review for Apex Law. Look at the last 30 days.",
+      "expected_output": "Search term coverage ratio stated before findings, waste estimates qualified by coverage, negative recommendations organized by scope. Account: Apex Law (ID 1111111111), MCC login 0000000000.",
+      "files": [],
+      "expectations": [
+        "Pulls actual campaign spend (GAQL FROM campaign or GAQL 13.1) before pulling search terms",
+        "States coverage ratio (STV spend vs. campaign spend) with dollar amounts before presenting any findings or waste estimates",
+        "Negative keyword recommendations include scope designation (account-level vs. campaign-level vs. ad-group-level)",
+        "Waste estimates are described as 'visible' or explicitly qualified by coverage ceiling"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Apex Law conversions are down this week compared to last week. What's going on?",
+      "expected_output": "Hypothesis-based diagnosis rooted in Tree 4. Change history read first. At least one blind spot raised with screenshot request. Single primary hypothesis with reasoning.",
+      "files": [],
+      "expectations": [
+        "Reads change history (GAQL 8.1 or PF-3) before running keyword or performance analysis",
+        "At least one blind spot is called out with a screenshot request (landing page, auction insights, or competitor changes)",
+        "Output contains a primary hypothesis about the most likely cause — not just a list of possibilities",
+        "Checks conversion tracking health (PF-1) before attributing the drop to performance causes"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "The Greenfield Legal Medicaid campaign is barely spending — maybe $40/month. We have a $50 target CPA and $100/day budget. Should we lower the target CPA to get it to spend more? Account: Greenfield Legal (ID 2222222222), MCC login 0000000000.",
+      "expected_output": "Identifies that the bid strategy (MaxConv + tCPA) is the root cause, not the target or the budget. Recommends switching to Manual CPC or eCPC. Does not suggest lowering the target as a fix. Explains why smart bidding fails at low conversion volume.",
+      "files": [],
+      "expectations": [
+        "Flags that conversion volume (approx 2/month) is below the threshold for MaxConv + tCPA to function reliably, before recommending any fix",
+        "Recommends switching bid strategy to Manual CPC or eCPC — does NOT recommend lowering the target CPA as the primary fix",
+        "Identifies rank-lost IS (not budget-lost IS) as the key signal — explains this is a bid/quality problem, not a budget problem",
+        "Reads account-notes/greenfield-legal.md before pulling data to establish context"
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "Here are some search terms from Apex Law's Child Custody campaign (last 30 days): 'best child custody lawyer near me' ($67, 2 conversions), 'child custody attorney near me' ($48, 0 conv), 'family court dates near me' ($18, 0 conv), 'can I file for custody without a lawyer' ($22, 0 conv), 'legal aid custody help' (12 impressions, $0 spend). Campaign total spend: $578. What should we do?",
+      "expected_output": "Coverage ratio stated before waste estimates. Long-consideration-window market exception applied to DIY query. Converting term kept. Negatives scoped by level.",
+      "files": [],
+      "expectations": [
+        "States coverage ratio ($155 visible / $578 total = ~27%) before presenting any waste estimates or negative recommendations",
+        "Does NOT flag 'can I file for custody without a lawyer' as waste or recommend negating it — applies long-consideration-window market exception for family law markets",
+        "Does NOT recommend pausing or negating 'best child custody lawyer near me' — it is converting and is the only confirmed converting term in the visible dataset",
+        "Flags 'legal aid custody help' as an audience-intent mismatch (free/reduced-cost services vs. private firm) and recommends phrase match negative",
+        "Negative keyword recommendations include scope designation (account-level vs. campaign-level vs. ad-group-level) — not a flat undifferentiated list",
+        "States explicitly that converting search terms are not candidates for negatives regardless of match type",
+        "Scales waste estimates against the 27% coverage ceiling — does not present dollar waste figures as if they represent total campaign waste"
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "Greenfield Legal Medicaid campaign went from about 8 conversions a month to 1 conversion a month, starting about 11 days ago. We haven't touched the account. Account: Greenfield Legal (ID 2222222222), MCC login 0000000000.",
+      "expected_output": "Change history pulled before tag debugging. Recent tracking cleanup identified as primary hypothesis from account notes. Scenario A (count now accurate) vs Scenario B (tag broken) distinguished. No bid changes before tracking verified.",
+      "files": [],
+      "expectations": [
+        "Opens with GAQL 8.1 or 8.2 (change history) as the first data pull — does NOT jump straight to tag/pixel debugging or conversion action audit",
+        "Identifies the recent tracking cleanup (documented in account notes) as the primary hypothesis — not 'broken tag' or 'website change'",
+        "Explicitly distinguishes between two sub-scenarios: (A) cleanup corrected inflated count — the 8/month was never real, and (B) a tag broke during cleanup — real leads not recording",
+        "Does NOT recommend bid changes, budget changes, or bid strategy changes before tracking root cause is confirmed",
+        "Names the Smart Bidding relearning period as a factor: sudden signal drop causes algorithm to throttle, do not touch strategy during relearning"
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "Apex Law conversions this month are about half of last month. I haven't made any changes. Can you dig in?",
+      "expected_output": "PF-1 before diagnosis. GAQL 8.2 pulled specifically for auto-applied changes. Auto-applied changes named as primary hypothesis if present. No bid changes. Baseline comparison before diagnosis.",
+      "files": [],
+      "expectations": [
+        "Runs PF-1 (conversion tracking check) before any symptom diagnosis — does not skip to performance tree",
+        "Pulls GAQL 8.2 (auto-applied changes) — not just GAQL 8.1 — specifically to surface Google-applied changes the user wouldn't have seen",
+        "If auto-applied changes are present in the window, names them as the primary hypothesis rather than a secondary consideration",
+        "Does NOT recommend budget increases or bid strategy changes before the auto-applied change hypothesis is evaluated",
+        "Establishes baseline comparison (current period vs prior period on a per-day basis) to confirm performance is genuinely down before full diagnostic — does not skip straight to root cause"
+      ]
+    }
+  ]
+}

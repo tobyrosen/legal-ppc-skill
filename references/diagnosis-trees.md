@@ -57,6 +57,9 @@ Look for multiple actions of the same type with similar names and `include_in_co
 **What attribution model is being used?**
 Data-driven attribution is fine for accounts with volume. Last-click is acceptable. Time-decay is acceptable. Position-based is unusual for legal. Flag any attribution model that seems inconsistent with how the firm's intake process actually works.
 
+**Is Enhanced Conversions for Leads configured?**
+Enhanced Conversions for Leads hashes and matches first-party contact data (email, phone) submitted in forms, enabling more accurate and durable cross-device attribution. It is Google's current recommended tracking upgrade for form submissions in legal. Check whether it is enabled in the Google Ads conversion settings. An account without it is missing an increasingly standard signal quality improvement — flag as a P2 recommendation on first review.
+
 ---
 
 ### PF-2: Structural Red Flags
@@ -190,7 +193,7 @@ Pull: GAQL 3.3 or 3.4 (keyword performance) for the affected campaigns. Look at 
 
 - **CVR is the dominant driver**: the cost per click may be reasonable but the traffic isn't converting. Move to Tree 1 (Conversions Low), Step 3 and 4.
 
-- **Both CPC and CVR are problems**: address in order — fix conversion tracking and landing page issues first (higher leverage), then address CPC through QS improvements.
+- **Both CPC and CVR are problems**: address in order. Move to Tree 1, Steps 3–4 first (diagnose CVR: conversion tracking, landing page, audience quality). After CVR is addressed, return here and move to Sub-tree B to diagnose the CPC/QS side. Don't optimize CPC on a broken conversion funnel.
 
 ---
 
@@ -266,6 +269,18 @@ In some accounts, ad scheduling restrictions are too aggressive — campaigns ar
 ### Tree 4: Performance Dropped — Something Changed
 
 **Entry:** The brief is "something is wrong" — performance was acceptable and now isn't. The most common brief. The most variable tree.
+
+---
+
+**Step 0: Confirm performance is actually off**
+
+Pull: GAQL 6.2 (90-day campaign performance), GAQL 6.3 (weekly segmented performance)
+
+Compare the current period (last 14–30 days) to the 90-day baseline. State the verdict explicitly before proceeding:
+- **CPA and CVR are materially worse than baseline**: performance is genuinely down. Continue.
+- **Metrics are within normal week-to-week variance**: the "feels off" perception may reflect a single bad week or a volatile metric, not a real trend. Report this finding first. Don't run a full diagnostic on normal variance.
+
+This step protects against over-diagnosing healthy accounts. It also establishes the baseline needed for every downstream diagnostic comparison in this tree.
 
 ---
 
@@ -435,11 +450,13 @@ For each term, the classification is: relevant, irrelevant, or ambiguous.
 **Irrelevant**: clearly outside the firm's practice area, geography, or client type. Add as negative at the appropriate level.
 **Ambiguous**: could be a prospect but intent is unclear. Flag for review — don't add as negative without further consideration.
 
+Before applying any negative library categories, check account notes for market-specific funnel exceptions. Some accounts have practice areas or markets where standard informational intent negatives would block real prospects (e.g., NC family law long-consideration-window, immigration procedural queries in Arizona, elder abuse informational queries). The negative library is a starting point, not a universal rule.
+
 Cross-reference against the negative keyword library categories:
 - Price/affordability signals (Section 1)
 - Employment/career signals (Section 2)
 - Self-help/DIY intent (Section 3)
-- Research/informational intent (Section 4)
+- Research/informational intent (Section 4) — *check account notes for market exceptions before applying*
 - Practice area cross-contamination (Section 5)
 
 ---
@@ -471,6 +488,93 @@ Produce in the upload format from the negative keyword library (phrase match by 
 
 ---
 
+### Tree 7: Conversion Tracking Failure / Sudden Drop
+
+**Entry:** Conversions dropped suddenly — especially to near-zero or zero — within a defined recent window, without an obvious account change. The brief is typically "tracking looks broken" or "conversions dropped 10 days ago."
+
+This is not the same as "conversions are generally low" (Tree 1) — that is a performance problem. This is a measurement problem. Until it is confirmed or ruled out, no other analysis is meaningful.
+
+**Pre-flight ordering exception:** For Tree 7, run PF-3 (change history) before PF-1 and PF-2. The standard pre-flight order exists because tracking integrity is the foundation of all other analysis — but here, the presenting symptom IS a tracking failure, so tag debugging (PF-1) is not a foundation check, it is the diagnosis itself. Change history answers the prior question: did something actually change? If nothing changed, then PF-1's tag checks are the right next step. If something did change, that discovery shapes everything that follows. Run PF-3 first, then PF-1.
+
+---
+
+**Step 1: Read change history for the relevant window**
+
+Pull: GAQL 8.1 (60-day changes), GAQL 8.2 (auto-applied changes)
+
+Establish exactly when the drop started. Cross-reference that date with any account changes.
+
+- **A bid strategy or budget change occurred around the drop date**: don't assume it's a tracking failure — a learning phase disruption can cause a real conversion drop, not just a measurement problem. See Sub-tree D. But also continue this tree, as tracking failure and learning phase disruption can co-occur.
+- **No account changes around the drop date**: external cause. Continue.
+- **Drop is abrupt (one day to next) rather than gradual**: stronger signal of a tracking change — tag break, integration disconnect, or website change.
+
+---
+
+**Step 2: Break down conversion volume by individual action**
+
+Pull: GAQL 2.2 (recent conversion volume), segmented so each action's volume is visible individually. Compare the 30 days before the drop against the 30 days after.
+
+**All primary actions dropped simultaneously:**
+Suggests a shared root cause — an account-level change, a website change affecting all tags, or a change to how Google is attributing conversions. Continue to Step 3.
+
+**One action dropped while others held:**
+The broken action is isolated. Skip to Step 4 for that action type directly.
+
+**All actions appear to be working but reported volume is lower:**
+Consider whether conversion action settings changed (counting method, attribution window). Also consider Smart Bidding relearning: if tracking was recently fixed or changed, the algorithm may have had a disrupted signal before the fix — the reported "drop" is the period before the fix, not a new failure.
+
+---
+
+**Step 3: Check for never-fired primary actions**
+
+Look at all-time conversion history for each primary action. A primary action with zero all-time conversions has never worked — it is not a new failure, it never functioned. This is distinct from an action that was working and then stopped.
+
+Never-fired primaries are a standing configuration error, not a recent event. Note them separately from the acute drop investigation.
+
+---
+
+**Step 4: Diagnose by action type**
+
+**WEBPAGE (codeless tag or gtag):**
+These fire when a user reaches a specific page URL (typically a thank-you or confirmation page).
+- Has the website been updated recently? Form submission flows change more often than they appear to.
+- Is the thank-you page URL still the same as when the tag was configured?
+- Does the current checkout/form flow actually reach the tagged URL on submission?
+
+> ⚠️ **BLIND SPOT — Tag firing cannot be confirmed via API**
+> → Request a screenshot of the current thank-you page URL and confirm it matches the conversion action's URL rule. If the URL changed, this is the root cause.
+
+**AD_CALL (Google forwarding number):**
+Google-native call tracking. These are the most reliable action type and rarely break without an account-level change. Confirm via GAQL:
+```
+SELECT call_view.call_tracking_display_name, call_view.duration_seconds, call_view.call_status,
+       segments.date
+FROM call_view
+ORDER BY segments.date DESC
+LIMIT 30
+```
+If call_view returns records, Google forwarding is active and confirmed working. If it returns nothing despite call extensions being live, the call extension itself may be missing a Google forwarding number.
+
+**UPLOAD_CLICKS (third-party call tracking platform — CallRail, CTM, etc.):**
+These platforms upload call data to Google Ads via the offline conversions API. Two common silent failure modes:
+1. **No Lead Rule configured**: the integration is connected but has no criteria for what constitutes a conversion. It silently uploads nothing. Fix: add a qualifying filter (e.g., call duration > 60 seconds) in the platform's Google Ads integration settings.
+2. **GCLID not being captured**: if the landing page doesn't capture and store the GCLID parameter from the ad click, the platform cannot attribute the call back to Google Ads. Enhanced Conversions (matching by phone number) is the fallback — check whether it is enabled in both Google Ads and the call tracking platform.
+
+---
+
+**Step 5: After the fix — Smart Bidding relearning**
+
+If the tracking failure affected a campaign running Maximize Conversions or tCPA:
+
+The algorithm has been operating on incomplete or absent conversion signals. After the tracking fix, the algorithm must relearn. This takes 2–4 weeks. During this window:
+- Hold bid strategy and targets constant — do not adjust in response to apparently poor performance
+- The apparent CPA may worsen temporarily as the algorithm recalibrates
+- A "conversion drop" that coincides with a tracking fix being deployed is the algorithm catching up, not a new failure
+
+> *This is the Smart Bidding Post-Tracking-Fix Protocol from SKILL.md. Do not deviate from it.*
+
+---
+
 ## Sub-Trees
 
 ---
@@ -493,7 +597,12 @@ Rank is the constraint. Rank = Quality Score × bid. Spending more money on bids
 Fix QS first (free improvement), then evaluate whether budget increase is warranted after rank improves. Addressing budget before rank just throws money at an auction you're losing on merit.
 
 **Neither is elevated, but IS is low:**
-This means the campaign is entering auctions but isn't getting many of them — unusual. Check whether geographic or audience targeting is more restrictive than intended, or whether the keyword pool is extremely narrow.
+This means the campaign is entering auctions but isn't getting many of them — unusual. Two hypotheses: targeting is more restrictive than intended, or the keyword pool is extremely narrow.
+
+Pull: GAQL 3.4 (keyword-level impressions). If most or all keywords have near-zero impressions, the keyword pool is the constraint — flag for keyword expansion or match type review (exact match on hyper-specific terms in small markets can produce genuine near-zero traffic). If keywords have impressions but campaign IS is still low, check geographic and audience targeting settings.
+
+> ⚠️ **BLIND SPOT — Geographic targeting inclusions/exclusions and audience lists are not easily readable via GAQL**
+> → Please share a screenshot of the campaign's Locations settings and Audiences tab to confirm whether targeting is inadvertently too narrow.
 
 ---
 
@@ -518,6 +627,8 @@ Google has assessed that the landing page doesn't deliver what the ad promises, 
 
 > ⚠️ **BLIND SPOT — Landing page quality cannot be assessed via API**
 > → Please share a screenshot of the landing page receiving traffic from this campaign. Assess: Does the page content match what the ad says? Is there a visible CTA? Does the keyword theme appear in the page headline? Is the page functional on mobile?
+
+*[Toby version]: Check `account-notes/[account].md`. If LP quality was flagged as BELOW_AVERAGE in a prior session and remains unresolved, escalate to P1. Note explicitly: bid strategy adjustments, keyword changes, and QS optimization have limited leverage while landing page quality is the binding constraint. The account can improve most other things and still underperform if the LP is not addressed.*
 
 **Multiple components are BELOW_AVERAGE:**
 Address in order: landing page first (highest impact, foundational), then ad relevance (structural fix), then CTR (copy optimization). Don't optimize ad copy on a broken landing page.
