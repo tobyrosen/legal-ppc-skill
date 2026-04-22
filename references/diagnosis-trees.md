@@ -190,7 +190,7 @@ Pull: GAQL 3.3 or 3.4 (keyword performance) for the affected campaigns. Look at 
 
 - **CVR is the dominant driver**: the cost per click may be reasonable but the traffic isn't converting. Move to Tree 1 (Conversions Low), Step 3 and 4.
 
-- **Both CPC and CVR are problems**: address in order — fix conversion tracking and landing page issues first (higher leverage), then address CPC through QS improvements.
+- **Both CPC and CVR are problems**: address in order. Move to Tree 1, Steps 3–4 first (diagnose CVR: conversion tracking, landing page, audience quality). After CVR is addressed, return here and move to Sub-tree B to diagnose the CPC/QS side. Don't optimize CPC on a broken conversion funnel.
 
 ---
 
@@ -266,6 +266,18 @@ In some accounts, ad scheduling restrictions are too aggressive — campaigns ar
 ### Tree 4: Performance Dropped — Something Changed
 
 **Entry:** The brief is "something is wrong" — performance was acceptable and now isn't. The most common brief. The most variable tree.
+
+---
+
+**Step 0: Confirm performance is actually off**
+
+Pull: GAQL 6.2 (90-day campaign performance), GAQL 6.3 (weekly segmented performance)
+
+Compare the current period (last 14–30 days) to the 90-day baseline. State the verdict explicitly before proceeding:
+- **CPA and CVR are materially worse than baseline**: performance is genuinely down. Continue.
+- **Metrics are within normal week-to-week variance**: the "feels off" perception may reflect a single bad week or a volatile metric, not a real trend. Report this finding first. Don't run a full diagnostic on normal variance.
+
+This step protects against over-diagnosing healthy accounts. It also establishes the baseline needed for every downstream diagnostic comparison in this tree.
 
 ---
 
@@ -402,6 +414,77 @@ The output of a first-review session is a prioritized findings list, not a to-do
 
 ---
 
+### Tree 6: Search Term Waste / Negative Keyword Gaps
+
+**Entry:** The brief is specifically about search term quality — mining for negatives, reviewing match type behavior, or investigating wasted spend on irrelevant queries.
+
+---
+
+**Step 0 (Mandatory): Establish coverage ratio before touching search term data**
+
+Pull: GAQL 13.1 (actual campaign spend), then GAQL 13.2 per active campaign (visible STV spend)
+
+Compute coverage ratio. State it before proceeding:
+> "Search term data covers $X of $Y actual spend (Z%). The hidden ~[100-Z]% is the Google Ads API ceiling — not fixable through query splitting."
+
+Do not present any findings, waste estimates, or negative keyword recommendations until this ratio is on the table. Scale all dollar estimates by the coverage ratio.
+
+---
+
+**Step 1: Pull search terms**
+
+Pull: GAQL 4.1 (30-day, sorted by cost), GAQL 4.2 (90-day, sorted by impressions)
+
+Use both windows. The 30-day view surfaces what's spending money now. The 90-day view surfaces high-impression irrelevant terms that may not cost much individually but erode impression share and budget over time.
+
+---
+
+**Step 2: Classify each high-cost or high-impression term**
+
+For each term, the classification is: relevant, irrelevant, or ambiguous.
+
+**Relevant**: query that a prospective client of this firm would plausibly use. Keep or add as keyword.
+**Irrelevant**: clearly outside the firm's practice area, geography, or client type. Add as negative at the appropriate level.
+**Ambiguous**: could be a prospect but intent is unclear. Flag for review — don't add as negative without further consideration.
+
+Before applying any negative library categories, check account notes for market-specific funnel exceptions. Some accounts have practice areas or markets where standard informational intent negatives would block real prospects (e.g., NC family law long-consideration-window, tenant/landlord overlap in partition law, elder abuse informational queries). The negative library is a starting point, not a universal rule.
+
+Cross-reference against the negative keyword library categories:
+- Price/affordability signals (Section 1)
+- Employment/career signals (Section 2)
+- Self-help/DIY intent (Section 3)
+- Research/informational intent (Section 4) — *check account notes for market exceptions before applying*
+- Practice area cross-contamination (Section 5)
+
+---
+
+**Step 3: Check what's already blocked**
+
+Pull: GAQL 9.1 (shared negative lists), GAQL 9.2 (contents of shared lists), GAQL 9.3 (campaign negatives), GAQL 9.4 (ad group negatives)
+
+Don't recommend negatives that are already in place. Identify structural gaps — categories from the negative keyword library that are entirely absent from the account's existing negative structure.
+
+---
+
+**Step 4: Identify the match type generating waste**
+
+If a significant portion of irrelevant search terms are triggered by phrase or exact match keywords, the problem is keyword selection, not match type. If they're triggered by broad match keywords, that confirms the knowledge base position on broad match in legal.
+
+Pull: GAQL 3.2 (match type distribution). Note which match types are associated with the worst-performing search terms.
+
+---
+
+**Step 5: Organize negative keyword recommendations by scope**
+
+Output should be organized as:
+- **Account-level additions** (irrelevant to everything the firm does)
+- **Campaign-level additions** (irrelevant to this practice area or geography but not universally)
+- **Ad group-level additions** (narrowly irrelevant to this specific keyword cluster)
+
+Produce in the upload format from the negative keyword library (phrase match by default, exact match where appropriate).
+
+---
+
 ### Tree 7: Conversion Tracking Failure / Sudden Drop
 
 **Entry:** Conversions dropped suddenly — especially to near-zero or zero — within a defined recent window, without an obvious account change. The brief is typically "tracking looks broken" or "conversions dropped 10 days ago."
@@ -487,75 +570,6 @@ The algorithm has been operating on incomplete or absent conversion signals. Aft
 
 ---
 
-### Tree 6: Search Term Waste / Negative Keyword Gaps
-
-**Entry:** The brief is specifically about search term quality — mining for negatives, reviewing match type behavior, or investigating wasted spend on irrelevant queries.
-
----
-
-**Step 0 (Mandatory): Establish coverage ratio before touching search term data**
-
-Pull: GAQL 13.1 (actual campaign spend), then GAQL 13.2 per active campaign (visible STV spend)
-
-Compute coverage ratio. State it before proceeding:
-> "Search term data covers $X of $Y actual spend (Z%). The hidden ~[100-Z]% is the Google Ads API ceiling — not fixable through query splitting."
-
-Do not present any findings, waste estimates, or negative keyword recommendations until this ratio is on the table. Scale all dollar estimates by the coverage ratio.
-
----
-
-**Step 1: Pull search terms**
-
-Pull: GAQL 4.1 (30-day, sorted by cost), GAQL 4.2 (90-day, sorted by impressions)
-
-Use both windows. The 30-day view surfaces what's spending money now. The 90-day view surfaces high-impression irrelevant terms that may not cost much individually but erode impression share and budget over time.
-
----
-
-**Step 2: Classify each high-cost or high-impression term**
-
-For each term, the classification is: relevant, irrelevant, or ambiguous.
-
-**Relevant**: query that a prospective client of this firm would plausibly use. Keep or add as keyword.
-**Irrelevant**: clearly outside the firm's practice area, geography, or client type. Add as negative at the appropriate level.
-**Ambiguous**: could be a prospect but intent is unclear. Flag for review — don't add as negative without further consideration.
-
-Cross-reference against the negative keyword library categories:
-- Price/affordability signals (Section 1)
-- Employment/career signals (Section 2)
-- Self-help/DIY intent (Section 3)
-- Research/informational intent (Section 4)
-- Practice area cross-contamination (Section 5)
-
----
-
-**Step 3: Check what's already blocked**
-
-Pull: GAQL 9.1 (shared negative lists), GAQL 9.2 (contents of shared lists), GAQL 9.3 (campaign negatives), GAQL 9.4 (ad group negatives)
-
-Don't recommend negatives that are already in place. Identify structural gaps — categories from the negative keyword library that are entirely absent from the account's existing negative structure.
-
----
-
-**Step 4: Identify the match type generating waste**
-
-If a significant portion of irrelevant search terms are triggered by phrase or exact match keywords, the problem is keyword selection, not match type. If they're triggered by broad match keywords, that confirms the knowledge base position on broad match in legal.
-
-Pull: GAQL 3.2 (match type distribution). Note which match types are associated with the worst-performing search terms.
-
----
-
-**Step 5: Organize negative keyword recommendations by scope**
-
-Output should be organized as:
-- **Account-level additions** (irrelevant to everything the firm does)
-- **Campaign-level additions** (irrelevant to this practice area or geography but not universally)
-- **Ad group-level additions** (narrowly irrelevant to this specific keyword cluster)
-
-Produce in the upload format from the negative keyword library (phrase match by default, exact match where appropriate).
-
----
-
 ## Sub-Trees
 
 ---
@@ -578,7 +592,12 @@ Rank is the constraint. Rank = Quality Score × bid. Spending more money on bids
 Fix QS first (free improvement), then evaluate whether budget increase is warranted after rank improves. Addressing budget before rank just throws money at an auction you're losing on merit.
 
 **Neither is elevated, but IS is low:**
-This means the campaign is entering auctions but isn't getting many of them — unusual. Check whether geographic or audience targeting is more restrictive than intended, or whether the keyword pool is extremely narrow.
+This means the campaign is entering auctions but isn't getting many of them — unusual. Two hypotheses: targeting is more restrictive than intended, or the keyword pool is extremely narrow.
+
+Pull: GAQL 3.4 (keyword-level impressions). If most or all keywords have near-zero impressions, the keyword pool is the constraint — flag for keyword expansion or match type review (exact match on hyper-specific terms in small markets can produce genuine near-zero traffic). If keywords have impressions but campaign IS is still low, check geographic and audience targeting settings.
+
+> ⚠️ **BLIND SPOT — Geographic targeting inclusions/exclusions and audience lists are not easily readable via GAQL**
+> → Please share a screenshot of the campaign's Locations settings and Audiences tab to confirm whether targeting is inadvertently too narrow.
 
 ---
 
