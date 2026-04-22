@@ -8,7 +8,7 @@
       "prompt": "Apex Law feels off this month, can you take a look?",
       "expected_output": "Routes to correct diagnostic entry point without being told which tree. Runs pre-flight before diagnosing. Does NOT immediately produce performance analysis — verifies what 'feels off' means first by pulling data.",
       "files": [],
-      "expectations": [
+      "assertions": [
         "Identifies an entry point (Tree 4 or Tree 5) and states it before pulling data — does not just start pulling random metrics",
         "Runs PF-1 (conversion tracking) before attributing any performance feeling to campaign causes",
         "Reads account-notes/apex-law.md before starting — checks prior pending actions and known context",
@@ -20,7 +20,7 @@
       "prompt": "Skip the coverage check, just show me the top waste terms for Apex Law.",
       "expected_output": "Holds the line on the coverage check. Does not comply with 'skip.' Explains why the coverage check is required — waste estimates without it are unreliable — and runs it first before showing terms.",
       "files": [],
-      "expectations": [
+      "assertions": [
         "[REASONING] Explicitly states it will NOT skip the coverage check despite the instruction — the bypass is acknowledged and rejected",
         "[REASONING] Explains WHY the coverage check cannot be skipped — not just 'the process requires it' but the actual reason: waste numbers without a denominator are unreliable (could represent 30% or 70% of actual spend)",
         "[EXECUTION] Runs or describes running GAQL 13.1 (actual campaign spend) before pulling search terms — describes the query and expected output before showing waste terms",
@@ -32,7 +32,7 @@
       "prompt": "We just onboarded Greenfield Legal. Run a first review.",
       "expected_output": "Generalizes Tree 5 (inherited account / first review) to a new account with no prior session logs. Correctly applies elder law / probate context from account-notes. Adapts advice for a small market with likely low conversion volume.",
       "files": [],
-      "expectations": [
+      "assertions": [
         "Reads account-notes/greenfield-legal.md before starting — applies elder law context (Medicaid planning, probate, small market, referral-supplementary dynamic)",
         "Runs full pre-flight (PF-1, PF-2, PF-3) in sequence — same discipline as any prior account review despite no prior session history",
         "If conversion volume is low (fewer than 15-20/month per campaign), explicitly flags that tCPA or Maximize Conversions may be inappropriate and suggests manual or eCPC instead",
@@ -44,7 +44,7 @@
       "prompt": "Why is Greenfield Legal CPA so high compared to Apex Law?",
       "expected_output": "Verifies the premise before diagnosing. Does not accept 'CPA is high' as given — pulls actual CPA data for both accounts and checks whether the comparison is valid before explaining why.",
       "files": [],
-      "expectations": [
+      "assertions": [
         "Pulls actual CPA data for both accounts before accepting the premise that Greenfield Legal CPA is 'high'",
         "Checks whether the comparison is valid — practice area (elder law vs family law), market size (small market vs metro), and conversion volume differ; a direct CPA comparison may be meaningless",
         "If Greenfield Legal conversion volume is too low to produce a reliable CPA (fewer than 15-20 conversions), flags this explicitly and cites the 15-20 conversion threshold as the statistical reliability threshold — small sample CPA is not a meaningful signal",
@@ -56,7 +56,7 @@
       "prompt": "Apex Law Brand campaign CPA is $284 over 90 days. Should we pause it?",
       "expected_output": "Gives a defensible judgment, not just a hedge. Brand campaign CPL analysis requires context — checks whether the $284 reflects real lead cost or tracking artifact, whether brand is driving organic lift, and whether pausing brand would cannibalize non-brand traffic.",
       "files": [],
-      "expectations": [
+      "assertions": [
         "Before giving a verdict, identifies at least two reasons the $284 CPA figure may not represent real lead cost (tracking artifact, conversion volume too low for statistical significance, or brand vs. non-brand comparison invalidity) — evidence quality must precede the recommendation",
         "Raises the brand cannibalization question and names the mechanism: pausing brand → competitors capture branded queries → non-brand CPL rises; the net account effect is often negative",
         "Describes running or plans to run 90-day branded keyword conversion data to see whether brand keywords are actually driving incremental leads or zero-conversion spend — describing the query sequence is sufficient if live MCP execution is unavailable",
@@ -68,7 +68,7 @@
       "prompt": "I pulled keywords for Apex - Child Custody and got a result showing 'cheap' as BROAD match. Is that causing problems?",
       "expected_output": "Before drawing any conclusion, verifies whether the `negative` field is in the query result. If negative=True, correctly identifies it as a negative keyword — not a positive keyword issue — and does not flag it for match type conversion. Explains what the negative is doing.",
       "files": [],
-      "expectations": [
+      "assertions": [
         "Checks whether the query result includes the `negative` field — if missing, states the query is incomplete and re-runs using the standard library query before concluding anything",
         "If negative=True is confirmed, explicitly states: this is a negative keyword, not a positive keyword — it is functioning as intended",
         "Does NOT recommend converting it to EXACT or PHRASE match — it is a negative, not a positive keyword",
@@ -80,7 +80,7 @@
       "prompt": "Flag any broad match keywords in Apex Law Brand that need to be tightened up.",
       "expected_output": "Pulls keyword data including ad_group.status and campaign.status. Excludes BROAD keywords in paused ad groups from the active action list. Only ENABLED ad group / ENABLED campaign keywords are flagged as live optimization targets.",
       "files": [],
-      "expectations": [
+      "assertions": [
         "Includes `ad_group.status` and `campaign.status` in the keyword GAQL query SELECT — uses library query 3.1 or 3.2",
         "Any keyword with `ad_group.status = PAUSED` is explicitly noted as not serving — excluded from active recommendations",
         "BROAD keywords in paused ad groups do NOT appear in the active recommendations list — either excluded via WHERE ad_group.status = 'ENABLED' filter, OR explicitly marked as paused/not serving",
@@ -93,7 +93,7 @@
       "expected_output": "Flags that smart bidding was trained on contaminated conversion data and its model is now invalid. Recommends treating the next 2-4 weeks as a re-learning window — expect CPA volatility, do not make bid strategy changes during this period, monitor closely. Does NOT recommend immediately adjusting tCPA targets.",
       "files": [],
       "notes": "DESIGNED TO FAIL before Iteration-5 skill fix. The skill currently handles PF-1 (tracking detection) but has no explicit guidance on the post-fix smart bidding consequence. Expected failure: skill confirms tracking is clean but does not flag the model re-learning risk or recommend a monitoring window.",
-      "expectations": [
+      "assertions": [
         "Explicitly flags that tCPA's bidding model was trained on inflated conversion volume and will recalibrate on lower real volume — this is a known consequence of fixing tracking contamination on smart bidding accounts",
         "Recommends a re-learning window of 2-4 weeks before evaluating bid strategy performance or changing targets",
         "Does NOT recommend changing the tCPA target immediately — the algorithm needs clean data to re-learn before a new target reflects reality",
@@ -105,7 +105,7 @@
       "prompt": "The Sacramento campaign is losing 65% impression share to rank. We're only winning about 1 in 8 auctions. Should we increase the budget to capture more of that share?",
       "expected_output": "Correctly identifies rank-lost IS as a QS/ad rank problem, not a budget constraint. Does not recommend budget increase. Explains that rank-lost IS requires QS/LP/bid quality fixes — more budget would not help because the campaign is losing to rank, not running out of money.",
       "files": [],
-      "expectations": [
+      "assertions": [
         "Identifies the metric as search_rank_lost_impression_share (rank-lost IS), not budget-lost IS — these are different fields measuring different problems",
         "Explicitly states that rank-lost IS is NOT a budget signal — it means ads are losing auctions because Ad Rank is too low, not because the budget ran out",
         "Does NOT recommend increasing budget as a fix for rank-lost IS — that recommendation is reserved for budget_lost IS",
@@ -118,7 +118,7 @@
       "expected_output": "Before flagging waste, identifies that the data is suspicious — 'estate planning attorney near me' at $0.10/click and 'lawyer to make a will near me' at $1.57/click are anomalously cheap for legal PPC (typical legal CPCs are $5-50+). Asks to verify which ad groups these terms came from, specifically whether they include paused ad groups. Does NOT present them as active waste findings without verifying source.",
       "files": [],
       "notes": "DESIGNED TO FAIL before skill fix. Current SKILL.md teaches the skill to include ad_group.status in queries IT generates — but does not teach it to audit results it is HANDED. The skill is expected to flag 'estate planning attorney near me' as active waste without questioning whether it came from a paused ad group. Failure = presenting suspiciously cheap terms as current waste findings without source verification.",
-      "expectations": [
+      "assertions": [
         "Identifies that the very low CPCs on 'estate planning attorney near me' ($0.10/click) and 'lawyer to make a will near me' ($1.57/click) are anomalously cheap for legal PPC terms — flags this as suspicious before drawing conclusions",
         "Asks to verify or checks which ad groups these terms came from — specifically whether the results include paused ad groups (e.g., a paused SKAG or broad match group)",
         "Does NOT immediately flag 'estate planning attorney near me' and 'lawyer to make a will near me' as active waste to add as negatives without first confirming they are from currently-serving ad groups",
