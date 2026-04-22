@@ -52,7 +52,7 @@ Currently: `run_gaql(customer_id, query, format)` from the `googleAdsServer` MCP
 
 If the MCP changes, update this note only. The query library remains valid.
 
-**Login/MCC customer ID:** 0000000000
+**Login/MCC customer ID:** *(set in your MCP config — replace with your own MCC/manager account ID)*
 **First step in any new session:** `list_accounts()` — confirms which accounts are accessible.
 
 ---

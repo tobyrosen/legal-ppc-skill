@@ -51,12 +51,12 @@
     },
     {
       "id": 14,
-      "prompt": "Here are some search terms from Apex Law's Riverside County - Child Custody campaign (last 30 days): 'best child custody lawyer near me' ($67, 2 conversions), 'child custody attorney in charlotte' ($48, 0 conv), 'family court dates target city' ($18, 0 conv), 'can I file for custody without a lawyer' ($22, 0 conv), 'legal aid custody help' (12 impressions, $0 spend). Campaign total spend: $578. What should we do?",
-      "expected_output": "Coverage ratio stated before waste estimates. NC market exception applied to DIY query. Converting term kept. Negatives scoped by level.",
+      "prompt": "Here are some search terms from Apex Law's Child Custody campaign (last 30 days): 'best child custody lawyer near me' ($67, 2 conversions), 'child custody attorney near me' ($48, 0 conv), 'family court dates near me' ($18, 0 conv), 'can I file for custody without a lawyer' ($22, 0 conv), 'legal aid custody help' (12 impressions, $0 spend). Campaign total spend: $578. What should we do?",
+      "expected_output": "Coverage ratio stated before waste estimates. Long-consideration-window market exception applied to DIY query. Converting term kept. Negatives scoped by level.",
       "files": [],
       "expectations": [
         "States coverage ratio ($155 visible / $578 total = ~27%) before presenting any waste estimates or negative recommendations",
-        "Does NOT flag 'can I file for custody without a lawyer' as waste or recommend negating it — applies NC long-consideration-window market exception",
+        "Does NOT flag 'can I file for custody without a lawyer' as waste or recommend negating it — applies long-consideration-window market exception for family law markets",
         "Does NOT recommend pausing or negating 'best child custody lawyer near me' — it is converting and is the only confirmed converting term in the visible dataset",
         "Flags 'legal aid custody help' as an audience-intent mismatch (free/reduced-cost services vs. private firm) and recommends phrase match negative",
         "Negative keyword recommendations include scope designation (account-level vs. campaign-level vs. ad-group-level) — not a flat undifferentiated list",
@@ -67,11 +67,11 @@
     {
       "id": 15,
       "prompt": "Greenfield Legal Medicaid campaign went from about 8 conversions a month to 1 conversion a month, starting about 11 days ago. We haven't touched the account. Account: Greenfield Legal (ID 2222222222), MCC login 0000000000.",
-      "expected_output": "Change history pulled before tag debugging. April 20 cleanup identified as primary hypothesis. Scenario A (count now accurate) vs Scenario B (tag broken) distinguished. No bid changes before tracking verified.",
+      "expected_output": "Change history pulled before tag debugging. Recent tracking cleanup identified as primary hypothesis from account notes. Scenario A (count now accurate) vs Scenario B (tag broken) distinguished. No bid changes before tracking verified.",
       "files": [],
       "expectations": [
         "Opens with GAQL 8.1 or 8.2 (change history) as the first data pull — does NOT jump straight to tag/pixel debugging or conversion action audit",
-        "Identifies the April 20 tracking cleanup (documented in account notes) as the primary hypothesis — not 'broken tag' or 'website change'",
+        "Identifies the recent tracking cleanup (documented in account notes) as the primary hypothesis — not 'broken tag' or 'website change'",
         "Explicitly distinguishes between two sub-scenarios: (A) cleanup corrected inflated count — the 8/month was never real, and (B) a tag broke during cleanup — real leads not recording",
         "Does NOT recommend bid changes, budget changes, or bid strategy changes before tracking root cause is confirmed",
         "Names the Smart Bidding relearning period as a factor: sudden signal drop causes algorithm to throttle, do not touch strategy during relearning"
