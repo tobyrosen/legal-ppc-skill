@@ -57,6 +57,9 @@ Look for multiple actions of the same type with similar names and `include_in_co
 **What attribution model is being used?**
 Data-driven attribution is fine for accounts with volume. Last-click is acceptable. Time-decay is acceptable. Position-based is unusual for legal. Flag any attribution model that seems inconsistent with how the firm's intake process actually works.
 
+**Is Enhanced Conversions for Leads configured?**
+Enhanced Conversions for Leads hashes and matches first-party contact data (email, phone) submitted in forms, enabling more accurate and durable cross-device attribution. It is Google's current recommended tracking upgrade for form submissions in legal. Check whether it is enabled in the Google Ads conversion settings. An account without it is missing an increasingly standard signal quality improvement — flag as a P2 recommendation on first review.
+
 ---
 
 ### PF-2: Structural Red Flags
@@ -622,6 +625,8 @@ Google has assessed that the landing page doesn't deliver what the ad promises, 
 
 > ⚠️ **BLIND SPOT — Landing page quality cannot be assessed via API**
 > → Please share a screenshot of the landing page receiving traffic from this campaign. Assess: Does the page content match what the ad says? Is there a visible CTA? Does the keyword theme appear in the page headline? Is the page functional on mobile?
+
+*[Toby version]: Check `account-notes/[account].md`. If LP quality was flagged as BELOW_AVERAGE in a prior session and remains unresolved, escalate to P1. Note explicitly: bid strategy adjustments, keyword changes, and QS optimization have limited leverage while landing page quality is the binding constraint. The account can improve most other things and still underperform if the LP is not addressed.*
 
 **Multiple components are BELOW_AVERAGE:**
 Address in order: landing page first (highest impact, foundational), then ad relevance (structural fix), then CTR (copy optimization). Don't optimize ad copy on a broken landing page.

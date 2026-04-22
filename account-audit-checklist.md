@@ -25,6 +25,7 @@ These run before anything else. Pre-flight findings take priority over every oth
 - [ ] `counting_type = ONE_PER_CLICK` for lead-type conversions (not MANY_PER_CLICK)
 - [ ] Attribution model is appropriate (DDA or Last Click acceptable; flag unusual models)
 - [ ] If a third-party call tracking platform is in use (CallRail, CTM, etc.): confirm a Lead Rule or equivalent qualifying filter is configured — without it the integration is a silent no-op
+- [ ] Enhanced Conversions for Leads is configured (Google's recommended upgrade for form submission tracking — hashes contact data for cross-device matching; flag as P2 if absent)
 
 **Blind spot:** Tag firing cannot be confirmed via API. If conversions are zero despite meaningful clicks, request GTM or GA4 debug view screenshot.
 
