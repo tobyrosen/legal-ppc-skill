@@ -494,6 +494,8 @@ Produce in the upload format from the negative keyword library (phrase match by 
 
 This is not the same as "conversions are generally low" (Tree 1) — that is a performance problem. This is a measurement problem. Until it is confirmed or ruled out, no other analysis is meaningful.
 
+**Pre-flight ordering exception:** For Tree 7, run PF-3 (change history) before PF-1 and PF-2. The standard pre-flight order exists because tracking integrity is the foundation of all other analysis — but here, the presenting symptom IS a tracking failure, so tag debugging (PF-1) is not a foundation check, it is the diagnosis itself. Change history answers the prior question: did something actually change? If nothing changed, then PF-1's tag checks are the right next step. If something did change, that discovery shapes everything that follows. Run PF-3 first, then PF-1.
+
 ---
 
 **Step 1: Read change history for the relevant window**
