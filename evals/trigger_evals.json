@@ -1,0 +1,102 @@
+{
+  "skill_name": "google-ads-analysis",
+  "description": "Trigger reliability evals. Tests whether the skill activates on relevant prompts (should-trigger) and stays dormant on adjacent prompts (should-not-trigger). Separate from output quality testing in evals.json and evals_v2.json.",
+  "evals": [
+    {
+      "id": "T1",
+      "type": "should-trigger",
+      "prompt": "Run a full account review on our Google Ads account.",
+      "rationale": "Explicit Google Ads mention + audit intent — clearest possible trigger."
+    },
+    {
+      "id": "T2",
+      "type": "should-trigger",
+      "prompt": "Our CPA has gone up a lot this month. Can you take a look?",
+      "rationale": "Implicit trigger — no mention of Google Ads, but CPA is a PPC metric. Should activate."
+    },
+    {
+      "id": "T3",
+      "type": "should-trigger",
+      "prompt": "Leads are down this week compared to last week. What's going on?",
+      "rationale": "Implicit trigger — no platform named. In a law firm PPC context, this routes to Google Ads diagnosis."
+    },
+    {
+      "id": "T4",
+      "type": "should-trigger",
+      "prompt": "This account feels off. Can you dig in?",
+      "rationale": "Vague brief but PPC-context phrase. Listed as trigger phrase in prior description — should still activate."
+    },
+    {
+      "id": "T5",
+      "type": "should-trigger",
+      "prompt": "Do a search term review for the last 30 days.",
+      "rationale": "Search term review is a Google Ads task. Implicit activation without naming the platform."
+    },
+    {
+      "id": "T6",
+      "type": "should-trigger",
+      "prompt": "Why is this campaign not spending? We have a $200/day budget but it's only using $40.",
+      "rationale": "Campaign spend underdelivery is a Google Ads diagnosis task. No platform named but unambiguously PPC."
+    },
+    {
+      "id": "T7",
+      "type": "should-trigger",
+      "prompt": "Run a GAQL query to pull 30-day campaign performance.",
+      "rationale": "GAQL is Google Ads-specific. Should trigger immediately."
+    },
+    {
+      "id": "T8",
+      "type": "should-trigger",
+      "prompt": "Check if our conversion tracking is set up correctly.",
+      "rationale": "Implicit — conversion tracking audit is a core skill task. No platform named but routing is clear in law firm PPC context."
+    },
+    {
+      "id": "T9",
+      "type": "should-trigger",
+      "prompt": "We just onboarded a new client — can you do a first review of their account?",
+      "rationale": "New account audit (Tree 5). No platform named but 'account' in law firm PPC agency context = Google Ads."
+    },
+    {
+      "id": "T10",
+      "type": "should-trigger",
+      "prompt": "What's our impression share looking like and why are we losing auctions?",
+      "rationale": "Impression share is a Google Ads metric. Should trigger even without the platform name."
+    },
+    {
+      "id": "T11",
+      "type": "should-not-trigger",
+      "prompt": "Write a Facebook ad for our family law campaign targeting divorced adults 35-55.",
+      "rationale": "Facebook/Meta ads — explicitly different platform. Skill covers Google Ads only."
+    },
+    {
+      "id": "T12",
+      "type": "should-not-trigger",
+      "prompt": "Can you help me write a blog post about child custody laws in Michigan?",
+      "rationale": "Content creation / SEO — no PPC context. Should not activate."
+    },
+    {
+      "id": "T13",
+      "type": "should-not-trigger",
+      "prompt": "Pull our AgencyAnalytics report for this month and format it for the client.",
+      "rationale": "Client reporting via AgencyAnalytics — explicitly excluded in skill description."
+    },
+    {
+      "id": "T14",
+      "type": "should-not-trigger",
+      "prompt": "What keywords should we target for a new immigration law campaign?",
+      "rationale": "Keyword research for a new campaign — excluded. Skill covers diagnosis and optimization, not campaign creation."
+    },
+    {
+      "id": "T15",
+      "type": "should-not-trigger",
+      "prompt": "Can you improve the SEO on our landing page? We need better organic rankings.",
+      "rationale": "SEO — explicitly excluded in skill description."
+    },
+    {
+      "id": "T16",
+      "type": "should-not-trigger",
+      "prompt": "Set up a new Google Ads campaign for our personal injury practice.",
+      "rationale": "Campaign creation — excluded. Even though Google Ads is named, the task is creation not analysis."
+    }
+  ]
+}
