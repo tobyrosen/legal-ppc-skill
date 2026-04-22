@@ -38,7 +38,7 @@ Legal search intent is layered and often misread. Someone searching "how to get 
 
 **What looks like waste in legal but often isn't:**
 
-Informational and research queries in legal carry higher buyer intent than they do in most verticals. The research phase precedes hiring an attorney — it does not substitute for it. Someone searching "how much does a partition lawsuit cost" or "can I force my co-owner to sell" has a real problem, is actively researching it, and may be a week away from calling. These are buyers in the early stage of their decision process, not DIY researchers who will never hire anyone.
+Informational and research queries in legal carry higher buyer intent than they do in most verticals. The research phase precedes hiring an attorney — it does not substitute for it. Someone searching "how much does a divorce cost in Michigan" or "can I get deported for a DUI in Arizona" has a real problem, is actively researching it, and may be a week away from calling. These are buyers in the early stage of their decision process, not DIY researchers who will never hire anyone.
 
 Specific query patterns that should NOT be flagged as waste by default:
 - **Cost/fee queries** ("how much does X cost", "attorney fees for X") — comparison shopping before hiring. High buyer intent in legal.
@@ -47,9 +47,9 @@ Specific query patterns that should NOT be flagged as waste by default:
 
 The instinct to block research queries because they're not transactional is correct in e-commerce and wrong in legal. Apply it cautiously.
 
-**Lead magnets and e-book downloads as real leads:** In legal, free guides, e-books, and checklists are genuine lead capture mechanisms. A person who downloads a partition law guide and submits their contact information has self-identified as someone with a partition problem — they are a lead, not a content consumer. If a client uses resource downloads as primary conversions in an account, this is intentional strategy. Do not suggest moving them to secondary conversions or question their value without strong evidence they are not being followed up on.
+**Lead magnets and e-book downloads as real leads:** In legal, free guides, e-books, and checklists are genuine lead capture mechanisms. A person who downloads a divorce guide and submits their contact information has self-identified as someone with a divorce problem — they are a lead, not a content consumer. If a client uses resource downloads as primary conversions in an account, this is intentional strategy. Do not suggest moving them to secondary conversions or question their value without strong evidence they are not being followed up on.
 
-**Practice-area-dependent intent:** Relevance is practice-area-specific. A query that is unambiguously waste for one firm is often a core lead source for another. "Tenant attorney" is waste for a criminal defense firm; it is a core lead source for a partition law firm where tenants in common co-ownership disputes are the primary case type. Before flagging a term category as waste, verify that the firm does not handle that case type. Check account notes first — if no notes exist, ask before recommending a negative.
+**Practice-area-dependent intent:** Relevance is practice-area-specific. A query that is unambiguously waste for one firm is often a core lead source for another. "Wage theft attorney" is waste for a criminal defense firm; it is a core lead source for an employment law firm. Before flagging a term category as waste, verify that the firm does not handle that case type. Check account notes first — if no notes exist, ask before recommending a negative.
 
 ### Geography and Topic as Strategy
 

@@ -450,7 +450,7 @@ For each term, the classification is: relevant, irrelevant, or ambiguous.
 **Irrelevant**: clearly outside the firm's practice area, geography, or client type. Add as negative at the appropriate level.
 **Ambiguous**: could be a prospect but intent is unclear. Flag for review — don't add as negative without further consideration.
 
-Before applying any negative library categories, check account notes for market-specific funnel exceptions. Some accounts have practice areas or markets where standard informational intent negatives would block real prospects (e.g., NC family law long-consideration-window, tenant/landlord overlap in partition law, elder abuse informational queries). The negative library is a starting point, not a universal rule.
+Before applying any negative library categories, check account notes for market-specific funnel exceptions. Some accounts have practice areas or markets where standard informational intent negatives would block real prospects (e.g., NC family law long-consideration-window, immigration procedural queries in Arizona, elder abuse informational queries). The negative library is a starting point, not a universal rule.
 
 Cross-reference against the negative keyword library categories:
 - Price/affordability signals (Section 1)

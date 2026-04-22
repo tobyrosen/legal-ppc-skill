@@ -87,7 +87,7 @@ Negative keyword libraries, search intent guidance, and diagnostic priors for:
 - Elder law (Medicaid planning, conservatorship)
 - Personal injury
 - Criminal defense
-- Real estate / partition law
+- Real estate / landlord-tenant
 
 ---
 
