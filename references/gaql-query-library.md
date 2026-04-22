@@ -168,12 +168,15 @@ SELECT
   ad_group_criterion.effective_cpc_bid_micros
 FROM ad_group_criterion
 WHERE ad_group_criterion.type = 'KEYWORD'
+  AND ad_group_criterion.negative = FALSE
   AND ad_group_criterion.status = 'ENABLED'
   AND campaign.status = 'ENABLED'
   AND ad_group.status = 'ENABLED'
 ORDER BY campaign.name, ad_group.name
 ```
 **What to look for:** Quality scores below 5 on important keywords — check which QS component is below average (`BELOW_AVERAGE`): `search_predicted_ctr` = ad copy problem; `creative_quality_score` = ad relevance problem; `post_click_quality_score` = landing page problem.
+
+**Required filter:** `ad_group_criterion.negative = FALSE` is mandatory. `ad_group_criterion` returns both positive and negative keywords — omitting this filter causes ad-group-level negatives to appear as positive keywords, producing false BROAD match flags and misidentified waste (P6).
 
 ---
 
@@ -204,12 +207,15 @@ SELECT
   ad_group_criterion.status
 FROM ad_group_criterion
 WHERE ad_group_criterion.type = 'KEYWORD'
+  AND ad_group_criterion.negative = FALSE
   AND ad_group_criterion.status != 'REMOVED'
   AND campaign.status = 'ENABLED'
   AND ad_group.status = 'ENABLED'
 ORDER BY campaign.name, ad_group_criterion.keyword.match_type
 ```
 **What to look for:** Any `BROAD` match type keywords outside of a deliberate SKAG test structure. Broad match in legal is almost always a mistake.
+
+**Required filter:** `ad_group_criterion.negative = FALSE` is mandatory here for the same reason as 3.1 — negatives have match types too, and without this filter ad-group-level negative BROAD keywords appear as positive BROADs.
 
 ---
 
