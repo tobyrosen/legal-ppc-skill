@@ -89,6 +89,30 @@
         "Does NOT recommend budget increases or bid strategy changes before the auto-applied change hypothesis is evaluated",
         "Establishes baseline comparison (current period vs prior period on a per-day basis) to confirm performance is genuinely down before full diagnostic — does not skip straight to root cause"
       ]
+    },
+    {
+      "id": 17,
+      "prompt": "Here are the keywords for Apex Law's Child Custody campaign. Which broad match keywords should we convert to phrase or exact?\n\n| Keyword | Match Type | QS | Monthly Cost |\n|---|---|---|---|\n| child custody lawyer | BROAD | 5 | $380 |\n| custody attorney near me | PHRASE | 7 | $290 |\n| cheap custody lawyer | BROAD | 3 | $140 |\n| emergency custody help | BROAD | 4 | $95 |\n| how to file for custody | BROAD | 4 | $60 |",
+      "expected_output": "Stops before making any recommendation and flags that the query result is missing the negative field. Requests a re-run using the correct GAQL query (3.1 or 3.2) before proceeding. Does not flag any keyword as a positive match type problem without first confirming it is a positive keyword.",
+      "files": [],
+      "assertions": [
+        "Explicitly flags that the keyword data is missing the `negative` field — states this before drawing any conclusions about which keywords to tighten",
+        "Does NOT recommend converting 'cheap custody lawyer' or any other keyword to a different match type without first confirming it is a positive keyword (not a negative)",
+        "Requests a re-run using GAQL query 3.1 or 3.2 from the library — specifically names the need for the negative field",
+        "Does NOT present a list of broad-to-phrase/exact conversion recommendations based on the incomplete result"
+      ]
+    },
+    {
+      "id": 18,
+      "prompt": "Based on the account notes, Apex Law's Child Custody campaign has been at $89 CPA over the last 30 days — that's from a pull we did on Monday (3 days ago). The campaign is on MaxConv + tCPA at $95. Should we lower the tCPA target to try to get CPA down?",
+      "expected_output": "Refuses to advise on tCPA changes based on account notes alone. States that current CPA requires a live GAQL pull before any bid strategy recommendation. Pulls or describes pulling GAQL 6.1 to establish current CPA. Does not engage with the $89 figure as a current baseline.",
+      "files": [],
+      "assertions": [
+        "Does NOT treat the $89 CPA from account notes as the current baseline — explicitly states that account notes reflect prior state, not current state",
+        "States that a live GAQL query is required before advising on tCPA changes — does not skip to the recommendation based on the stated figure",
+        "Pulls or describes pulling GAQL 6.1 (campaign performance) to establish current CPA before making any bid strategy recommendation",
+        "Does NOT recommend lowering the tCPA target as a direct response to the stated $89 CPA without first verifying current performance via live data"
+      ]
     }
   ]
 }
