@@ -60,13 +60,13 @@ If the MCP changes, update this note only. The query library remains valid.
 
 ## GAQL Query Integrity — Keywords and Search Terms
 
-### Keyword queries (`ad_group_criterion`)
+### Keyword queries (`ad_group_criterion` and `keyword_view`)
 
-The API returns **both positive and negative keywords in the same result set**. Failing to distinguish them causes confirmed misdiagnosis.
+The API returns **both positive and negative keywords in the same result set** — this applies to both `ad_group_criterion` AND `keyword_view` queries. Failing to distinguish them causes confirmed misdiagnosis.
 
 **Mandatory rules before flagging any keyword as an issue:**
 
-1. **Always SELECT `ad_group_criterion.negative`** when querying keywords from `ad_group_criterion`. If this field is missing from your query result, the query is incomplete — re-run using query 3.1 or 3.2 from the GAQL library before drawing any conclusions.
+1. **Always filter `ad_group_criterion.negative = FALSE` in the WHERE clause** of any keyword query, regardless of whether the resource is `ad_group_criterion` or `keyword_view`. If this filter is missing, the result contains negatives mixed with positives — re-run before drawing any conclusions.
 
 2. **Check `negative` before flagging.** If `negative = True`, this keyword is a negative. It is working correctly. Do NOT treat it as a positive match type issue, a quality score problem, or a waste source.
 
@@ -74,7 +74,7 @@ The API returns **both positive and negative keywords in the same result set**. 
 
 4. **Also SELECT `campaign.status`** for the same reason. A keyword in a paused campaign is not a live problem.
 
-**Quick check:** if a keyword query result doesn't have a `negative` column, stop. Re-run the correct query from the library. Do not proceed with analysis on an incomplete result.
+**Quick check:** if a keyword query — from either `ad_group_criterion` or `keyword_view` — does not include `ad_group_criterion.negative = FALSE` in the WHERE clause, stop. Re-run the correct query from the library. Do not proceed with analysis on an incomplete result.
 
 ### Search term queries (`search_term_view`)
 
@@ -150,6 +150,28 @@ Do not present findings, waste estimates, or negative keyword recommendations un
 **What this means for analysis:** waste estimates and conversion totals from search term data represent the visible portion only. Scale dollar figures by the coverage ratio when reporting (e.g., if visible waste is $244 at 54% coverage, estimated total waste is ~$452). Patterns and categories observed in the visible 50% are representative — the hidden 50% is randomly distributed, not systematically different.
 
 **Never recommend blocking a term category solely based on search term data showing zero conversions.** Account-level conversion data (from `FROM campaign`) is authoritative for spend; search term data is a sampling.
+
+---
+
+## Search Partners CPA Distortion — Network Segmentation Required
+
+When a brief presents a CPA figure for a campaign running on **both Search and Search Partners**, that figure is a blended average across two networks with different traffic quality. Search Partners traffic typically converts at a lower rate and higher CPA than Google Search traffic in legal PPC.
+
+**Before drawing any CPA conclusion or recommending any bid change, flag whether the campaign includes Search Partners:**
+
+Pull: GAQL 6.4 or `segments.network` — segment campaign performance by `SEARCH` vs. `SEARCH_PARTNERS`.
+
+If network data is not provided and Search Partners status is unknown:
+- State explicitly: the reported CPA may be a blended figure that includes Search Partners
+- Do not diagnose "CPA is high" or recommend a tCPA change until network split is confirmed
+- The required next step is: pull performance by `segments.network` (clicks, conversions, cost, CPA) for each network separately
+
+**Smart bidding signal risk:** Excluding Search Partners is not a simple win. Removing the Partners network reduces the total conversion signal available to the smart bidding algorithm. If the campaign is near the 15-20 conv/month reliability threshold, excluding Partners may push it into Sub-tree D territory. Always check conversion volume contribution before recommending exclusion.
+
+**Decision framework after pulling network data:**
+- If Search Partners CPA is above target AND Partners conversion volume is small relative to Search → exclusion is reasonable; signal loss is minimal
+- If Search Partners CPA is above target BUT Partners is contributing significant conversion volume → exclusion risk is real; consider whether blended CPA is still on-target if Partners is removed
+- If Search CPA is already on-target → the issue is contained to Partners; exclusion is the likely fix, but confirm volume contribution first
 
 ---
 
