@@ -84,11 +84,15 @@ The API returns **both positive and negative keywords in the same result set** �
 
 1. **Always include `ad_group.status = 'ENABLED'` in the WHERE clause.** Same rule as keyword queries — different query type, same root cause.
 
-2. **Check which ad group a term came from before flagging it.** If `ad_group.status = PAUSED` or `REMOVED`, that term is historical. Do NOT flag it as an active waste source or a current keyword structure problem.
+2. **Always SELECT `search_term_view.status` in every search term query.** If this field is missing from the result, the query is incomplete — re-run using the library query before drawing any conclusions. Do not flag any term as a finding without this field present.
 
-3. **Status field confirms active serving.** The `search_term_view.status` field shows `NONE` for terms from paused groups — another signal to check.
+3. **Never flag a term with `status = NONE` as an active finding.** `NONE` means the term matched historically but is no longer actively served by any keyword. It may be from a period when a broader keyword (e.g., BROAD match) was active and has since been tightened or paused. It is not a current waste source. Confirmed misdiagnosis: "partition action nevada" in Client B (2026-04-27) — flagged as active, was status NONE from a paused BROAD keyword.
 
-**Root cause of both rules:** Google's API scopes data by account and date, not by serving status. Paused ad groups still have historical records. Always filter explicitly.
+4. **Check which ad group a term came from before flagging it.** If `ad_group.status = PAUSED` or `REMOVED`, that term is historical. Do NOT flag it as an active waste source or a current keyword structure problem.
+
+**Quick check:** If a search term query result does not include `search_term_view.status`, stop. Re-run the correct query from the library. Do not proceed with analysis on an incomplete result.
+
+**Root cause:** Google's API scopes data by account and date, not by serving status. Paused ad groups and expired keyword matches still have historical records. Always filter and verify explicitly.
 
 ### Auditing search term data you are handed
 
