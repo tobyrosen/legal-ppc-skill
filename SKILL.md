@@ -60,13 +60,13 @@ If the MCP changes, update this note only. The query library remains valid.
 
 ## GAQL Query Integrity — Keywords and Search Terms
 
-### Keyword queries (`ad_group_criterion`)
+### Keyword queries (`ad_group_criterion` and `keyword_view`)
 
-The API returns **both positive and negative keywords in the same result set**. Failing to distinguish them causes confirmed misdiagnosis.
+The API returns **both positive and negative keywords in the same result set** — this applies to both `ad_group_criterion` AND `keyword_view` queries. Failing to distinguish them causes confirmed misdiagnosis.
 
 **Mandatory rules before flagging any keyword as an issue:**
 
-1. **Always SELECT `ad_group_criterion.negative`** when querying keywords from `ad_group_criterion`. If this field is missing from your query result, the query is incomplete — re-run using query 3.1 or 3.2 from the GAQL library before drawing any conclusions.
+1. **Always filter `ad_group_criterion.negative = FALSE` in the WHERE clause** of any keyword query, regardless of whether the resource is `ad_group_criterion` or `keyword_view`. If this filter is missing, the result contains negatives mixed with positives — re-run before drawing any conclusions.
 
 2. **Check `negative` before flagging.** If `negative = True`, this keyword is a negative. It is working correctly. Do NOT treat it as a positive match type issue, a quality score problem, or a waste source.
 
@@ -74,7 +74,7 @@ The API returns **both positive and negative keywords in the same result set**. 
 
 4. **Also SELECT `campaign.status`** for the same reason. A keyword in a paused campaign is not a live problem.
 
-**Quick check:** if a keyword query result doesn't have a `negative` column, stop. Re-run the correct query from the library. Do not proceed with analysis on an incomplete result.
+**Quick check:** if a keyword query — from either `ad_group_criterion` or `keyword_view` — does not include `ad_group_criterion.negative = FALSE` in the WHERE clause, stop. Re-run the correct query from the library. Do not proceed with analysis on an incomplete result.
 
 ### Search term queries (`search_term_view`)
 
@@ -84,11 +84,15 @@ The API returns **both positive and negative keywords in the same result set**. 
 
 1. **Always include `ad_group.status = 'ENABLED'` in the WHERE clause.** Same rule as keyword queries — different query type, same root cause.
 
-2. **Check which ad group a term came from before flagging it.** If `ad_group.status = PAUSED` or `REMOVED`, that term is historical. Do NOT flag it as an active waste source or a current keyword structure problem.
+2. **Always SELECT `search_term_view.status` in every search term query.** If this field is missing from the result, the query is incomplete — re-run using the library query before drawing any conclusions. Do not flag any term as a finding without this field present.
 
-3. **Status field confirms active serving.** The `search_term_view.status` field shows `NONE` for terms from paused groups — another signal to check.
+3. **Never flag a term with `status = NONE` as an active finding.** `NONE` means the term matched historically but is no longer actively served by any keyword. It may be from a period when a broader keyword (e.g., BROAD match) was active and has since been tightened or paused. It is not a current waste source. Confirmed misdiagnosis: "partition action nevada" in Client B (2026-04-27) — flagged as active, was status NONE from a paused BROAD keyword.
 
-**Root cause of both rules:** Google's API scopes data by account and date, not by serving status. Paused ad groups still have historical records. Always filter explicitly.
+4. **Check which ad group a term came from before flagging it.** If `ad_group.status = PAUSED` or `REMOVED`, that term is historical. Do NOT flag it as an active waste source or a current keyword structure problem.
+
+**Quick check:** If a search term query result does not include `search_term_view.status`, stop. Re-run the correct query from the library. Do not proceed with analysis on an incomplete result.
+
+**Root cause:** Google's API scopes data by account and date, not by serving status. Paused ad groups and expired keyword matches still have historical records. Always filter and verify explicitly.
 
 ### Auditing search term data you are handed
 
@@ -153,6 +157,64 @@ Do not present findings, waste estimates, or negative keyword recommendations un
 
 ---
 
+## QS Throttling — All-BELOW_AVERAGE + Zero Impressions
+
+The Google Ads UI displays a "limited by quality score" label for severely underperforming keywords. The API does not expose this label as a field — `system_serving_status` returns `ELIGIBLE` even for throttled keywords. To diagnose QS throttling via API, use this heuristic:
+
+**Throttled keyword pattern:** QS ≤ 2, AND all three components BELOW_AVERAGE (`search_predicted_ctr`, `creative_quality_score`, `post_click_quality_score`), AND zero or near-zero impressions over the most recent 7-14 days on an active campaign with available budget.
+
+When all three conditions are present, the keyword has been effectively removed from auction consideration by Google. This is categorically different from a keyword with QS 4-6 and one weak component.
+
+**Standard QS optimization does not recover a throttled keyword.** Improving ad copy, landing page, or CTR applies to underperforming keywords that are still entering auctions. For a throttled keyword, Google is not entering it into auctions at all — incremental quality improvements cannot recover it from this baseline.
+
+**The correct intervention is structural replacement:**
+1. Pause the throttled keyword
+2. Create a new keyword variant in a new or reorganized ad group with dedicated ad copy and a landing page that precisely matches the query intent
+3. A fresh keyword gives Google a clean quality signal with no prior history
+
+State the heuristic explicitly when diagnosing — do not present `system_serving_status = ELIGIBLE` as confirmation that the keyword is serving normally.
+
+---
+
+## BROAD Match Keyword Remediation — Default Path
+
+When a BROAD match keyword is flagged for cleanup (high CPA, waste, or match type tightening), the default recommendation is **convert to phrase match first** — not delete, not pause, not jump directly to exact.
+
+**Why phrase, not exact:** BROAD → exact skips the intermediate step that preserves near-intent query variants while filtering the looser ones. Exact match may lose reach unnecessarily. Phrase match is the standard intermediate step.
+
+**Why not delete or pause:** If a BROAD keyword has conversion history, it carries smart bidding signal. Deleting or pausing removes that signal. Phrase match conversion preserves the signal while tightening control.
+
+**When hard delete is appropriate:** Only for irrelevant terms — wrong practice area, wrong geography, competitor brand names. Relevant keywords that are simply too broad get converted to phrase, not deleted.
+
+**Sequence:**
+1. Convert BROAD to phrase match
+2. Monitor search terms for 2-4 weeks
+3. If CPA remains above target after phrase conversion, identify specific waste terms to negative or evaluate tightening to exact
+
+---
+
+## Search Partners CPA Distortion — Network Segmentation Required
+
+When a brief presents a CPA figure for a campaign running on **both Search and Search Partners**, that figure is a blended average across two networks with different traffic quality. Search Partners traffic typically converts at a lower rate and higher CPA than Google Search traffic in legal PPC.
+
+**Before drawing any CPA conclusion or recommending any bid change, flag whether the campaign includes Search Partners:**
+
+Pull: GAQL 6.4 or `segments.network` — segment campaign performance by `SEARCH` vs. `SEARCH_PARTNERS`.
+
+If network data is not provided and Search Partners status is unknown:
+- State explicitly: the reported CPA may be a blended figure that includes Search Partners
+- Do not diagnose "CPA is high" or recommend a tCPA change until network split is confirmed
+- The required next step is: pull performance by `segments.network` (clicks, conversions, cost, CPA) for each network separately
+
+**Smart bidding signal risk:** Excluding Search Partners is not a simple win. Removing the Partners network reduces the total conversion signal available to the smart bidding algorithm. If the campaign is near the 15-20 conv/month reliability threshold, excluding Partners may push it into Sub-tree D territory. Always check conversion volume contribution before recommending exclusion.
+
+**Decision framework after pulling network data:**
+- If Search Partners CPA is above target AND Partners conversion volume is small relative to Search → exclusion is reasonable; signal loss is minimal
+- If Search Partners CPA is above target BUT Partners is contributing significant conversion volume → exclusion risk is real; consider whether blended CPA is still on-target if Partners is removed
+- If Search CPA is already on-target → the issue is contained to Partners; exclusion is the likely fix, but confirm volume contribution first
+
+---
+
 ## Handling Comparative and Premise-Based Questions
 
 When a question contains a stated premise — "Why is X so high?", "X is at $284, should we pause it?", "X is performing worse than Y" — **verify the premise before diagnosing it.**
@@ -198,6 +260,10 @@ If MCP tools are available, use them. Don't reason from a snapshot when you can 
 - **Budget-lost IS** — impressions lost because the daily budget ran out. Fix: increase budget.
 
 **Rule:** When assessing IS, always pull GAQL 5.1 which includes both fields. Never characterize a campaign as "budget-constrained" based on rank-lost IS alone — that is a QS/LP problem requiring creative work, not spend.
+
+**Rank-lost IS on Maximize Conversions = QS issue only.** On campaigns using Maximize Conversions (no tCPA), the algorithm already bids as high as it calculates optimal for each auction. If rank-lost IS is high on a Max Conv campaign, the algorithm is not "holding back" — it is losing auctions because Ad Rank is insufficient. The fix is QS and landing page quality, not a bid strategy change. Never diagnose rank-lost IS as a bid constraint on a Max Conv campaign — there is no bid ceiling to raise.
+
+**Budget-lost IS can occur without hitting the daily cap.** BROAD match keywords can consume budget disproportionately early in the day — serving on high-volume, lower-intent queries before more targeted phrase/exact keywords compete. This produces budget-lost IS even when daily spend is below the budget ceiling. If a campaign has budget-lost IS and a BROAD keyword consuming most of the daily budget before 10am, the fix is converting the BROAD to phrase match — not increasing budget. Increasing budget gives the BROAD more to consume early-day and does not solve the problem.
 
 ---
 
@@ -309,6 +375,14 @@ For each priority flag, work through the relevant diagnosis tree. A flag becomes
 - **Internal analysis** → prioritized findings list with context and recommendations
 - **Client communication** → translated into plain language, focused on business impact
 - **Reporting** → handled separately via AgencyAnalytics, not this skill
+
+**Campaign → Ad Group path is mandatory in every finding.** Every keyword, search term, ad, or ad group finding must lead with the full path so the user can navigate to it in the Google Ads UI:
+
+```
+Campaign: [campaign name] | Ad Group: [ad group name] | [keyword or term]
+```
+
+Without the campaign name, a finding is unactionable — the user cannot locate the item. This applies to every finding in every output format, without exception. A finding that omits the path is incomplete.
 
 ### Step 9 — Write session log *(Toby version only)*
 Before closing the session, generate a session log using the template below and save to `session-logs/YYYY-MM-DD-[account-name].md`.
