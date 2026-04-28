@@ -270,6 +270,8 @@ In some accounts, ad scheduling restrictions are too aggressive — campaigns ar
 
 **Entry:** The brief is "something is wrong" — performance was acceptable and now isn't. The most common brief. The most variable tree.
 
+**Pre-flight ordering exception:** If the drop is sudden or large in magnitude (40%+ decline within a 1–2 week window), run PF-3 (change history) before PF-1 and PF-2. The standard pre-flight order prioritizes tracking integrity — but when a drop is abrupt, a bid strategy change, budget change, or auto-applied update is far more likely to be the cause than a tag failure. Running PF-3 first answers the "did something change?" question before spending time on tag debugging. If nothing changed, proceed to PF-1 normally. If a structural change is found, that discovery shapes every downstream step.
+
 ---
 
 **Step 0: Confirm performance is actually off**
@@ -710,7 +712,15 @@ Action: reset the tCPA target to the historical average (or slightly above it), 
 
 If change history shows repeated bid strategy changes at 1–2 week intervals — often with manual bid adjustments in between — the account has likely never completed a learning phase. This is the most common pattern in inherited accounts with a history of anxious management.
 
-Breaking the cycle requires patience: set the bid strategy, set a realistic target, and commit to no significant changes for 21–30 days. This is often difficult to explain to clients — budget spending erratically during learning phases looks bad in the short term even when the long-term outcome will be better.
+Breaking the cycle requires patience — and a hard rule: **do not change the tCPA target at the start of the freeze window.** Setting a "better" number still resets the learning clock. The freeze must start from the current live value, whatever it is.
+
+Two valid approaches:
+
+1. **Hold the current tCPA target.** Commit to no changes for a minimum of **4 full weeks (28 days)**. Not 21 days — 4 weeks. The learning phase requires at least 14 days of clean data; 28 days provides a meaningful buffer above that floor. Do not lower the target, do not raise it, do not pause the campaign. Hold.
+
+2. **Switch to Maximize Conversions (no target).** If the current tCPA is far from any achievable baseline — as often happens after a staircase of raises — removing the target entirely allows the algorithm to optimize direction rather than hit an arbitrary number. This is often the correct call when the tCPA has been raised multiple times without completing a learning cycle, because no single "current" value reflects real performance data.
+
+Either approach is valid. What is NOT valid: making any additional bid strategy changes, target changes, or budget changes during the stabilization window. This is often difficult to explain to clients — budget spending erratically during learning phases looks bad in the short term even when the long-term outcome will be better.
 
 *[Toby version]: Note in session log under `Session Observations` if the client has been briefed on the learning phase concept and their reaction. This context is useful for managing expectations in future sessions.*
 

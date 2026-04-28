@@ -238,6 +238,7 @@ WHERE segments.date DURING LAST_90_DAYS
   AND campaign.status = 'ENABLED'
   AND ad_group.status = 'ENABLED'
   AND ad_group_criterion.status = 'ENABLED'
+  AND ad_group_criterion.negative = FALSE
   AND metrics.cost_micros > 0
 ORDER BY metrics.cost_micros DESC
 ```
@@ -264,6 +265,7 @@ WHERE segments.date DURING LAST_30_DAYS
   AND campaign.status = 'ENABLED'
   AND ad_group.status = 'ENABLED'
   AND ad_group_criterion.status = 'ENABLED'
+  AND ad_group_criterion.negative = FALSE
 ORDER BY metrics.cost_micros DESC
 ```
 
