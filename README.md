@@ -1,63 +1,89 @@
 # Legal PPC Skill — Google Ads Analysis for Law Firms
 
-![Status](https://img.shields.io/badge/status-active%20development-yellow)
-![Evals](https://img.shields.io/badge/evals-40%2F40%20passing-brightgreen)
+![Version](https://img.shields.io/badge/version-v3.5-blue)
+![Evals](https://img.shields.io/badge/eval%20delta-%2B86pp-brightgreen)
+![Status](https://img.shields.io/badge/production-active-success)
 
-> **Active development.** Core skill is stable and eval-validated, but new protocols, practice areas, and diagnostic trees are added regularly as the skill is used in production.
-
-A Claude Code skill for expert-level Google Ads analysis and optimization for law firm accounts.
-
-Built by [Rosen Advertising](https://rosenadvertising.com) and validated across active legal PPC accounts.
+> A Claude Code skill that turns Google Ads analysis from a manual, error-prone process into a structured, expert-level diagnostic session — every time.
 
 ---
 
-## What This Skill Does
+## The Problem
 
-Enables Claude to run structured Google Ads analysis for law firm accounts — without step-by-step direction. It encodes expert-level knowledge about legal PPC and provides diagnostic frameworks, pre-built GAQL queries, and keyword libraries specific to legal marketing.
+Legal PPC is one of the most expensive ad environments on the planet. Family law clicks run $10–30. Elder law, $15–40. Personal injury, $20–80+. One misread metric, one wrong bid decision, one unconverted BROAD keyword left running — and you've burned real money with nothing to show for it.
 
-**Core capabilities:**
-- Performance diagnosis via structured decision trees
-- Pre-flight validation (conversion tracking, structural issues, change history) before any symptom analysis
-- Search term review with waste identification and negative keyword recommendations
-- QS / impression share analysis with rank-loss vs. budget-loss distinction
-- Smart bidding evaluation including post-tracking-fix protocol
-- Account audits for inherited or new accounts
+Most AI-assisted PPC analysis fails in exactly the same ways: it reads the wrong keywords (negatives mixed with positives), trusts bad data (paused ad group history blending into search term reports), and makes the wrong bidding call (lowering tCPA when it's already above target, restricting the campaign right when it needs room to convert).
 
-**Built-in protections against common mistakes:**
-- Correctly handles negative keywords vs. positive keywords in GAQL results
-- Filters paused/removed ad groups from active analysis (search terms and keywords)
-- Verifies premises before diagnosing ("CPA is high" → pulls data first)
-- Detects anomalously cheap CPCs in handed search term data (paused ad group contamination signal)
-- Requires coverage check before presenting search term waste findings
+This skill fixes that.
+
+---
+
+## What It Does
+
+Plug it into Claude Code with a Google Ads MCP and you get structured, expert-level account analysis without step-by-step direction. Give it a brief — or just say "something feels off" — and it runs the right diagnostic, in the right order, with the right safeguards.
+
+**Session flow:**
+1. Read account notes (prior session history, pending actions)
+2. Run three mandatory pre-flights: conversion tracking, structural issues, change history
+3. Pull live data via GAQL and flag candidates
+4. Diagnose priority issues through structured decision trees
+5. Produce a prioritized action list — and write a session log for the next session
+
+**What it gets right that a general model doesn't:**
+
+| Failure mode | What a general model does | What this skill does |
+|---|---|---|
+| Negative keywords in GAQL results | Flags them as active optimization targets | Filters `negative = FALSE` — required in every keyword query |
+| Paused ad group search terms | Treats them as active waste | Requires `ad_group.status = ENABLED` filter; `status = NONE` terms are explicitly excluded |
+| Cheap CPC on a legal term | Explains it as "low-intent traffic" | Routes to data contamination first — paused ad group history bleeding in |
+| 58% rank-lost IS | Recommends raising budget | Correctly identifies as QS/bid quality problem; budget won't help |
+| tCPA above target | Recommends lowering tCPA to "tighten up" | Applies direction rule: lowering when above target restricts volume, not cost |
+| CPA from 4 conversions | Treats it as a reliable signal | Flags the 15-20 conversion threshold; below that, CPA is noise |
+| Search term waste estimates | Reports face-value numbers | Discloses the ~50% API coverage ceiling and scales estimates accordingly |
+
+---
+
+## Eval Results
+
+The skill ships with an adversarial eval suite. Each eval runs the same prompt with and without the skill loaded, then scores against specific behavioral assertions. The goal: the skill should catch things a capable general model misses.
+
+**Current delta: +86 percentage points** (with skill: 97.6% — without skill: 11.9%)
+
+Selected discriminating evals:
+
+| Eval | Scenario | With skill | Without skill |
+|---|---|---|---|
+| QS throttling | All-BELOW_AVERAGE + zero impressions | 4/4 | 0/4 |
+| Coverage check | Search term analysis before coverage ratio reported | 4/4 | 0/4 |
+| Change history first | Performance drop — change history before symptom diagnosis | 5/5 | 1/5 |
+| BROAD → phrase | Correct default intervention for BROAD keyword | 4/4 | 0/4 |
+| Budget vs rank IS | Distinguishes rank-lost from budget-lost IS | 4/4 | 1/4 |
+| CPC anomaly routing | Low avg CPC → data integrity first, not keyword targeting | 4/4 | 1/4 |
+| Account notes override | Account-specific rule overrides general BROAD guidance | 4/4 | 1/4 |
 
 ---
 
 ## Requirements
 
 - [Claude Code](https://claude.ai/code) with skill support
-- A Google Ads MCP server — see below
-- Access to a Google Ads account or MCC
+- A Google Ads MCP server that exposes `run_gaql` or `execute_gaql_query`
 
-### Google Ads MCP
+### Recommended MCP
 
-This skill is designed for and tested with **[cohnen/mcp-google-ads](https://github.com/cohnen/mcp-google-ads)** — a Google Ads MCP server that connects Claude directly to the Google Ads API.
-
-The GAQL queries in this skill are standard Google Ads Query Language and will work with any MCP that exposes a `run_gaql` or `execute_gaql_query` tool. If you're using a different MCP implementation, update the tool note in `SKILL.md` accordingly.
+Tested with **[cohnen/mcp-google-ads](https://github.com/cohnen/mcp-google-ads)**. Any GAQL-capable MCP works — update the tool note in `SKILL.md` if you're using a different implementation.
 
 ---
 
 ## Installation
 
 ```bash
-# 1. Set up cohnen/mcp-google-ads (follow their README for credentials)
-git clone https://github.com/cohnen/mcp-google-ads
-
-# 2. Clone this skill
 git clone https://github.com/RosenAdvertising/legal-ppc-skill
-
-# 3. Configure your accounts in SKILL.md (Accounts section)
-# 4. Add account-notes/ files for each account (see Versions section below)
 ```
+
+1. Set up your Google Ads MCP (see cohnen/mcp-google-ads)
+2. Update the `## Accounts` table in `SKILL.md` with your account IDs
+3. Add `account-notes/[account].md` files for accounts you manage regularly (see the internal version note below)
+4. Load the skill in Claude Code and run `list_accounts()` to confirm API access
 
 ---
 
@@ -65,20 +91,20 @@ git clone https://github.com/RosenAdvertising/legal-ppc-skill
 
 ```
 legal-ppc-skill/
-├── SKILL.md                        # Main skill instructions (load this)
-├── account-audit-checklist.md      # Structured first-review checklist (Sections A–I)
+├── SKILL.md                           # Main skill file — load this
+├── account-audit-checklist.md         # Structured first-review checklist (Sections A–I)
 ├── references/
 │   ├── google-ads-knowledge-base.md   # Core philosophy — read before any analysis
-│   ├── diagnosis-trees.md             # Diagnostic frameworks for common problems
+│   ├── diagnosis-trees.md             # Decision trees for common problems
 │   ├── gaql-query-library.md          # Pre-built GAQL queries by diagnostic task
-│   └── negative-keyword-library.md    # Master negative lists by legal practice area
+│   └── negative-keyword-library.md    # Master negative lists by practice area
 └── evals/
-    └── evals_v2.json                  # Test suite (10 evals, adversarial + edge cases)
+    └── evals_v2.json                  # Adversarial test suite
 ```
 
 ---
 
-## Practice Areas Covered
+## Practice Areas
 
 Negative keyword libraries, search intent guidance, and diagnostic priors for:
 
@@ -91,46 +117,27 @@ Negative keyword libraries, search intent guidance, and diagnostic priors for:
 
 ---
 
-## Eval Results
+## Public vs. Internal Version
 
-The skill ships with a test suite of 10 adversarial evals covering:
+This is the **public version**. The internal version used in production at Rosen Advertising adds:
+- `account-notes/[account].md` — per-account session history, pending actions, market-specific priors
+- `session-logs/` — structured logs written at session end (what ran, what changed, what's next)
+- `references/learnings.md` — validated patterns extracted from live session history across multiple accounts
 
-| Eval | Topic |
-|---|---|
-| 4 | Vague brief routing — names entry point, runs pre-flight |
-| 5 | Adversarial bypass resistance — holds line on coverage check |
-| 6 | First review — new account generalization |
-| 7 | False premise verification — verifies CPA claim before diagnosing |
-| 8 | Brand campaign judgment — cannibalization mechanism |
-| 9 | GAQL negative keyword misread detection |
-| 10 | Paused ad group exclusion from active keyword list |
-| 11 | tCPA post-tracking-fix protocol |
-| 12 | IS metric distinction (rank-lost vs. budget-lost) |
-| 13 | Paused ad group detection in handed search term data |
-
-**Pass rate: 40/40 (100%) as of iteration 9.**
+The public version is the full skill minus the client-specific data. It works standalone.
 
 ---
 
-## Versions
-
-This repository contains the **public version** of the skill. The internal version used by Rosen Advertising adds account-specific notes, session logging, and a validated learnings document built from live session history.
-
----
-
-## Known Limitations / In Progress
+## Known Limitations
 
 **`search_term_view` coverage ceiling (~50%)**
-The Google Ads API withholds low-volume search terms and caps rows per query. Expect to see roughly half of actual campaign spend in any search term pull. The skill discloses this and scales estimates, but it's a platform constraint with no workaround.
+The Google Ads API caps search term rows per query and withholds low-volume terms. Expect ~50% coverage of actual campaign spend in any search term pull. The skill discloses this, scales estimates by coverage ratio, and never recommends blocking a term category based on search term data alone.
 
-**Conversion tracking reads are GAQL-only**
-There's no API endpoint for reading conversion action configuration (primary vs. secondary, attribution model, counting method) as a structured object. The skill reconstructs this from `conversion_action` queries, which requires interpretation. Direct UI verification is often faster for complex setups.
+**Conversion tracking configuration is read-only via GAQL**
+There's no structured API object for conversion action settings (primary vs. secondary, attribution model, counting method). The skill reconstructs this from `conversion_action` queries. For complex setups, UI verification is faster.
 
-**No asset / creative performance analysis**
-Responsive search ad asset-level performance (individual headline/description scores) is not yet covered. The skill reviews ad copy structurally but doesn't pull asset-level quality scores from the API.
-
-**Multi-account parallel analysis**
-The skill documents a sub-agent pattern for parallel campaign pulls, but cross-account analysis (e.g., comparing two accounts) is handled sequentially. Parallel account pulls across an MCC aren't yet systematized.
+**Asset-level creative performance not yet covered**
+Responsive search ad headline/description scores are not pulled. Ad copy is reviewed structurally, not at asset level.
 
 ---
 
