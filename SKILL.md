@@ -138,6 +138,46 @@ This is the single most common mistake made after a tracking cleanup. The instin
 
 ---
 
+## tCPA Direction Rule
+
+**Only lower tCPA when actual cost/conv is already comfortably below the current target.** Lowering tCPA when CPA is at or above target restricts campaign volume — it signals to the algorithm to win fewer auctions, which reduces conversion opportunities when the account is already struggling to generate them.
+
+**Decision framework:**
+
+- **cost/conv well below target** (e.g., target $150, actual $90): Safe to lower tCPA to capture efficiency. Move in 10–15% increments, not all at once.
+- **cost/conv near target** (e.g., target $150, actual $140): Hold. Insufficient headroom. Lowering risks volume loss without efficiency gain.
+- **cost/conv above target** (e.g., target $150, actual $210): Do NOT lower tCPA. Fix root causes first — QS, ad relevance, LP conversion rate, negative keyword gaps. Lowering further restricts an already underperforming campaign.
+- **cost/conv well above target AND low impression share:** Root cause is almost always QS/bid quality, not budget. Adding budget does not fix a tCPA campaign that's losing impressions to rank. Diagnose rank-lost IS (use GAQL 5.1).
+
+**The instinct to "tighten" tCPA when CPA is high is wrong.** When the algorithm is already under pressure to find converting traffic, lowering the target tells it to spend less per conversion — which means it enters fewer auctions and gets fewer conversions, not cheaper ones. This is the most common bidding mistake in legal PPC.
+
+**Exception:** If budget is clearly not the constraint (budget-lost IS is near 0) and rank-lost IS is very high, the issue is bid quality — tCPA can be raised to give the algorithm room to compete, not lowered.
+
+---
+
+## Campaign-Level CPC Anomaly — Routing Protocol
+
+When campaign-level avg CPC looks anomalous (not search term level — the campaign performance summary), route the diagnosis based on direction:
+
+**Anomalously LOW avg CPC for the practice area:**
+
+Legal PPC typical ranges: family law $8–25, elder law $10–35, personal injury $20–80, partition/real estate $15–40, elder abuse $60–150+.
+
+If campaign avg CPC is well below these ranges (e.g., $3.20 in a Medicaid campaign, or $2.50 in a divorce campaign):
+
+1. **First check: tracking integrity.** Low avg CPC on competitive legal terms is a red flag for data contamination — possibly includes historical data from paused ad groups or test periods when CPCs were lower, or a conversion tracking issue that is inflating apparent traffic.
+2. **Do NOT route to keyword targeting as the first frame.** The instinct to explain cheap clicks as "wrong match type" or "low-intent keywords" is secondary. Check data integrity first.
+3. Pull campaign history (PF-3) and confirm the avg CPC trajectory. If it was historically normal and recently dropped, something changed — conversion tracking, keyword structure, or bid strategy reset.
+4. If search term data confirms the clicks are coming from low-intent queries at low CPC, then keyword/match type diagnosis applies. But only after ruling out data contamination.
+
+**Anomalously HIGH avg CPC:**
+
+For high-value practice areas (elder abuse, complex commercial litigation), $80–150/click is normal — do not flag as problematic by default. Context: case values in elder abuse can be $500K–$2M+; a $120 CPC acquiring one case is exceptional ROI.
+
+Flag as potentially problematic only when HIGH avg CPC is combined with: (a) zero or near-zero conversions over 14+ days, AND (b) impression share is adequate (>30%). This combination suggests the algorithm is bidding high for clicks that don't convert — possible LP issue, wrong audience, or conversion tracking failure.
+
+---
+
 ## Search Term Data — Coverage Ceiling
 
 `search_term_view` typically shows **~50% of actual campaign spend**. This is a Google Ads API limitation — the API withholds low-volume search terms and has a hard row cap per query. It is not fixable through query splitting or pagination (GAQL does not support OFFSET).
