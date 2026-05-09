@@ -1,6 +1,6 @@
 # Legal PPC Skill — Google Ads Analysis for Law Firms
 
-![Version](https://img.shields.io/badge/version-v3.5-blue)
+![Version](https://img.shields.io/badge/version-v3.6-blue)
 ![Evals](https://img.shields.io/badge/eval%20delta-%2B86pp-brightgreen)
 ![Status](https://img.shields.io/badge/production-active-success)
 
@@ -67,6 +67,7 @@ Selected discriminating evals:
 
 - [Claude Code](https://claude.ai/code) with skill support
 - A Google Ads MCP server that exposes `run_gaql` or `execute_gaql_query`
+- The `Agent` tool must be available for multi-campaign parallel search term reviews. If not available, the skill falls back to sequential execution automatically.
 
 ### Recommended MCP
 
@@ -121,7 +122,7 @@ Negative keyword libraries, search intent guidance, and diagnostic priors for:
 
 This is the **public version**. The internal version used in production at Rosen Advertising adds:
 - `account-notes/[account].md` — per-account session history, pending actions, market-specific priors
-- `session-logs/` — structured logs written at session end (what ran, what changed, what's next)
+- `session-logs/` — structured logs written at session end (what ran, what changed, what's next). Directory is created automatically on first use.
 - `references/learnings.md` — validated patterns extracted from live session history across multiple accounts
 
 The public version is the full skill minus the client-specific data. It works standalone.
