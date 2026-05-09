@@ -324,6 +324,8 @@ Main agent → synthesizes all summaries into findings + action list
 
 Use this pattern any time a search term review spans more than 2 campaigns.
 
+**Compatibility:** Requires Claude Code with the `Agent` tool available. If running in an environment where the `Agent` tool is not available, run each campaign's search term pull sequentially in the same session rather than in parallel.
+
 ---
 
 ## Skill Dependencies
@@ -353,15 +355,17 @@ Common brief types:
 - **Ad copy review** — Assess creative performance and identify refresh candidates.
 - **Conversion tracking audit** — Verify that what's being tracked is correct and complete.
 
-**Brief clarity gate:** Before pulling any data, assess whether the brief is specific enough to target the session. A clear brief (explicit concern, named campaign, defined scope) → proceed. A vague brief ("run a review", "check performance", "see what's going on", "[account] feels off") → do two things before pulling any data:
+**Brief clarity gate:** Assess whether the brief is specific enough to target the session. A clear brief (explicit concern, named campaign, defined scope) → proceed directly. A vague brief ("run a review", "check performance", "see what's going on", "[account] feels off") → do the following:
 
-1. **State the diagnostic entry point.** Name which Tree in `references/diagnosis-trees.md` applies — e.g., "This looks like a Tree 4 (performance drop) entry point, pending clarification" or "Defaulting to Tree 5 (account review) since no specific concern was named." Say this out loud in your response. Don't silently assume an entry point and start pulling queries.
+1. **State the diagnostic entry point.** Name which Tree in `references/diagnosis-trees.md` applies — e.g., "This looks like a Tree 4 (performance drop) entry point" or "Defaulting to Tree 5 (account review) since no specific concern was named." Say this out loud in your response. Don't silently assume an entry point.
 
-2. **Ask 1–2 focused clarifying questions:**
+2. **Proceed to Steps 2 and 3.** Pre-flight checks run regardless of brief clarity — do not wait for clarification before running them. See Step 3.
+
+3. **Ask 1–2 focused clarifying questions after pre-flight**, using what you found as context:
    - "Is there a specific concern driving this — performance drop, budget issue, something the client flagged?"
    - "Is there a campaign or time period you want to prioritize?"
 
-This isn't gatekeeping — it's targeting. Naming the entry point surfaces your diagnostic reasoning before any data pull and lets the user redirect you if it's wrong. Don't start pulling large datasets before knowing where to look.
+This isn't gatekeeping — it's targeting. Pre-flight data makes clarifying questions more precise. Name the entry point, run pre-flight, then ask.
 
 ### Step 2 — Verify prior session's pending actions *(Toby version only)*
 Before any new analysis, read `account-notes/[account].md` and check the `## Pending Actions` section.
@@ -403,7 +407,7 @@ Format each item as:
 - [ACTION] [target] — [one-line rationale] | [scope: account/campaign/ad-group]
 ```
 
-Update `account-notes/[account].md → ## Pending Actions` with the full list before closing.
+*(Toby version only)* Update `account-notes/[account].md → ## Pending Actions` with the full list before closing.
 
 ### Step 6 — Prioritize flags by impact
 Prioritize by: estimated spend impact × confidence it's a real problem. Structural issues affecting budget allocation every day rank ahead of cosmetic issues.
@@ -425,7 +429,7 @@ Campaign: [campaign name] | Ad Group: [ad group name] | [keyword or term]
 Without the campaign name, a finding is unactionable — the user cannot locate the item. This applies to every finding in every output format, without exception. A finding that omits the path is incomplete.
 
 ### Step 9 — Write session log *(Toby version only)*
-Before closing the session, generate a session log using the template below and save to `session-logs/YYYY-MM-DD-[account-name].md`.
+Before closing the session, generate a session log using the template below. Create the `session-logs/` directory if it does not already exist, then save to `session-logs/YYYY-MM-DD-[account-name].md`.
 
 ---
 
