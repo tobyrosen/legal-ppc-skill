@@ -1,0 +1,21 @@
+# Cowork standard typos config — domain term allowlist
+# Propagated to <repo>/typos.toml by propagate.py
+#
+# Add entries here to prevent the typos hook from auto-renaming words that
+# are real domain terms (not typos).
+#
+# Found false positives (2026-05-27):
+#   - 'gir' = Greens in Regulation (golf metric). typos thought it was 'git'.
+#   - 'GIR' = same, uppercase variant
+#
+# Add more domain terms as they're discovered.
+
+[default.extend-words]
+gir = "gir"
+GIR = "GIR"
+
+[default.extend-identifiers]
+# Allow identifiers containing 'gir' as substring (e.g. compute_gir, golf_gir)
+compute_gir = "compute_gir"
+GIRResult = "GIRResult"
+golf_gir = "golf_gir"

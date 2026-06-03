@@ -7,14 +7,16 @@ These are diagnostic frameworks, not flowcharts. They guide judgment — they do
 **GAQL references** point to sections in `gaql-query-library.md` (e.g., "GAQL 2.1" = Section 2, Query 1).
 
 **Blind spot callouts** appear wherever the API cannot provide what's needed. The screenshot protocol is:
+
 > ⚠️ **BLIND SPOT — [what cannot be seen]**
 > → Please share a screenshot of [exact location, with applicable filters/date range].
 
 **Version note:** This skill has two operational modes:
+
 - **Toby version** — reads `learnings.md` and the relevant `account-notes/[account].md` at session start. Has historical context. Generates a session log at session end.
 - **Public version** — reads skill reference files only. No historical context. No session logging.
 
-Sections marked *[Toby version]* describe behaviors that only apply in the internal version.
+Sections marked _[Toby version]_ describe behaviors that only apply in the internal version.
 
 ---
 
@@ -35,11 +37,13 @@ If no conversion actions are configured at all: the account has never had tracki
 
 **What is each enabled conversion action actually measuring?**
 Evaluate the `type` and `name` fields together. The types that represent real leads in legal:
+
 - `WEBPAGE` actions with names suggesting form completion, contact submission, or appointment booking
 - `AD_CALL` or `PHONE_CALL` actions (auto-tracked call extensions)
 - `UPLOAD_CLICKS` (offline import — only meaningful if the firm is actually importing intake data)
 
 Flag immediately if the primary conversion action (`include_in_conversions_metric = TRUE`) is:
+
 - A session or page view (name suggests "All Visits," "Sessions," "Time on Site")
 - A soft engagement action (scroll depth, video play)
 - A duplicate of another primary action with identical settings
@@ -75,7 +79,7 @@ Evaluate against the good-account checklist from the knowledge base. These are b
 - **Brand campaign isolated?** Review campaign names for evidence of brand/non-brand separation. There is no API flag for this — use naming convention as the signal. Flag if any campaign name suggests it may contain both.
 - **Broad match keywords present?** Pull GAQL 3.2 (match type distribution). Flag any `BROAD` type keywords outside of explicitly named test campaigns.
 
-*[Toby version]: Cross-reference structural flags against `account-notes/[account].md`. Some known accounts have deliberate exceptions to standard structure — don't re-flag things that have already been investigated and resolved.*
+_[Toby version]: Cross-reference structural flags against `account-notes/[account].md`. Some known accounts have deliberate exceptions to standard structure — don't re-flag things that have already been investigated and resolved._
 
 ---
 
@@ -142,7 +146,7 @@ Cross-reference the timing with change history (PF-3).
 > ⚠️ **BLIND SPOT — Landing page changes cannot be detected via API**
 > A common cause of sudden conversion rate drops is a website or landing page update that changed the form, CTA, or page structure.
 > → Please share a screenshot of the current landing page for the affected campaigns, and confirm whether any website changes were made around the time of the drop.
-
+>
 > ⚠️ **BLIND SPOT — Competitor ad changes are not visible via API**
 > New competitors entering the market or existing competitors improving their copy and offers can depress CVR without any change in your account.
 > → Please share a screenshot of the Auction Insights tab for the affected campaigns (last 30 days), and optionally a manual search for your top keywords to see what competitor ads currently look like.
@@ -158,7 +162,7 @@ Indicators: high click volume, meaningful spend, consistent zero or near-zero co
 > ⚠️ **BLIND SPOT — Landing page quality cannot be assessed via API**
 > → Please share a screenshot of the landing page(s) receiving ad traffic. Assess: Is there a clear, prominent CTA? Is the messaging aligned with what the ads promise? Is there a phone number visible above the fold? Is the mobile experience functional?
 
-*[Toby version]: Check `account-notes/[account].md` for prior landing page findings. If this has been flagged before and hasn't been addressed, note the recurrence in the session log.*
+_[Toby version]: Check `account-notes/[account].md` for prior landing page findings. If this has been flagged before and hasn't been addressed, note the recurrence in the session log._
 
 ---
 
@@ -186,7 +190,7 @@ Pull: GAQL 3.3 or 3.4 (keyword performance) for the affected campaigns. Look at 
 
 - **CPC is disproportionately high for the market**: Is impression share rank loss elevated? Pull GAQL 5.1. High rank loss IS means the account is losing auctions on quality/bid grounds — throwing more money at bids may not fix this.
   - Move to Sub-tree B (Quality Score Diagnosis) before adjusting bids.
-  
+
 > ⚠️ **BLIND SPOT — Competitor CPC dynamics are not visible via API**
 > Rising CPCs without account changes usually indicate increased auction competition. The API cannot show you who is bidding more aggressively or what their bids are.
 > → Please share a screenshot of Auction Insights for the campaigns with elevated CPC (last 30 days vs. prior 30 days if available). This will show whether new competitors have entered or existing ones have increased their presence.
@@ -279,6 +283,7 @@ In some accounts, ad scheduling restrictions are too aggressive — campaigns ar
 Pull: GAQL 6.2 (90-day campaign performance), GAQL 6.3 (weekly segmented performance)
 
 Compare the current period (last 14–30 days) to the 90-day baseline. State the verdict explicitly before proceeding:
+
 - **CPA and CVR are materially worse than baseline**: performance is genuinely down. Continue.
 - **Metrics are within normal week-to-week variance**: the "feels off" perception may reflect a single bad week or a volatile metric, not a real trend. Report this finding first. Don't run a full diagnostic on normal variance.
 
@@ -296,7 +301,7 @@ Do not skip this step. The change history often answers the question before any 
 - **Bid strategy or budget changes within the last 14 days**: strong learning phase disruption hypothesis. See Sub-tree D (Smart Bidding Instability) before anything else.
 - **No significant changes**: external factors are likely. Continue to Step 2.
 
-*[Toby version]: Check `account-notes/[account].md` for seasonal patterns or prior incidents that might explain the current drop.*
+_[Toby version]: Check `account-notes/[account].md` for seasonal patterns or prior incidents that might explain the current drop._
 
 ---
 
@@ -326,7 +331,7 @@ Cross-reference with change history timing (PF-3). Key question: did any change 
 
 > ⚠️ **BLIND SPOT — Landing page changes are not visible via API**
 > → Has the website or landing page changed recently? If uncertain, please share a screenshot of the current landing page for the affected campaigns.
-
+>
 > ⚠️ **BLIND SPOT — Seasonal patterns in legal search behavior are not visible within the account data alone**
 > → Compare this period to the same period in the prior year if data is available. Family law search volume, for example, typically rises after the holidays and dips in summer — patterns that look like performance drops are sometimes normal seasonality.
 
@@ -415,7 +420,7 @@ At this point you have a list of flags from every step. Prioritize by: estimated
 
 The output of a first-review session is a prioritized findings list, not a to-do list. Some findings require further investigation before becoming actionable. Note which ones do.
 
-*[Toby version]: Write a session log for this session even if no actions were taken. First-review sessions often contain the most valuable `Session Observations` — the things that are surprising about how the account was run.*
+_[Toby version]: Write a session log for this session even if no actions were taken. First-review sessions often contain the most valuable `Session Observations` — the things that are surprising about how the account was run._
 
 ---
 
@@ -430,6 +435,7 @@ The output of a first-review session is a prioritized findings list, not a to-do
 Pull: GAQL 13.1 (actual campaign spend), then GAQL 13.2 per active campaign (visible STV spend)
 
 Compute coverage ratio. State it before proceeding:
+
 > "Search term data covers $X of $Y actual spend (Z%). The hidden ~[100-Z]% is the Google Ads API ceiling — not fixable through query splitting."
 
 Do not present any findings, waste estimates, or negative keyword recommendations until this ratio is on the table. Scale all dollar estimates by the coverage ratio.
@@ -455,10 +461,11 @@ For each term, the classification is: relevant, irrelevant, or ambiguous.
 Before applying any negative library categories, check account notes for market-specific funnel exceptions. Some accounts have practice areas or markets where standard informational intent negatives would block real prospects (e.g., NC family law long-consideration-window, immigration procedural queries in Arizona, elder abuse informational queries). The negative library is a starting point, not a universal rule.
 
 Cross-reference against the negative keyword library categories:
+
 - Price/affordability signals (Section 1)
 - Employment/career signals (Section 2)
 - Self-help/DIY intent (Section 3)
-- Research/informational intent (Section 4) — *check account notes for market exceptions before applying*
+- Research/informational intent (Section 4) — _check account notes for market exceptions before applying_
 - Practice area cross-contamination (Section 5)
 
 ---
@@ -482,6 +489,7 @@ Pull: GAQL 3.2 (match type distribution). Note which match types are associated 
 **Step 5: Organize negative keyword recommendations by scope**
 
 Output should be organized as:
+
 - **Account-level additions** (irrelevant to everything the firm does)
 - **Campaign-level additions** (irrelevant to this practice area or geography but not universally)
 - **Ad group-level additions** (narrowly irrelevant to this specific keyword cluster)
@@ -539,6 +547,7 @@ Never-fired primaries are a standing configuration error, not a recent event. No
 
 **WEBPAGE (codeless tag or gtag):**
 These fire when a user reaches a specific page URL (typically a thank-you or confirmation page).
+
 - Has the website been updated recently? Form submission flows change more often than they appear to.
 - Is the thank-you page URL still the same as when the tag was configured?
 - Does the current checkout/form flow actually reach the tagged URL on submission?
@@ -548,17 +557,20 @@ These fire when a user reaches a specific page URL (typically a thank-you or con
 
 **AD_CALL (Google forwarding number):**
 Google-native call tracking. These are the most reliable action type and rarely break without an account-level change. Confirm via GAQL:
-```
+
+```text
 SELECT call_view.call_tracking_display_name, call_view.duration_seconds, call_view.call_status,
        segments.date
 FROM call_view
 ORDER BY segments.date DESC
 LIMIT 30
 ```
+
 If call_view returns records, Google forwarding is active and confirmed working. If it returns nothing despite call extensions being live, the call extension itself may be missing a Google forwarding number.
 
 **UPLOAD_CLICKS (third-party call tracking platform — CallRail, CTM, etc.):**
 These platforms upload call data to Google Ads via the offline conversions API. Two common silent failure modes:
+
 1. **No Lead Rule configured**: the integration is connected but has no criteria for what constitutes a conversion. It silently uploads nothing. Fix: add a qualifying filter (e.g., call duration > 60 seconds) in the platform's Google Ads integration settings.
 2. **GCLID not being captured**: if the landing page doesn't capture and store the GCLID parameter from the ad click, the platform cannot attribute the call back to Google Ads. Enhanced Conversions (matching by phone number) is the fallback — check whether it is enabled in both Google Ads and the call tracking platform.
 
@@ -569,11 +581,12 @@ These platforms upload call data to Google Ads via the offline conversions API. 
 If the tracking failure affected a campaign running Maximize Conversions or tCPA:
 
 The algorithm has been operating on incomplete or absent conversion signals. After the tracking fix, the algorithm must relearn. This takes 2–4 weeks. During this window:
+
 - Hold bid strategy and targets constant — do not adjust in response to apparently poor performance
 - The apparent CPA may worsen temporarily as the algorithm recalibrates
 - A "conversion drop" that coincides with a tracking fix being deployed is the algorithm catching up, not a new failure
 
-> *This is the Smart Bidding Post-Tracking-Fix Protocol from SKILL.md. Do not deviate from it.*
+> _This is the Smart Bidding Post-Tracking-Fix Protocol from SKILL.md. Do not deviate from it._
 
 ---
 
@@ -630,7 +643,7 @@ Google has assessed that the landing page doesn't deliver what the ad promises, 
 > ⚠️ **BLIND SPOT — Landing page quality cannot be assessed via API**
 > → Please share a screenshot of the landing page receiving traffic from this campaign. Assess: Does the page content match what the ad says? Is there a visible CTA? Does the keyword theme appear in the page headline? Is the page functional on mobile?
 
-*[Toby version]: Check `account-notes/[account].md`. If LP quality was flagged as BELOW_AVERAGE in a prior session and remains unresolved, escalate to P1. Note explicitly: bid strategy adjustments, keyword changes, and QS optimization have limited leverage while landing page quality is the binding constraint. The account can improve most other things and still underperform if the LP is not addressed.*
+_[Toby version]: Check `account-notes/[account].md`. If LP quality was flagged as BELOW_AVERAGE in a prior session and remains unresolved, escalate to P1. Note explicitly: bid strategy adjustments, keyword changes, and QS optimization have limited leverage while landing page quality is the binding constraint. The account can improve most other things and still underperform if the LP is not addressed._
 
 **Multiple components are BELOW_AVERAGE:**
 Address in order: landing page first (highest impact, foundational), then ad relevance (structural fix), then CTR (copy optimization). Don't optimize ad copy on a broken landing page.
@@ -651,8 +664,9 @@ Pull: GAQL 6.3 (weekly trend), GAQL 7.1 (RSA performance), GAQL 8.1 (change hist
 **How long has the decline been happening?**
 
 - **Gradual decline over 3–6+ months**: creative staleness is the most common cause. The same ads have been running long enough that the audience has been repeatedly exposed. CTR decays slowly but consistently. Cross-reference: when were these ads last meaningfully updated? (Change history, GAQL 8.1)
+
   - Action: creative refresh. New headlines that address a different angle, new emotional hooks, test contrast language.
-  
+
 - **Abrupt drop over 1–2 weeks**: external change. New competitors, competitor creative improvement, or SERP layout change.
 
 > ⚠️ **BLIND SPOT — Competitor ad copy and SERP layout changes are not visible via API**
@@ -722,17 +736,18 @@ Two valid approaches:
 
 Either approach is valid. What is NOT valid: making any additional bid strategy changes, target changes, or budget changes during the stabilization window. This is often difficult to explain to clients — budget spending erratically during learning phases looks bad in the short term even when the long-term outcome will be better.
 
-*[Toby version]: Note in session log under `Session Observations` if the client has been briefed on the learning phase concept and their reaction. This context is useful for managing expectations in future sessions.*
+_[Toby version]: Note in session log under `Session Observations` if the client has been briefed on the learning phase concept and their reaction. This context is useful for managing expectations in future sessions._
 
 ---
 
 ## Session Log Reminder
 
-*[Toby version only]*
+_[Toby version only]_
 
 At the end of every analysis session, generate a session log using the template in `SKILL.md` and save it to `session-logs/YYYY-MM-DD-[account-name].md`.
 
 The most important fields for future skill development are:
+
 - **Diagnostic Path** — what you actually checked and in what order
 - **Blind Spots Hit** — what you couldn't see and whether a screenshot resolved it
 - **Session Observations** — anything that surprised you, anything the current trees don't account for
