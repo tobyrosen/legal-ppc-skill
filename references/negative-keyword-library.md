@@ -19,7 +19,8 @@ Master reference for negative keywords in law firm Google Ads accounts. Organize
 These block users signaling they cannot afford legal services or are explicitly seeking free/reduced-cost options. These users rarely convert to paying clients.
 
 ### Broad Match (use cautiously — review for collateral blocking)
-```
+
+```text
 free
 cheap
 quick
@@ -38,7 +39,8 @@ low cost
 ```
 
 ### Phrase Match
-```
+
+```text
 "afford"
 "aid"
 "assistance"
@@ -57,7 +59,8 @@ low cost
 ```
 
 ### Exact Match
-```
+
+```text
 [afford]
 [aid]
 [assistance]
@@ -84,7 +87,8 @@ low cost
 These block job seekers, law students, and people researching legal careers — not legal services clients.
 
 ### Phrase Match
-```
+
+```text
 "attorney jobs"
 "lawyer jobs"
 "legal jobs"
@@ -110,7 +114,8 @@ These block job seekers, law students, and people researching legal careers — 
 ```
 
 ### Exact Match
-```
+
+```text
 [law school]
 [bar exam]
 [paralegal]
@@ -127,7 +132,8 @@ These block job seekers, law students, and people researching legal careers — 
 These block people seeking to represent themselves or find forms — they are not looking to hire an attorney.
 
 ### Phrase Match
-```
+
+```text
 "how to file"
 "how to represent"
 "self represent"
@@ -163,7 +169,8 @@ These block people seeking to represent themselves or find forms — they are no
 These block early-stage research queries that are unlikely to convert. Use phrase match only — exact match is too narrow, and broad match risks catching too much.
 
 ### Phrase Match
-```
+
+```text
 "definition"
 "what is"
 "what does"
@@ -201,7 +208,8 @@ These block early-stage research queries that are unlikely to convert. Use phras
 Apply at the campaign level, not account-level. These prevent a family law campaign from triggering on criminal defense queries and vice versa.
 
 ### For Family Law Campaigns — Exclude These Practice Areas
-```
+
+```text
 "criminal"
 "criminal defense"
 "criminal lawyer"
@@ -231,7 +239,8 @@ Apply at the campaign level, not account-level. These prevent a family law campa
 ```
 
 ### For Criminal Defense Campaigns — Exclude These Practice Areas
-```
+
+```text
 "divorce"
 "custody"
 "child support"
@@ -246,7 +255,8 @@ Apply at the campaign level, not account-level. These prevent a family law campa
 ```
 
 ### For Personal Injury Campaigns — Exclude These Practice Areas
-```
+
+```text
 "divorce"
 "custody"
 "criminal"
@@ -265,7 +275,8 @@ Apply at the campaign level, not account-level. These prevent a family law campa
 Managed at the campaign targeting settings level, not as keyword negatives — but listed here for reference. For accounts where geographic keywords appear in search terms from outside the target market, add location modifiers as negatives at the campaign level.
 
 Examples (apply as phrase match, customized to account):
-```
+
+```text
 "[competing city] attorney"
 "[out-of-state] lawyer"
 "[wrong jurisdiction] divorce"

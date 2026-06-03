@@ -41,6 +41,7 @@ Legal search intent is layered and often misread. Someone searching "how to get 
 Informational and research queries in legal carry higher buyer intent than they do in most verticals. The research phase precedes hiring an attorney — it does not substitute for it. Someone searching "how much does a divorce cost in Michigan" or "can I get deported for a DUI in Arizona" has a real problem, is actively researching it, and may be a week away from calling. These are buyers in the early stage of their decision process, not DIY researchers who will never hire anyone.
 
 Specific query patterns that should NOT be flagged as waste by default:
+
 - **Cost/fee queries** ("how much does X cost", "attorney fees for X") — comparison shopping before hiring. High buyer intent in legal.
 - **Procedural questions** ("can I file for X", "how do I start X", "can I force X") — people determining whether they have a case and whether they need an attorney. These frequently convert.
 - **Outcome/liability queries** ("who pays for X", "what happens if X") — people in active decision mode evaluating their situation. Keep unless confirmed non-converting over substantial volume.
@@ -72,6 +73,7 @@ Google increasingly pushes consolidation. Resist it. When you merge a divorce ca
 **Network settings:** Search network only is the default. Search partners and display network deliver inferior traffic for legal at the same cost. Include them only with specific justification and close monitoring.
 
 **Competitor targeting:** Bidding on a competitor's brand name is a legitimate strategy in legal PPC — not an oversight. A firm may deliberately appear on searches for a specific rival to intercept comparison shoppers or suppress a competitor's budget. Before flagging competitor brand clicks as waste, distinguish:
+
 - **Intentional competitor targeting** → strategy. The account notes or client context will indicate this. Do not recommend removing it without checking first.
 - **Accidental brand bleed** → broad match keywords or poor negatives catching a competitor's name as collateral traffic. This is waste.
 
@@ -90,6 +92,7 @@ Phrase and exact match are the defaults — 99% of the time. This is not conserv
 Broad match is only tested in rare cases, often in SKAG (single keyword ad group) structure to isolate its behavior.
 
 **Negative keyword structure:** Account-level shared negative keyword lists are essential infrastructure. They block irrelevant traffic categories at scale — job seekers, people looking for DIY legal resources, people in the wrong geography. The hierarchy follows scope of the exclusion:
+
 - Irrelevant to the entire account → account-level negative
 - Irrelevant to a campaign → campaign-level negative
 - Irrelevant to an ad group → ad group-level negative
@@ -115,6 +118,7 @@ All recommended bidding strategies rely on properly configured conversion tracki
 5. **Manual CPC** — The original approach. Only used in genuine crises. Almost never appropriate for active accounts today.
 
 **Bidding principles:**
+
 - Smart bidding requires a learning phase of at least 14 days. Do not make significant changes to bid strategy, budgets, or targeting during this window — it resets the clock and extends instability.
 - Smart bidding on low-conversion-volume accounts will oscillate and overspend during learning phases. Ensure there's sufficient data before switching to tCPA.
 - The pattern in mismanaged inherited accounts: smart bidding turned on without data → bad performance → repeated manual adjustments → algorithm never learns → continued poor performance → more adjustments. Breaking this cycle requires patience.
@@ -131,6 +135,7 @@ All recommended bidding strategies rely on properly configured conversion tracki
 Legal ad copy operates under bar association rules that vary by state — no guarantees, careful language around results, restrictions on certain claims. Within those constraints:
 
 **Headline principles (Ogilvy-informed):**
+
 - Lead with the client's problem, not the firm's credentials
 - Bold statement or question that speaks directly to the situation beats generic claims
 - "Need help with your visa? Here's how we make it stress-free" outperforms "Experienced Immigration Lawyer"
@@ -141,6 +146,7 @@ Legal ad copy operates under bar association rules that vary by state — no gua
 **Curiosity-driven copy:** "You might think all criminal defense lawyers are the same. Think again." Works at any funnel stage — hooks early-stage researchers and reinforces differentiation for high-intent searchers.
 
 **Intent matching:**
+
 - High-intent users (searching "family law attorney [city]") → Direct, action-oriented, urgency-focused copy. "Call now for a free consultation."
 - Awareness-stage users (searching "how to file for divorce") → Educational framing, softer CTA. "Learn more about your options — speak to an attorney today."
 
@@ -155,6 +161,7 @@ Legal ad copy operates under bar association rules that vary by state — no gua
 Every analysis session has a brief — sometimes it comes from the client, sometimes it's self-directed in the course of ongoing optimization. Either way, the brief determines where to look first. There is no universal starting point.
 
 **Reading the account before drawing conclusions:**
+
 - **Conversion tracking** — Verify that what's being tracked aligns with actual business objectives. Inherited accounts frequently have misconfigured tracking, duplicate conversions, or conversions that don't represent real leads. This is always worth checking early.
 - **Change history** — Read it early. An account untouched for weeks is being neglected. An account flooded with auto-applied changes is being mismanaged by Google. The pattern of changes tells you what kind of problem you're dealing with before you look at performance data.
 
@@ -175,6 +182,7 @@ Every analysis session has a brief — sometimes it comes from the client, somet
 Short-term data is one of the most common sources of bad keyword decisions. A keyword that appears acceptable over 30 days may reveal consistent underperformance over 90 days — and a keyword that looks like a problem in a bad week may be a strong performer over a longer window. Always check multiple date ranges before making keyword-level decisions.
 
 When auditing keywords, look for:
+
 - **Long-term bleed** — keywords generating consistent clicks with few or no conversions over extended periods. These are often left running because short-term data doesn't flag them clearly.
 - **Conversion clustering** — keywords that convert well in bursts but go cold for long stretches. These may reflect seasonality or market conditions rather than keyword quality.
 - **CPC drift** — gradual CPC increases on specific keywords over time that don't correspond to performance improvements. This is a signal of increasing competition on that term and may require bid strategy reconsideration.
@@ -188,6 +196,7 @@ The instinct to pause or remove underperforming keywords based on a bad month is
 ### What Good Looks Like
 
 A well-run legal account has:
+
 - Clean geographic and practice area segmentation with independent budget and bid strategy per campaign
 - Phrase and exact match keywords; broad match absent or tightly isolated in test structure
 - A maintained account-level negative keyword list
@@ -214,4 +223,4 @@ A well-run legal account has:
 
 ---
 
-*This document encodes a framework built over a decade of legal PPC management, primarily in family law. It will frequently diverge from Google's recommendations. That divergence is intentional and should be expected.*
+_This document encodes a framework built over a decade of legal PPC management, primarily in family law. It will frequently diverge from Google's recommendations. That divergence is intentional and should be expected._

@@ -7,6 +7,7 @@ compatibility: Requires googleAdsServer MCP with run_gaql tool (Google Ads API a
 # Google Ads Analysis Skill — Rosen Advertising
 
 ## Purpose
+
 This skill enables autonomous analysis and optimization of Google Ads accounts for law firms. It encodes expert-level knowledge about legal PPC and provides structured tools for diagnosis, auditing, and optimization without requiring step-by-step direction.
 
 ---
@@ -26,19 +27,19 @@ This skill operates in two modes:
 Read these before any analysis:
 
 - **`references/google-ads-knowledge-base.md`** — Core philosophy and principles. The lens through which all findings are evaluated. Non-negotiable starting point.
-- **`references/learnings.md`** *(Toby version only)* — Validated patterns extracted from past session logs. Read this after the knowledge base to supplement with empirically-observed patterns.
-- **`account-notes/[account].md`** *(Toby version only)* — Account-specific context, history, and prior findings. Read the relevant file for the account being analyzed.
+- **`references/learnings.md`** _(Toby version only)_ — Validated patterns extracted from past session logs. Read this after the knowledge base to supplement with empirically-observed patterns.
+- **`account-notes/[account].md`** _(Toby version only)_ — Account-specific context, history, and prior findings. Read the relevant file for the account being analyzed.
 
 ---
 
 ## Reference Files
 
-| File | Purpose | When to Use |
-|------|---------|-------------|
-| `references/gaql-query-library.md` | Pre-built GAQL queries organized by diagnostic task | Any time live account data is needed |
-| `references/negative-keyword-library.md` | Master negative keyword lists by category | Search term reviews, account audits, new account setup |
-| `references/diagnosis-trees.md` | Diagnostic frameworks for the most common account problems | Performance diagnosis, account review, issue investigation |
-| `account-audit-checklist.md` | Structured first-review audit checklist (Sections A–I, pass/fail, output format) | First-contact account review (Tree 5) |
+| File                                     | Purpose                                                                          | When to Use                                                |
+| ---------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `references/gaql-query-library.md`       | Pre-built GAQL queries organized by diagnostic task                              | Any time live account data is needed                       |
+| `references/negative-keyword-library.md` | Master negative keyword lists by category                                        | Search term reviews, account audits, new account setup     |
+| `references/diagnosis-trees.md`          | Diagnostic frameworks for the most common account problems                       | Performance diagnosis, account review, issue investigation |
+| `account-audit-checklist.md`             | Structured first-review audit checklist (Sections A–I, pass/fail, output format) | First-contact account review (Tree 5)                      |
 
 ---
 
@@ -47,13 +48,14 @@ Read these before any analysis:
 Queries in `references/gaql-query-library.md` are pure GAQL and MCP-agnostic. Execute them using whatever GAQL execution tool is available in the current environment.
 
 Currently: `run_gaql(customer_id, query, format)` from the `googleAdsServer` MCP.
+
 - Prefer `format="table"` for diagnostic reads
 - Use `format="csv"` for large result sets you need to process
 - `run_gaql` is preferred over `execute_gaql_query` — it's a superset with output format control
 
 If the MCP changes, update this note only. The query library remains valid.
 
-**Login/MCC customer ID:** *(set in your MCP config — replace with your own MCC/manager account ID)*
+**Login/MCC customer ID:** _(set in your MCP config — replace with your own MCC/manager account ID)_
 **First step in any new session:** `list_accounts()` — confirms which accounts are accessible.
 
 ---
@@ -105,6 +107,7 @@ Legal PPC CPCs are typically $5–50+ per click for competitive terms (probate, 
 Cheap CPC on a competitive legal term is a red flag that the data includes paused ad group history — paused ad groups accumulate low-cost historical impressions/clicks from when CPCs were lower, or from test periods.
 
 **Protocol for handed search term data:**
+
 1. Before drawing any conclusions, scan the CPC column. If you see legal-intent terms at under $2/click (especially under $1), flag this immediately: "These CPCs look anomalously low for legal PPC — typical range is $5–50+. This may include data from paused ad groups."
 2. Ask: "Can you confirm which ad groups these terms came from, and whether the query filtered for ENABLED ad groups only?"
 3. Do NOT present terms with suspicious CPCs as active waste findings until the source is confirmed.
@@ -129,6 +132,7 @@ This is the single most common mistake made after a tracking cleanup. The instin
 5. **After 2–4 weeks of clean data**, evaluate whether the target needs adjustment. Now you have a real baseline. Adjust based on that — not on the pre-fix numbers.
 
 **What to monitor during relearning:**
+
 - Learning status in the campaign settings (should show "Learning" initially, then clear)
 - 14-day rolling CPA (expect rise, then stabilization)
 - Impression share (may drop as algorithm recalibrates auction bids)
@@ -183,6 +187,7 @@ Flag as potentially problematic only when HIGH avg CPC is combined with: (a) zer
 `search_term_view` typically shows **~50% of actual campaign spend**. This is a Google Ads API limitation — the API withholds low-volume search terms and has a hard row cap per query. It is not fixable through query splitting or pagination (GAQL does not support OFFSET).
 
 **Coverage check is mandatory before presenting any search term findings.** Do this first, before analysis, before findings, before recommendations:
+
 1. Pull actual campaign spend for the period via `FROM campaign`
 2. Sum total cost from your `search_term_view` results
 3. Report the ratio: "Search term data covers $X of $Y actual spend (Z%)"
@@ -208,6 +213,7 @@ When all three conditions are present, the keyword has been effectively removed 
 **Standard QS optimization does not recover a throttled keyword.** Improving ad copy, landing page, or CTR applies to underperforming keywords that are still entering auctions. For a throttled keyword, Google is not entering it into auctions at all — incremental quality improvements cannot recover it from this baseline.
 
 **The correct intervention is structural replacement:**
+
 1. Pause the throttled keyword
 2. Create a new keyword variant in a new or reorganized ad group with dedicated ad copy and a landing page that precisely matches the query intent
 3. A fresh keyword gives Google a clean quality signal with no prior history
@@ -227,6 +233,7 @@ When a BROAD match keyword is flagged for cleanup (high CPA, waste, or match typ
 **When hard delete is appropriate:** Only for irrelevant terms — wrong practice area, wrong geography, competitor brand names. Relevant keywords that are simply too broad get converted to phrase, not deleted.
 
 **Sequence:**
+
 1. Convert BROAD to phrase match
 2. Monitor search terms for 2-4 weeks
 3. If CPA remains above target after phrase conversion, identify specific waste terms to negative or evaluate tightening to exact
@@ -242,6 +249,7 @@ When a brief presents a CPA figure for a campaign running on **both Search and S
 Pull: GAQL 6.4 or `segments.network` — segment campaign performance by `SEARCH` vs. `SEARCH_PARTNERS`.
 
 If network data is not provided and Search Partners status is unknown:
+
 - State explicitly: the reported CPA may be a blended figure that includes Search Partners
 - Do not diagnose "CPA is high" or recommend a tCPA change until network split is confirmed
 - The required next step is: pull performance by `segments.network` (clicks, conversions, cost, CPA) for each network separately
@@ -249,6 +257,7 @@ If network data is not provided and Search Partners status is unknown:
 **Smart bidding signal risk:** Excluding Search Partners is not a simple win. Removing the Partners network reduces the total conversion signal available to the smart bidding algorithm. If the campaign is near the 15-20 conv/month reliability threshold, excluding Partners may push it into Sub-tree D territory. Always check conversion volume contribution before recommending exclusion.
 
 **Decision framework after pulling network data:**
+
 - If Search Partners CPA is above target AND Partners conversion volume is small relative to Search → exclusion is reasonable; signal loss is minimal
 - If Search Partners CPA is above target BUT Partners is contributing significant conversion volume → exclusion risk is real; consider whether blended CPA is still on-target if Partners is removed
 - If Search CPA is already on-target → the issue is contained to Partners; exclusion is the likely fix, but confirm volume contribution first
@@ -278,11 +287,13 @@ Do not accept a stated CPA, performance comparison, or benchmark as given. Pull 
 **The rule:** If a conclusion requires knowing current account state (keyword status, current CPA, current conversion volume, current campaign settings), it must come from a live GAQL query — not from account notes alone.
 
 Account notes are used for:
+
 - Understanding prior context before pulling data
 - Knowing what to look for and what changed since the last session
 - Applying market-specific priors and account history
 
 Account notes are NOT used for:
+
 - Determining whether a keyword is currently active
 - Stating current CPA or performance numbers
 - Confirming whether a prior recommendation was implemented
@@ -310,12 +321,14 @@ If MCP tools are available, use them. Don't reason from a snapshot when you can 
 ## Using Sub-Agents for Heavy Analysis
 
 For tasks that involve pulling and analyzing large search term datasets across multiple campaigns, spawn parallel sub-agents — one per campaign — using the `Agent` tool with `subagent_type: "general-purpose"`. This:
+
 - Prevents search term files from consuming the main context window
 - Enables parallel data pulls (faster wall-clock time)
 - Keeps each agent's analysis focused on one campaign
 
 **Pattern:**
-```
+
+```text
 Main agent → fires N sub-agents in parallel (one per campaign)
 Each sub-agent → pulls search terms, runs intent categorization, returns structured summary:
   { campaign, spend_visible, spend_actual, waste_terms[], converting_terms[], flags[] }
@@ -332,11 +345,11 @@ Use this pattern any time a search term review spans more than 2 campaigns.
 
 This skill works best alongside other installed skills. Check availability at session start and use them when relevant:
 
-| Skill | Use for | Required? |
-|-------|---------|-----------|
-| `xlsx` | Negative keyword upload files, bulk change sheets, structured exports | Recommended |
-| `pptx` / `docx` | Client-facing reports | Optional |
-| *(data skill — future)* | Statistical aggregation, complex analysis | Planned |
+| Skill                   | Use for                                                               | Required?   |
+| ----------------------- | --------------------------------------------------------------------- | ----------- |
+| `xlsx`                  | Negative keyword upload files, bulk change sheets, structured exports | Recommended |
+| `pptx` / `docx`         | Client-facing reports                                                 | Optional    |
+| _(data skill — future)_ | Statistical aggregation, complex analysis                             | Planned     |
 
 If a dependency is missing and the user asks for output that skill would handle, note what's missing and suggest installing it rather than producing a lower-quality substitute.
 
@@ -345,9 +358,11 @@ If a dependency is missing and the user asks for output that skill would handle,
 ## How to Approach a Session
 
 ### Step 1 — Establish the brief
+
 Every session has a brief. It may be explicit (client concern, specific issue) or self-directed (monthly review, regular optimization). The brief determines where to focus. There is no universal starting point.
 
 Common brief types:
+
 - **Performance review** — What happened over the last period? What changed?
 - **Issue investigation** — Something is wrong. Diagnose and explain.
 - **Account audit** — First look at an account or periodic structural review.
@@ -367,7 +382,8 @@ Common brief types:
 
 This isn't gatekeeping — it's targeting. Pre-flight data makes clarifying questions more precise. Name the entry point, run pre-flight, then ask.
 
-### Step 2 — Verify prior session's pending actions *(Toby version only)*
+### Step 2 — Verify prior session's pending actions _(Toby version only)_
+
 Before any new analysis, read `account-notes/[account].md` and check the `## Pending Actions` section.
 
 **If the file doesn't exist:** This is a new account with no prior session history. Note this, skip the verification step, and plan to create the file at session end using the template in the session log section. Proceed to Step 3.
@@ -381,7 +397,9 @@ For each pending item, pull current account state via GAQL and verify whether it
 This closes the feedback loop. The skill recommended the action; now it confirms whether it happened and can begin attributing performance changes to specific interventions. Don't skip this even if the user hasn't mentioned it — it's how the skill builds a reliable thesis about what works in this account.
 
 ### Step 3 — Run pre-flight checks
+
 Before any symptom-specific diagnosis, run the three pre-flight checks from `references/diagnosis-trees.md`:
+
 - PF-1: Conversion tracking verification
 - PF-2: Structural red flags
 - PF-3: Change history read
@@ -389,46 +407,54 @@ Before any symptom-specific diagnosis, run the three pre-flight checks from `ref
 All three are mandatory and none are deferred by a vague brief. Run PF-1, PF-2, and PF-3 before any symptom-specific diagnosis, regardless of brief clarity. PF-1 is the most urgent — conversion tracking issues invalidate every other finding and should be checked first. PF-2 and PF-3 follow immediately after, not after the brief is clarified. A vague brief about "performance feeling off" is still a brief. All three pre-flights run.
 
 ### Step 4 — Pull data, flag everything
+
 Run the relevant queries from the GAQL library. Don't draw conclusions yet — read the account broadly and flag anything that deviates from knowledge base standards or known good-account patterns. A flag is a candidate for investigation, not a confirmed finding.
 
 When you hit something you can't see via the API, use the blind spot protocol from `references/diagnosis-trees.md`:
+
 > ⚠️ **BLIND SPOT — [what cannot be seen]**
 > → Please share a screenshot of [exact location, with applicable filters/date range].
 
 **For search term reviews across more than 2 campaigns:** suggest the sub-agent pattern before pulling data (see "Using Sub-Agents" above). This is the default approach for multi-campaign pulls — don't wait for the user to ask.
 
 ### Step 5 — Maintain a running action list
+
 This is the most important habit in multi-section sessions. As each analysis section completes, immediately append its action items to a running list — don't wait until the end. Items from section A must still be present when section C is done.
 
 At session end, the action list is the union of every section's items. Nothing gets dropped because a later section produced its own list.
 
 Format each item as:
-```
+
+```text
 - [ACTION] [target] — [one-line rationale] | [scope: account/campaign/ad-group]
 ```
 
-*(Toby version only)* Update `account-notes/[account].md → ## Pending Actions` with the full list before closing.
+_(Toby version only)_ Update `account-notes/[account].md → ## Pending Actions` with the full list before closing.
 
 ### Step 6 — Prioritize flags by impact
+
 Prioritize by: estimated spend impact × confidence it's a real problem. Structural issues affecting budget allocation every day rank ahead of cosmetic issues.
 
 ### Step 7 — Diagnose priority flags
+
 For each priority flag, work through the relevant diagnosis tree. A flag becomes a finding when you can state: what is wrong, why it matters, what likely caused it, and what should be done.
 
 ### Step 8 — Produce output
+
 - **Internal analysis** → prioritized findings list with context and recommendations
 - **Client communication** → translated into plain language, focused on business impact
 - **Reporting** → handled separately via AgencyAnalytics, not this skill
 
 **Campaign → Ad Group path is mandatory in every finding.** Every keyword, search term, ad, or ad group finding must lead with the full path so the user can navigate to it in the Google Ads UI:
 
-```
+```text
 Campaign: [campaign name] | Ad Group: [ad group name] | [keyword or term]
 ```
 
 Without the campaign name, a finding is unactionable — the user cannot locate the item. This applies to every finding in every output format, without exception. A finding that omits the path is incomplete.
 
-### Step 9 — Write session log *(Toby version only)*
+### Step 9 — Write session log _(Toby version only)_
+
 Before closing the session, generate a session log using the template below. Create the `session-logs/` directory if it does not already exist, then save to `session-logs/YYYY-MM-DD-[account-name].md`.
 
 ---
@@ -437,15 +463,15 @@ Before closing the session, generate a session log using the template below. Cre
 
 Add your accounts here. The `login_customer_id` is your MCC ID (if using a manager account).
 
-| Account | ID | Notes |
-|---------|-----|-------|
-| Example — Family Law | 1234567890 | See `account-notes/example-family-law.md`. |
-| MCC/Login | 0000000000 | Use as login_customer_id when querying sub-accounts |
+| Account              | ID         | Notes                                               |
+| -------------------- | ---------- | --------------------------------------------------- |
+| Example — Family Law | 1234567890 | See `account-notes/example-family-law.md`.          |
+| MCC/Login            | 0000000000 | Use as login_customer_id when querying sub-accounts |
 
-*(Replace with your own accounts. One row per account. Add an account-notes file for each.)*
+_(Replace with your own accounts. One row per account. Add an account-notes file for each.)_
 
 ---
 
-## Session Log Template and Skill Development Loop *(Toby version only)*
+## Session Log Template and Skill Development Loop _(Toby version only)_
 
 See `references/session-management.md` for the session log template and skill development loop instructions.
