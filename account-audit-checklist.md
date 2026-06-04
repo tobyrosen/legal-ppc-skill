@@ -12,6 +12,36 @@ Work through each section in order. Mark each item ✓ (pass), ✗ (flag), or �
 
 These run before anything else. Pre-flight findings take priority over every other finding.
 
+### PF-0: Account Macro Context (Reasoning Input)
+
+_GAQL: 1.1 (campaigns, current + prior periods), 2.3 (conversion volume by campaign), 11.1 (budget/spend by period)_
+
+This step is mandatory **reasoning input**, not a default user-facing output section. Pull it every time, surface only when flag-worthy.
+
+- [ ] Spend trend pulled: current period vs prior 90-day baseline (account-level and per-campaign)
+- [ ] Conversion volume trend pulled: current period vs prior 90-day baseline
+- [ ] Lead volume trend pulled where CRM data is available (otherwise primary conversion action volume)
+- [ ] CPL/CPA trend pulled: current period vs prior 90-day baseline
+- [ ] Year-over-year delta noted if data spans long enough
+
+**Flag-worthy signals (surface in output):**
+
+- Material trend shift (≥25% change MoM in spend, conv volume, or CPL)
+- Trend reversal (account direction has flipped vs prior period)
+- Contradiction with the tactical recommendation being made (e.g., recommending bid-up while spend is already up 40% MoM with conversions flat or down)
+- Pattern explaining other findings (e.g., YoY drop aligned with a structural change)
+
+**Output format when flagging:**
+
+```text
+[MACRO FLAG] [one-line description of the trend]
+[Why it matters in the context of the work being done]
+```
+
+Macro context that is steady, expected, or supportive of the recommendation is NOT surfaced. The user is not asking for a trend report — they are asking for an audit or optimization. Surface macro only when it changes how the work should be interpreted.
+
+---
+
 ### PF-1: Conversion Tracking
 
 _GAQL: 2.1 (all conversion actions), 2.2 (recent conversion volume)_

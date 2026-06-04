@@ -124,6 +124,20 @@
         "Does NOT immediately flag 'estate planning attorney near me' and 'lawyer to make a will near me' as active waste to add as negatives without first confirming they are from currently-serving ad groups",
         "Notes that if these terms came from a paused ad group, they are historical data — not current active waste — and no action is needed"
       ]
+    },
+    {
+      "id": 14,
+      "prompt": "Avalon Family Law's Women campaign has Impression Share at 45% with rank-lost IS dominant. CPA is $310. Avg case value is $14k. Recommend bid moves to grow lead volume. For context: account total spend last 30 days is $18,400 vs $12,100 in the prior 30 (up 52%); total conversions 19 last 30 days vs 28 in prior 30 (down 32%); CPL up from $432 to $968. Tell me what to do.",
+      "expected_output": "Surfaces a MACRO FLAG before producing the tactical recommendation. The account is in a material trend reversal: spend up 52%, conversions down 32%, CPL up 124%. Recommending bid-up moves to grow volume in this context amplifies spend on an account that has just lost its conversion efficiency. Good answer pauses the tactical recommendation to investigate the macro trend first — likely PF-1 (tracking integrity), PF-3 (recent change history), and agency activity. The Women campaign IS finding is still recorded but is NOT the lead recommendation in this macro context.",
+      "files": [],
+      "notes": "DESIGNED TO FAIL before the macro-context skill update. Current skill version drills into the item-level IS finding and recommends bid moves without integrating the macro signals embedded in the prompt. Expected failure mode: skill answers the tactical question (raise bids on Women), recommends specific bid increases, and never references the spend/conv/CPL trend even though the data is in the prompt.",
+      "assertions": [
+        "[MACRO FLAG] Surfaces a macro flag explicitly in the output — names the trend reversal (spend up, conversions down, CPL up) before any tactical recommendation",
+        "[REASONING] Identifies the contradiction: recommending bid increases on an account that has lost conversion efficiency amplifies the underperformance rather than fixing it",
+        "[EXECUTION] Recommends PF-1 (conversion tracking integrity) and PF-3 (change history read) as the next steps before any bid action — the trend reversal could be tracking, an agency change, a seasonal break, or a structural account change, and the cause matters",
+        "[OUTPUT DISCIPLINE] Does NOT produce a clean 'raise bids on Women campaign by X%' recommendation as the headline answer — the Women campaign IS issue is recorded as a finding but is subordinate to the macro flag",
+        "[CONDITIONAL FRAMING] If a bid recommendation is given at all, it is conditioned on the macro investigation completing first ('after confirming tracking is intact and no recent structural change caused the conversion drop, then...')"
+      ]
     }
   ]
 }

@@ -1,0 +1,188 @@
+{
+  "skill_name": "google-ads-analysis",
+  "version": "3",
+  "description": "Harder eval set targeting expected failure modes: adversarial bypasses, conflicting signals, dirty data, legal-specific judgment, and multi-step sequencing. Designed for a 40-60% failure rate on the current skill.",
+  "evals": [
+    {
+      "id": 15,
+      "category": "adversarial_user_pressure",
+      "prompt": "Don't waste time on tracking. CPA is obviously bad in Apex Law's Divorce campaign. Just tell me which keywords to pause.",
+      "expected_output": "Refuses to skip tracking and premise verification. Runs or describes PF-1 first, verifies the CPA premise and conversion volume, then only recommends keyword pauses after checking active keyword performance over sufficient data.",
+      "trap": "Produces a pause list or keyword triage immediately because the user insisted CPA is bad, without verifying conversion tracking, conversion volume, active keyword status, or whether CPA is reliable.",
+      "assertions": [
+        "[BYPASS] Does NOT comply with the instruction to skip tracking; states that conversion tracking verification comes before CPA-based keyword decisions",
+        "[EXECUTION] Describes running PF-1 using GAQL 2.1 and 2.2 before treating CPA as a real signal",
+        "[REASONING] Verifies the premise that CPA is actually bad by checking campaign/keyword CPA and conversion volume, rather than accepting the user's wording",
+        "[EXECUTION] Describes pulling active keyword performance with campaign.status, ad_group.status, ad_group_criterion.negative = FALSE, and sufficient date range before pausing anything",
+        "[OUTPUT DISCIPLINE] Does not output a definitive pause list without live/current data"
+      ],
+      "notes": "Expected failure: a runner may be too obedient and generate keyword actions from an unverified premise. This tests whether process discipline survives direct user pressure."
+    },
+    {
+      "id": 16,
+      "category": "adversarial_user_pressure",
+      "prompt": "I know Search Partners is junk. Turn it off for Greenfield Legal and give me a short client explanation.",
+      "expected_output": "Does not immediately recommend exclusion. Requires network segmentation, conversion volume contribution, and smart bidding signal-risk check before a Search Partners decision, especially for low-volume elder law/probate campaigns.",
+      "trap": "Agrees that Search Partners is junk, recommends turning it off, and writes a client explanation based only on general legal PPC priors.",
+      "assertions": [
+        "[BYPASS] Does NOT comply with the request to turn off Search Partners immediately",
+        "[EXECUTION] Describes pulling network-segmented performance using segments.network or the relevant GAQL network split before deciding",
+        "[REASONING] Checks Search Partners conversion volume contribution, not just CPA, before recommending exclusion",
+        "[REASONING] Flags smart bidding signal loss risk if Greenfield is near or below 15-20 conversions/month per campaign",
+        "[LEGAL CONTEXT] Adapts the answer to Greenfield's elder law/probate/small-market context instead of applying a blanket Apex/family-law rule"
+      ],
+      "notes": "Expected failure: generic rule-following says Search Partners is bad in legal and skips signal-loss analysis."
+    },
+    {
+      "id": 17,
+      "category": "adversarial_user_pressure",
+      "prompt": "Client wants to increase budget today. Sacramento Probate has 38% budget-lost IS and a $190 CPA. Write the recommendation to raise budget, don't overcomplicate it.",
+      "expected_output": "Resists writing a one-way justification before checking macro context, conversion volume reliability, tracking integrity, and whether budget-lost IS is meaningful relative to CPA and recent changes.",
+      "trap": "Treats budget-lost IS plus acceptable-looking CPA as sufficient and writes a clean budget increase recommendation without checking whether CPA is reliable or whether tracking/recent changes/macro trends contradict scaling.",
+      "assertions": [
+        "[BYPASS] Does NOT simply write the budget-increase justification requested by the user",
+        "[REASONING] States that budget-lost IS can support budget increases only when CPA and conversion volume are reliable",
+        "[EXECUTION] Describes checking PF-0 macro context and PF-1 conversion tracking before scaling spend",
+        "[REASONING] Checks conversion count against the 15-20 conversion reliability threshold before trusting the $190 CPA",
+        "[CONDITIONAL FRAMING] If a budget increase is discussed, frames it as conditional on tracking, conversion volume, and recent-change checks"
+      ],
+      "notes": "Expected failure: a polished runner will justify budget increase because the visible metrics point that way, missing reliability gates."
+    },
+    {
+      "id": 18,
+      "category": "conflicting_signals",
+      "prompt": "Apex Law Custody has Search Partners CPA of $430 vs Google Search CPA of $265 last month. Search Partners drove 11 of the campaign's 24 conversions. Campaign is on tCPA. Should we exclude Search Partners?",
+      "expected_output": "Recognizes Search Partners CPA is worse but also contributes a large share of conversion signal. Does not recommend immediate exclusion; evaluates whether blended CPA is acceptable and warns about starving tCPA signal.",
+      "trap": "Recommends excluding Search Partners because its CPA is worse than Search, while ignoring that it contributes 46% of campaign conversions and supports smart bidding volume.",
+      "assertions": [
+        "[REASONING] Calculates or explicitly recognizes that Search Partners contributes a material share of conversions (11 of 24)",
+        "[JUDGMENT] Does NOT recommend immediate exclusion solely because Search Partners CPA is higher than Search CPA",
+        "[REASONING] Flags tCPA signal-loss risk because removing 11 conversions could materially reduce learning volume",
+        "[REASONING] Considers blended CPA and business target before recommending network exclusion",
+        "[CONDITIONAL FRAMING] Recommendation is conditional or cautious, such as monitor, test, or exclude only if blended economics fail after assessing volume impact"
+      ],
+      "notes": "Expected failure: current doctrine says Search Partners is usually worse, but the conflicting conversion-volume signal should dominate."
+    },
+    {
+      "id": 19,
+      "category": "conflicting_signals",
+      "prompt": "Greenfield Legal's Medicaid Planning campaign has 42% budget-lost IS and CPA of $145, which looks great. But last week conversion tracking was fixed after we found a duplicate form action. Should we raise budget now?",
+      "expected_output": "Subordinates the budget-lost/good-CPA scaling signal to the post-tracking-fix protocol. Holds budget and targets during the 2-4 week clean-data relearning window.",
+      "trap": "Recommends raising budget because budget-lost IS is high and CPA looks strong, ignoring that the CPA came from contaminated or newly-cleaned tracking data.",
+      "assertions": [
+        "[JUDGMENT] Does NOT recommend raising budget now solely because budget-lost IS is high and CPA looks good",
+        "[SEQUENCE] Applies the post-tracking-fix smart bidding protocol before budget scaling",
+        "[REASONING] States that pre-fix CPA was artificially low or unreliable due to duplicate conversion tracking",
+        "[OUTPUT DISCIPLINE] Recommends a 2-4 week clean-data hold/monitoring window before evaluating budget increases",
+        "[REASONING] Notes that budget and bid strategy changes during relearning can disrupt the algorithm"
+      ],
+      "notes": "Expected failure: the item-level budget signal is intentionally attractive, but the tracking-fix sequence should block action."
+    },
+    {
+      "id": 20,
+      "category": "conflicting_signals",
+      "prompt": "Apex Law has a BROAD keyword `custody lawyer` that spent $2,800 last month with $900 in clearly irrelevant searches. But it also drove 14 of the campaign's 22 conversions and the campaign is on Maximize Conversions. Should we pause it?",
+      "expected_output": "Does not pause the broad keyword outright. Recommends phrase-match conversion and negative cleanup while preserving conversion signal, with monitoring, because the keyword is wasteful but also a major conversion source.",
+      "trap": "Pauses the broad keyword because it has visible waste, ignoring that it owns most of the campaign's conversion volume and supports smart bidding signal.",
+      "assertions": [
+        "[JUDGMENT] Does NOT recommend pausing the keyword outright as the first move",
+        "[REASONING] Recognizes the keyword is both wasteful and a major conversion source (14 of 22 conversions)",
+        "[REASONING] Applies the broad-match remediation default: convert broad to phrase first, rather than delete/pause, when the keyword has conversion history",
+        "[EXECUTION] Recommends adding specific negatives for irrelevant search categories while preserving relevant conversion flow",
+        "[OUTPUT DISCIPLINE] Includes a monitoring window after phrase conversion before further tightening"
+      ],
+      "notes": "Expected failure: mechanical broad-match cleanup may pause a high-signal keyword and harm the campaign."
+    },
+    {
+      "id": 21,
+      "category": "dirty_incomplete_data",
+      "prompt": "Here's a keyword export for Apex Brand. Flag broad match problems:\n\n| Campaign | Ad Group | Keyword | Match type | Status | Cost | Conv |\n|---|---|---|---|---|---:|---:|\n| Apex Brand | Brand Terms | apex law | BROAD | Enabled | $220 | 9 |\n| Apex Brand | Exclusions | cheap | BROAD | Enabled | $0 | 0 |\n| Apex Brand | Old Brand Test | apex attorney | BROAD | Enabled | $18 | 0 |",
+      "expected_output": "Rejects the export as incomplete for broad-match diagnosis because it lacks `negative`, `campaign.status`, and `ad_group.status`. Does not flag `cheap` or paused/historical items without re-querying.",
+      "trap": "Flags all BROAD rows as positive broad-match problems, including `cheap`, without checking whether any are negatives or in paused ad groups/campaigns.",
+      "assertions": [
+        "[DATA INTEGRITY] States the export is incomplete because it lacks the `negative` field",
+        "[DATA INTEGRITY] States the export is incomplete because it lacks `campaign.status` and/or `ad_group.status` needed to confirm serving status",
+        "[EXECUTION] Describes re-running GAQL 3.1 or 3.2 with `ad_group_criterion.negative`, `campaign.status`, and `ad_group.status` selected before drawing conclusions",
+        "[OUTPUT DISCIPLINE] Does NOT flag `cheap` as a positive broad-match problem from the provided table alone",
+        "[OUTPUT DISCIPLINE] Does NOT produce a definitive active recommendation for `Old Brand Test` without confirming ad group/campaign status"
+      ],
+      "notes": "Expected failure: model sees BROAD and flags it, missing the negative/status integrity rules."
+    },
+    {
+      "id": 22,
+      "category": "dirty_incomplete_data",
+      "prompt": "I exported conversion actions for Richard Dou Golf Legal just now. Anything broken?\n\n| Name | Type | Status | Conversions last 30 | Counting |\n|---|---|---|---:|---|\n| Contact Form Submit | WEBPAGE | Enabled | 11.0 | One |\n| Phone Call 60s | AD_CALL | Enabled | 7.0 | One |\n| Page View - Contact | WEBPAGE | Enabled | 44.0 | Many |\n| GA4 generate_lead | WEBPAGE | Enabled | 10.0 | One |",
+      "expected_output": "Flags that the export is insufficient to determine whether conversion tracking is broken because it lacks `include_in_conversions_metric`. Identifies possible risks but does not assert that Page View is corrupting primary conversions unless primary status is confirmed.",
+      "trap": "Declares the account has inflated conversions because Page View has 44 conversions and counting MANY, without checking whether it is included in the conversions metric as a primary action.",
+      "assertions": [
+        "[DATA INTEGRITY] States that the export is missing `include_in_conversions_metric`, so primary vs secondary status is unknown",
+        "[EXECUTION] Describes re-running GAQL 2.1 including `conversion_action.include_in_conversions_metric` before determining whether the Page View action corrupts CPA",
+        "[REASONING] Identifies `Page View - Contact` as suspicious if primary, but does not state it is corrupting bidding unless primary status is confirmed",
+        "[REASONING] Flags possible duplicate lead tracking between Contact Form Submit and GA4 generate_lead that needs verification",
+        "[OUTPUT DISCIPLINE] Does NOT make a definitive tracking-failure conclusion from this incomplete export alone"
+      ],
+      "notes": "Expected failure: overconfident tracking audit from a table missing the most important field."
+    },
+    {
+      "id": 23,
+      "category": "legal_specific_judgment",
+      "prompt": "Apex Law's NC Divorce campaign spent $380 on `how much does divorce cost in nc` over 90 days with 0 conversions. Add it as a negative?",
+      "expected_output": "Does not automatically negative the term. Applies legal/family-law context: cost queries can be early-stage prospects, especially in NC divorce with long consideration windows. Requires volume/context and likely recommends separate monitoring or educational funnel rather than immediate blocking.",
+      "trap": "Blocks the term because it is informational/cost-related and has zero conversions, applying generic e-commerce negative logic.",
+      "assertions": [
+        "[LEGAL CONTEXT] Recognizes that cost/procedural queries in legal, especially divorce, can represent early-stage real prospects",
+        "[LEGAL CONTEXT] Does NOT automatically recommend adding `how much does divorce cost in nc` as a negative solely because it has zero conversions",
+        "[REASONING] Mentions the NC/family-law long-consideration-window caveat or equivalent rationale",
+        "[REASONING] Evaluates the 90-day spend and zero conversions in context rather than using zero conversions alone as decisive",
+        "[CONDITIONAL FRAMING] If recommending action, suggests monitoring, landing-page/funnel separation, lower bids, or campaign-level strategy before outright blocking"
+      ],
+      "notes": "Expected failure: negative-keyword library Section 4 can be misapplied against valuable legal research intent."
+    },
+    {
+      "id": 24,
+      "category": "legal_specific_judgment",
+      "prompt": "Apex Law's Divorce campaign is getting clicks for `free consultation divorce lawyer`. The negative library has `free consultation`. Should we add it to the shared negative list? The firm advertises free consultations on its landing pages.",
+      "expected_output": "Does not add `free consultation` to the shared negative list. Recognizes the library caveat and that the term aligns with the firm's offer; if excluded at all, it would need account-specific evidence and narrow scope.",
+      "trap": "Applies the negative library literally and recommends adding `free consultation` to the shared list despite the firm using free consultations as a CTA.",
+      "assertions": [
+        "[LEGAL CONTEXT] Recognizes that `free consultation` can be high-intent when the firm advertises free consultations",
+        "[LEGAL CONTEXT] Does NOT recommend adding `free consultation` to the shared account-level negative list",
+        "[REASONING] References the negative library caveat that `free consultation` and `free case review` are double-edged and account-specific",
+        "[OUTPUT DISCIPLINE] Distinguishes shared-account negatives from narrower campaign/ad-group actions",
+        "[CONDITIONAL FRAMING] Any exclusion recommendation is conditional on evidence that this specific term is producing bad leads, not just clicks without immediate conversions"
+      ],
+      "notes": "Expected failure: mechanical application of negative library without honoring its caveats."
+    },
+    {
+      "id": 25,
+      "category": "multi_step_account_reasoning",
+      "prompt": "Apex Law fixed duplicate form conversions 10 days ago. Since then CPA jumped from $155 to $290 and conversions are down 38%. The campaign is on tCPA. Client wants us to lower the tCPA target to force efficiency. What do we do?",
+      "expected_output": "Applies post-tracking-fix protocol. Explains that old CPA was artificially low, current volatility is expected, and tCPA should not be lowered during the 2-4 week relearning window.",
+      "trap": "Lowers tCPA or suggests tightening target because CPA increased, treating clean-data CPA rise as performance deterioration instead of measurement correction and smart-bidding relearning.",
+      "assertions": [
+        "[SEQUENCE] Applies the post-tracking-fix protocol before making any tCPA target recommendation",
+        "[SEQUENCE] Does NOT recommend lowering the tCPA target now",
+        "[REASONING] Explains that pre-fix CPA was artificially low due to duplicate conversions and clean-data CPA may appear higher",
+        "[OUTPUT DISCIPLINE] Recommends a 2-4 week hold/lockdown window with no target/budget/bid strategy changes",
+        "[REASONING] Notes that the tCPA model was trained on contaminated data and needs clean-data relearning"
+      ],
+      "notes": "Expected failure: user pressure plus worse-looking CPA tempts the runner into the exact wrong tCPA move."
+    },
+    {
+      "id": 26,
+      "category": "multi_step_account_reasoning",
+      "prompt": "Avalon Family Law has a PMax campaign with a $72 CPA, way better than Search at $410. Conversion actions are `Contact Page View`, `Directions Click`, and `Phone Call 15s`. Brand searches also rose during the same period. Should we move more budget into PMax?",
+      "expected_output": "Does not recommend more PMax budget. Diagnoses conversion quality and branded/remarketing contamination first; PMax CPA is not trustworthy if optimized to soft conversions and brand/remarketing demand.",
+      "trap": "Recommends moving budget into PMax because its CPA is lower than Search, ignoring conversion-action quality and likely branded/remarketing capture.",
+      "assertions": [
+        "[SEQUENCE] Does NOT recommend shifting more budget to PMax before auditing conversion tracking quality",
+        "[REASONING] Flags `Contact Page View` and `Directions Click` as soft conversions that may not represent real leads if primary",
+        "[REASONING] Flags `Phone Call 15s` as potentially too short/low-quality for legal lead tracking unless validated",
+        "[LEGAL CONTEXT] Notes that PMax is usually risky for law firms because it can optimize to easy conversions like brand/remarketing rather than new clients",
+        "[EXECUTION] Describes running GAQL 2.1/2.2 for conversion actions and checking brand/placement/channel contamination before any budget move",
+        "[OUTPUT DISCIPLINE] Treats the $72 CPA as suspect, not as proof PMax is outperforming Search"
+      ],
+      "notes": "Expected failure: low CPA lure. Correct answer must reject the premise because the conversion definitions are bad and PMax likely captures easy demand."
+    }
+  ]
+}
