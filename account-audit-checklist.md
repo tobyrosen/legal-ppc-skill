@@ -78,9 +78,9 @@ _GAQL: 1.1 (all campaigns), 1.3 (ad rotation)_
 
 ### PF-3: Change History Read
 
-_GAQL: 8.1 (60-day changes), 8.2 (auto-applied changes 90-day)_
+_GAQL: 8.1 (recent changes, last 30 days), 8.2 (auto-applied changes, last 30 days)_
 
-- [ ] No auto-applied changes from Google (`client_type = GOOGLE_ADS_AUTOMATED_RULE` or `GOOGLE_ADS_RECOMMENDATIONS`) in the last 90 days — or each one reviewed and confirmed intentional
+- [ ] No auto-applied changes from Google (`client_type = GOOGLE_ADS_AUTOMATED_RULE` or `GOOGLE_ADS_RECOMMENDATIONS`) in the last 30 days — or each one reviewed and confirmed intentional. Note: `change_event` only reaches 30 days; for older changes, check the Google Ads UI change history.
 - [ ] No learning phase disruption pattern: repeated bid strategy changes at <14-day intervals
 - [ ] Account shows signs of active management (changes present within last 3 weeks on active campaigns)
 - [ ] No budget, bid strategy, or targeting changes within the last 14 days that would explain current performance issues as learning phase noise
