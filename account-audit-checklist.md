@@ -12,8 +12,39 @@ Work through each section in order. Mark each item ✓ (pass), ✗ (flag), or �
 
 These run before anything else. Pre-flight findings take priority over every other finding.
 
+### PF-0: Account Macro Context (Reasoning Input)
+
+_GAQL: 1.1 (campaigns, current + prior periods), 2.3 (conversion volume by campaign), 11.1 (budget/spend by period)_
+
+This step is mandatory **reasoning input**, not a default user-facing output section. Pull it every time, surface only when flag-worthy.
+
+- [ ] Spend trend pulled: current period vs prior 90-day baseline (account-level and per-campaign)
+- [ ] Conversion volume trend pulled: current period vs prior 90-day baseline
+- [ ] Lead volume trend pulled where CRM data is available (otherwise primary conversion action volume)
+- [ ] CPL/CPA trend pulled: current period vs prior 90-day baseline
+- [ ] Year-over-year delta noted if data spans long enough
+
+**Flag-worthy signals (surface in output):**
+
+- Material trend shift (≥25% change MoM in spend, conv volume, or CPL)
+- Trend reversal (account direction has flipped vs prior period)
+- Contradiction with the tactical recommendation being made (e.g., recommending bid-up while spend is already up 40% MoM with conversions flat or down)
+- Pattern explaining other findings (e.g., YoY drop aligned with a structural change)
+
+**Output format when flagging:**
+
+```text
+[MACRO FLAG] [one-line description of the trend]
+[Why it matters in the context of the work being done]
+```
+
+Macro context that is steady, expected, or supportive of the recommendation is NOT surfaced. The user is not asking for a trend report — they are asking for an audit or optimization. Surface macro only when it changes how the work should be interpreted.
+
+---
+
 ### PF-1: Conversion Tracking
-*GAQL: 2.1 (all conversion actions), 2.2 (recent conversion volume)*
+
+_GAQL: 2.1 (all conversion actions), 2.2 (recent conversion volume)_
 
 - [ ] At least one conversion action is enabled and active
 - [ ] Primary conversion actions (`include_in_conversions_metric = TRUE`) measure real leads — not page views, sessions, or soft engagements
@@ -32,7 +63,8 @@ These run before anything else. Pre-flight findings take priority over every oth
 ---
 
 ### PF-2: Structural Red Flags
-*GAQL: 1.1 (all campaigns), 1.3 (ad rotation)*
+
+_GAQL: 1.1 (all campaigns), 1.3 (ad rotation)_
 
 - [ ] No Performance Max campaigns (PMax is almost always wrong for law firms)
 - [ ] Display/content network disabled on all search campaigns (`target_content_network = FALSE`)
@@ -45,7 +77,8 @@ These run before anything else. Pre-flight findings take priority over every oth
 ---
 
 ### PF-3: Change History Read
-*GAQL: 8.1 (60-day changes), 8.2 (auto-applied changes 90-day)*
+
+_GAQL: 8.1 (60-day changes), 8.2 (auto-applied changes 90-day)_
 
 - [ ] No auto-applied changes from Google (`client_type = GOOGLE_ADS_AUTOMATED_RULE` or `GOOGLE_ADS_RECOMMENDATIONS`) in the last 90 days — or each one reviewed and confirmed intentional
 - [ ] No learning phase disruption pattern: repeated bid strategy changes at <14-day intervals
@@ -56,7 +89,7 @@ These run before anything else. Pre-flight findings take priority over every oth
 
 ## Section 1: Account Structure
 
-*GAQL: 1.1 (campaigns), 1.2 (ad groups)*
+_GAQL: 1.1 (campaigns), 1.2 (ad groups)_
 
 - [ ] Geographic segmentation present — campaigns organized by target market/city
 - [ ] Practice area segmentation present — separate campaigns per practice area (divorce, custody, etc.)
@@ -73,7 +106,7 @@ These run before anything else. Pre-flight findings take priority over every oth
 
 ## Section 2: Keyword Health
 
-*GAQL: 3.1 (keywords + QS), 3.2 (match type distribution), 3.3 (90-day keyword performance)*
+_GAQL: 3.1 (keywords + QS), 3.2 (match type distribution), 3.3 (90-day keyword performance)_
 
 - [ ] No broad match keywords in active campaigns
 - [ ] Core keywords have Quality Score ≥ 6 (flag keywords with high spend and QS < 5)
@@ -83,6 +116,7 @@ These run before anything else. Pre-flight findings take priority over every oth
 - [ ] Keyword themes are tight within each ad group — no "kitchen sink" ad groups
 
 **QS component mapping:**
+
 - `search_predicted_ctr` BELOW_AVERAGE → ad copy problem
 - `creative_quality_score` BELOW_AVERAGE → keyword/ad mismatch problem
 - `post_click_quality_score` BELOW_AVERAGE → landing page problem
@@ -91,7 +125,7 @@ These run before anything else. Pre-flight findings take priority over every oth
 
 ## Section 3: Negative Keyword Infrastructure
 
-*GAQL: 9.1 (shared lists), 9.2 (shared list contents), 9.3 (campaign negatives), 9.4 (ad group negatives)*
+_GAQL: 9.1 (shared lists), 9.2 (shared list contents), 9.3 (campaign negatives), 9.4 (ad group negatives)_
 
 - [ ] At least one shared negative keyword list exists and is applied to all active campaigns
 - [ ] Shared list contains phrase-match categoricals (not only exact-match reactive strings)
@@ -108,7 +142,7 @@ These run before anything else. Pre-flight findings take priority over every oth
 
 ## Section 4: Ad Creative
 
-*GAQL: 7.1 (RSA performance), 7.2 (ad freshness), 8.1 (change history for ad update dates)*
+_GAQL: 7.1 (RSA performance), 7.2 (ad freshness), 8.1 (change history for ad update dates)_
 
 - [ ] At least one active RSA per ad group
 - [ ] No ad groups with paused or removed ads only
@@ -123,7 +157,7 @@ These run before anything else. Pre-flight findings take priority over every oth
 
 ## Section 5: Geographic & Device Performance
 
-*GAQL: 10.1 (geographic — targeting view), 10.2 (user location — actual physical location), 10.3 (device performance)*
+_GAQL: 10.1 (geographic — targeting view), 10.2 (user location — actual physical location), 10.3 (device performance)_
 
 - [ ] Spend is concentrated in the target geographic area — not leaking to out-of-market locations
 - [ ] User location data (10.2) aligns with geographic targeting intent — check for "interested in" serving reaching out-of-market users
@@ -134,7 +168,7 @@ These run before anything else. Pre-flight findings take priority over every oth
 
 ## Section 6: Bidding & Budget
 
-*GAQL: 11.1 (budget utilization), 11.2 (shared bidding strategies), 2.3 (conversion volume by campaign)*
+_GAQL: 11.1 (budget utilization), 11.2 (shared bidding strategies), 2.3 (conversion volume by campaign)_
 
 - [ ] Campaigns with smart bidding (tCPA, Maximize Conversions) have at least 15–20 conversions/month — if not, flag bid strategy mismatch
 - [ ] tCPA targets are realistic — not set significantly below the account's historical CPA (causes oscillation)
@@ -146,7 +180,7 @@ These run before anything else. Pre-flight findings take priority over every oth
 
 ## Section 7: Impression Share & Competitive Position
 
-*GAQL: 5.1 (IS breakdown)*
+_GAQL: 5.1 (IS breakdown)_
 
 - [ ] Overall search IS reviewed — note whether budget loss or rank loss is the dominant constraint
 - [ ] Top IS and absolute top IS noted for core campaigns (indicates whether brand is dominating for brand terms)
@@ -166,7 +200,8 @@ After completing all sections:
 4. **Not actionable yet (needs screenshot or more data):** Blind spots that need external input before a recommendation is possible.
 
 Format each item for the running action list:
-```
+
+```text
 - [ACTION] [target] — [one-line rationale] | [scope: account/campaign/ad-group]
 ```
 
@@ -175,10 +210,11 @@ Format each item for the running action list:
 ## Account Notes Update
 
 After the audit, update `account-notes/[account].md` with:
+
 - Account structure summary (campaigns, ad groups, active/paused state)
 - Any permanent market-specific context discovered (e.g., practice area nuances, seasonality, client brief preferences)
 - All Priority 1–3 items in the `## Pending Actions` section
 
 ---
 
-*This checklist is v1 — battle-test it against at least 2 accounts and update based on what it misses or over-specifies.*
+_This checklist is v1 — battle-test it against at least 2 accounts and update based on what it misses or over-specifies._
