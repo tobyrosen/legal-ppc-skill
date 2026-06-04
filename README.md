@@ -23,6 +23,7 @@ This skill fixes that.
 Plug it into Claude Code with a Google Ads MCP and you get structured, expert-level account analysis without step-by-step direction. Give it a brief — or just say "something feels off" — and it runs the right diagnostic, in the right order, with the right safeguards.
 
 **Session flow:**
+
 1. Read account notes (prior session history, pending actions)
 2. Run three mandatory pre-flights: conversion tracking, structural issues, change history
 3. Pull live data via GAQL and flag candidates
@@ -31,15 +32,15 @@ Plug it into Claude Code with a Google Ads MCP and you get structured, expert-le
 
 **What it gets right that a general model doesn't:**
 
-| Failure mode | What a general model does | What this skill does |
-|---|---|---|
-| Negative keywords in GAQL results | Flags them as active optimization targets | Filters `negative = FALSE` — required in every keyword query |
-| Paused ad group search terms | Treats them as active waste | Requires `ad_group.status = ENABLED` filter; `status = NONE` terms are explicitly excluded |
-| Cheap CPC on a legal term | Explains it as "low-intent traffic" | Routes to data contamination first — paused ad group history bleeding in |
-| 58% rank-lost IS | Recommends raising budget | Correctly identifies as QS/bid quality problem; budget won't help |
-| tCPA above target | Recommends lowering tCPA to "tighten up" | Applies direction rule: lowering when above target restricts volume, not cost |
-| CPA from 4 conversions | Treats it as a reliable signal | Flags the 15-20 conversion threshold; below that, CPA is noise |
-| Search term waste estimates | Reports face-value numbers | Discloses the ~50% API coverage ceiling and scales estimates accordingly |
+| Failure mode                      | What a general model does                 | What this skill does                                                                       |
+| --------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Negative keywords in GAQL results | Flags them as active optimization targets | Filters `negative = FALSE` — required in every keyword query                               |
+| Paused ad group search terms      | Treats them as active waste               | Requires `ad_group.status = ENABLED` filter; `status = NONE` terms are explicitly excluded |
+| Cheap CPC on a legal term         | Explains it as "low-intent traffic"       | Routes to data contamination first — paused ad group history bleeding in                   |
+| 58% rank-lost IS                  | Recommends raising budget                 | Correctly identifies as QS/bid quality problem; budget won't help                          |
+| tCPA above target                 | Recommends lowering tCPA to "tighten up"  | Applies direction rule: lowering when above target restricts volume, not cost              |
+| CPA from 4 conversions            | Treats it as a reliable signal            | Flags the 15-20 conversion threshold; below that, CPA is noise                             |
+| Search term waste estimates       | Reports face-value numbers                | Discloses the ~50% API coverage ceiling and scales estimates accordingly                   |
 
 ---
 
@@ -51,15 +52,15 @@ The skill ships with an adversarial eval suite. Each eval runs the same prompt w
 
 Selected discriminating evals:
 
-| Eval | Scenario | With skill | Without skill |
-|---|---|---|---|
-| QS throttling | All-BELOW_AVERAGE + zero impressions | 4/4 | 0/4 |
-| Coverage check | Search term analysis before coverage ratio reported | 4/4 | 0/4 |
-| Change history first | Performance drop — change history before symptom diagnosis | 5/5 | 1/5 |
-| BROAD → phrase | Correct default intervention for BROAD keyword | 4/4 | 0/4 |
-| Budget vs rank IS | Distinguishes rank-lost from budget-lost IS | 4/4 | 1/4 |
-| CPC anomaly routing | Low avg CPC → data integrity first, not keyword targeting | 4/4 | 1/4 |
-| Account notes override | Account-specific rule overrides general BROAD guidance | 4/4 | 1/4 |
+| Eval                   | Scenario                                                   | With skill | Without skill |
+| ---------------------- | ---------------------------------------------------------- | ---------- | ------------- |
+| QS throttling          | All-BELOW_AVERAGE + zero impressions                       | 4/4        | 0/4           |
+| Coverage check         | Search term analysis before coverage ratio reported        | 4/4        | 0/4           |
+| Change history first   | Performance drop — change history before symptom diagnosis | 5/5        | 1/5           |
+| BROAD → phrase         | Correct default intervention for BROAD keyword             | 4/4        | 0/4           |
+| Budget vs rank IS      | Distinguishes rank-lost from budget-lost IS                | 4/4        | 1/4           |
+| CPC anomaly routing    | Low avg CPC → data integrity first, not keyword targeting  | 4/4        | 1/4           |
+| Account notes override | Account-specific rule overrides general BROAD guidance     | 4/4        | 1/4           |
 
 ---
 
@@ -90,7 +91,7 @@ git clone https://github.com/RosenAdvertising/legal-ppc-skill
 
 ## File Structure
 
-```
+```text
 legal-ppc-skill/
 ├── SKILL.md                           # Main skill file — load this
 ├── account-audit-checklist.md         # Structured first-review checklist (Sections A–I)
@@ -121,6 +122,7 @@ Negative keyword libraries, search intent guidance, and diagnostic priors for:
 ## Public vs. Internal Version
 
 This is the **public version**. The internal version used in production at Rosen Advertising adds:
+
 - `account-notes/[account].md` — per-account session history, pending actions, market-specific priors
 - `session-logs/` — structured logs written at session end (what ran, what changed, what's next). Directory is created automatically on first use.
 - `references/learnings.md` — validated patterns extracted from live session history across multiple accounts
