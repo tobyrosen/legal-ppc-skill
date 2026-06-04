@@ -19,11 +19,13 @@ These patterns were observed in the 2026-03-28 Client A session. They are strong
 ---
 
 ### P1 — search_term_view Coverage Is an API Ceiling, Not a Privacy Threshold
+
 **Source:** 2026-03-28-Client A | **Status:** Provisional (1 session)
 
 **Pattern:** `search_term_view` consistently returns ~50% of actual campaign spend. This is not Google's privacy threshold — it is a hard row cap imposed at the API level. It is not improvable through query granularity (per-campaign, per-ad-group splits), because GAQL has no OFFSET and the cap operates at the query result level.
 
 **Implications for diagnosis:**
+
 - Always pull actual campaign spend from `FROM campaign` before presenting search term findings
 - State the coverage ratio explicitly before any waste estimates
 - Scale waste estimates by coverage ratio (visible waste ÷ coverage pct)
@@ -32,6 +34,7 @@ These patterns were observed in the 2026-03-28 Client A session. They are strong
 ---
 
 ### P2 — "Legal Aid" Consolidation Pattern
+
 **Source:** 2026-03-28-Client A | **Status:** Provisional (1 session)
 
 **Pattern:** Accounts often accumulate hundreds of specific reactive exact-match negative strings (e.g., "legal aid clinic statesville nc", "legal aid divorce nc", "legal aid family law") instead of a single phrase-match categorical that covers all variants.
@@ -43,6 +46,7 @@ These patterns were observed in the 2026-03-28 Client A session. They are strong
 ---
 
 ### P3 — DDA Decimal Fingerprint for Duplicate Conversion Detection
+
 **Source:** 2026-03-28-Client A | **Status:** Provisional (1 session)
 
 **Pattern:** When Data-Driven Attribution (DDA) distributes conversion credit across touchpoints, the fractional values assigned to a given conversion ID are deterministic — the same event always produces the same fractional tails. If two conversion actions report identical fractional tails (e.g., both show 6.272...), they are almost certainly tracking the same underlying event through different attribution paths (e.g., GA4 form view + HubSpot form submission capturing the same user form fill).
@@ -54,6 +58,7 @@ These patterns were observed in the 2026-03-28 Client A session. They are strong
 ---
 
 ### P4 — Long Consideration Window Markets (NC Separation Period Example)
+
 **Source:** 2026-03-28-Client A | **Status:** Provisional (1 account — NC family law specific, but framework generalizes)
 
 **Pattern:** Some legal markets have structurally long consideration windows where informational/research queries represent real prospects at an earlier stage of the funnel, not irrelevant traffic.
@@ -62,6 +67,7 @@ These patterns were observed in the 2026-03-28 Client A session. They are strong
 
 **General framework for market exceptions:**
 Before applying Section 4 (informational intent) negatives from the negative keyword library, ask:
+
 1. Does this market have a structural event that prolongs the consideration window?
 2. Do informational queries from this area actually convert in account data, even at lower rates?
 3. Are competitors running on informational terms and converting them?
@@ -73,6 +79,7 @@ If yes to any: hold on blocking informational intent; analyze actual search term
 ---
 
 ### P5 — Competitor Name Searches May Be Intentional Targets (NC Example)
+
 **Source:** 2026-03-28-Client A | **Status:** Provisional (1 session)
 
 **Pattern:** In long consideration window markets, prospects research multiple providers over an extended period. Competitor name searches — even for direct competing attorneys — may represent prospects who consulted that competitor earlier in their funnel and are now considering alternatives.
@@ -90,11 +97,13 @@ If yes to any: hold on blocking informational intent; analyze actual search term
 ---
 
 ### P6 — Both ad_group_criterion and keyword_view Return Positive and Negative Keywords
+
 **Source:** 2026-04-01-Client A, 2026-04-19-Client A, 2026-04-27-Client Cjenkins | **Status:** Confirmed (3 sessions, multiple accounts)
 
 **Pattern:** GAQL queries against `ad_group_criterion` AND `keyword_view` both return positive and negative keywords in the same result set. If the `negative` field is not filtered, the two types are indistinguishable from the response. This caused confirmed misdiagnosis in multiple sessions — negative keywords were flagged as active BROAD match problems or active targeting issues.
 
 **Observed cases:**
+
 - `cheap` (BROAD) in Client A Catawba - Child Custody ad group — flagged as a positive keyword needing conversion. It was an ad-group-level negative. (2 sessions)
 - `5 signs`, `elder`, `dallas`, `pro bono` in Client C Jenkins LA+ — flagged as active junk positive keywords. All were ad group-level negatives. Caught via `ad_group_criterion` direct query after the `keyword_view` query returned them without the filter.
 
@@ -105,6 +114,7 @@ If yes to any: hold on blocking informational intent; analyze actual search term
 ---
 
 ### P8 — search_term_view Returns Historical Data Without status = NONE Filter
+
 **Source:** 2026-04-20-Client D, 2026-04-27-Client B | **Status:** Confirmed (2 sessions, 2 accounts)
 
 **Pattern:** `search_term_view` has two distinct mechanisms that produce false active findings:
@@ -116,6 +126,7 @@ If yes to any: hold on blocking informational intent; analyze actual search term
 **Same root cause as P6:** The API returns all matching records for a given account/date range regardless of current serving status. Explicit field-level checks are the only defense.
 
 **Implication:**
+
 - Every `search_term_view` query must SELECT `search_term_view.status` — if the field is not in the result, the query is incomplete, do not proceed
 - Every `search_term_view` query must include `AND ad_group.status = 'ENABLED'` in the WHERE clause
 - Never flag a term with `status = NONE` as an active finding — it is not currently serving
@@ -124,6 +135,7 @@ If yes to any: hold on blocking informational intent; analyze actual search term
 ---
 
 ### P7 — search_rank_lost_impression_share ≠ Budget Constraint
+
 **Source:** 2026-04-19-Client B | **Status:** Provisional (1 session)
 
 **Pattern:** `metrics.search_rank_lost_impression_share` measures impressions lost because Ad Rank was too low — a QS, bid, or landing page problem. It is not a budget signal. `metrics.search_budget_lost_impression_share` is the separate field that measures impressions lost to budget exhaustion. Conflating the two produces wrong recommendations: OC's 67% rank-lost IS was misread as "budget constrained" when it actually indicated a landing page / QS problem requiring creative and LP work, not more budget.

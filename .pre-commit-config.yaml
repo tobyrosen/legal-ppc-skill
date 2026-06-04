@@ -37,11 +37,18 @@ repos:
       - id: gitleaks
 
   # Markdown lint
+  # PER-REPO RELAXATION (2026-06-03): MD036 (emphasis-as-heading) and MD024
+  # (duplicate-heading) are disabled here in addition to the fleet baseline.
+  # This is a prose-heavy Google Ads skill repo whose bold labels ("GAQL: 2.1",
+  # "Step 0/1/2…", parentheticals) are intentional emphasis, not section
+  # headings — MD036 fired 33 false positives on them. Correctness rules
+  # (MD040 fenced-code-language, etc.) stay ON. Do not let re-propagation
+  # overwrite this line without re-applying the MD036/MD024 disable.
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.44.0
     hooks:
       - id: markdownlint
-        args: [--fix, --disable, MD013, MD033, MD041, "--"]
+        args: [--fix, --disable, MD013, MD033, MD041, MD036, MD024, "--"]
 
   # Spell-check code identifiers and comments (low false positive)
   - repo: https://github.com/crate-ci/typos
@@ -69,7 +76,8 @@ repos:
       - id: pyright
         name: pyright (Python type check, staged files only)
         entry: pyright
-        language: system
+        language: node
+        additional_dependencies: ["pyright@1.1.410"]
         types_or: [python, pyi]
 
   # ─────────────────────────────────────────────────────────────
@@ -99,19 +107,27 @@ repos:
 
   # ─────────────────────────────────────────────────────────────
   # Rust (only fires on .rs files staged — silent in non-Rust repos)
+  #
+  # Cargo.toml location is auto-detected so the hooks work in both layouts:
+  #   - Standard Rust repo: Cargo.toml at the repo root
+  #   - Tauri repo:         Cargo.toml under src-tauri/
+  # The shell prefix cd's into src-tauri/ only when that's where Cargo.toml lives.
   # ─────────────────────────────────────────────────────────────
   - repo: local
     hooks:
       - id: rustfmt
         name: rustfmt
-        entry: cargo fmt --all --check
+        entry: bash -c 'if [ -f src-tauri/Cargo.toml ] && [ ! -f Cargo.toml ]; then cd src-tauri; fi; cargo fmt --all --check'
         language: system
         types: [rust]
         pass_filenames: false
 
       - id: clippy
         name: clippy
-        entry: cargo clippy --all-targets -- -D warnings
+        # Warn-only by default — surfaces clippy findings without blocking commits.
+        # Repos can ratchet up by changing `-- -W warnings` to `-- -D warnings` in
+        # their own .pre-commit-config.yaml once their Rust baseline is clean.
+        entry: bash -c 'if [ -f src-tauri/Cargo.toml ] && [ ! -f Cargo.toml ]; then cd src-tauri; fi; cargo clippy --all-targets -- -W warnings'
         language: system
         types: [rust]
         pass_filenames: false
