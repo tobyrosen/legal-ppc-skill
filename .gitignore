@@ -1,5 +1,7 @@
 # Internal files — not included in public release
 account-notes/
+# ...except the committed synthetic eval fixtures (real account-notes/ stays ignored)
+!evals/fixtures/account-notes/
 session-logs/
 references/learnings.md
 skills/

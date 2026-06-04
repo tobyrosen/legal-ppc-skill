@@ -85,7 +85,7 @@ _[Toby version]: Cross-reference structural flags against `account-notes/[accoun
 
 ### PF-3: Change History Read
 
-Pull: GAQL 8.1 (recent changes, 60 days), GAQL 8.2 (auto-applied changes, 90 days)
+Pull: GAQL 8.1 (recent changes, last 30 days), GAQL 8.2 (auto-applied changes, last 30 days)
 
 This is a narrative read, not a metric check. You are asking: what kind of account is this, and what kind of management has it received?
 
@@ -510,7 +510,7 @@ This is not the same as "conversions are generally low" (Tree 1) — that is a p
 
 **Step 1: Read change history for the relevant window**
 
-Pull: GAQL 8.1 (60-day changes), GAQL 8.2 (auto-applied changes)
+Pull: GAQL 8.1 (changes, last 30 days), GAQL 8.2 (auto-applied changes, last 30 days)
 
 Establish exactly when the drop started. Cross-reference that date with any account changes.
 
@@ -558,7 +558,7 @@ These fire when a user reaches a specific page URL (typically a thank-you or con
 **AD_CALL (Google forwarding number):**
 Google-native call tracking. These are the most reliable action type and rarely break without an account-level change. Confirm via GAQL:
 
-```text
+```gaql
 SELECT call_view.call_tracking_display_name, call_view.duration_seconds, call_view.call_status,
        segments.date
 FROM call_view
