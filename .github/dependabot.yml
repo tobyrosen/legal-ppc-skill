@@ -1,54 +1,11 @@
-# Cowork standard Dependabot config
-# Propagated by propagate.py into each repo at .github/dependabot.yml
-# Multi-ecosystem: pip + npm + cargo, weekly cadence, grouped updates.
+# Cowork Dependabot config — tailored for this repo.
+# legal-ppc-skill is a docs/skill repo (markdown + JSON evals only) with no
+# pip / npm / cargo manifests, so the multi-ecosystem template's pip/npm/cargo
+# entries would abort each run with "no files found". The only ecosystem that
+# applies here is the GitHub Actions workflow files.
 
 version: 2
 updates:
-  # Python (pip + uv-managed projects)
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    groups:
-      python-deps:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-
-  # JavaScript / TypeScript / Astro (npm, pnpm, yarn)
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    groups:
-      js-deps:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-
-  # Rust (cargo)
-  - package-ecosystem: "cargo"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    groups:
-      rust-deps:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-
   # GitHub Actions workflow files
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -56,3 +13,10 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 3
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
