@@ -194,6 +194,26 @@ This is the single most common mistake made after a tracking cleanup. The instin
 
 ---
 
+## Target Setting — Targets Come From Firm Economics, Not Account Data
+
+A bidding target (tCPA, target CPL, target cost per signed case) is an **external input** — not something you back-solve from the account's own numbers. The account's current CPA tells you how performance compares to the target; it is never the _source_ of the target.
+
+**Where a target comes from, in priority order:**
+
+1. **Firm economics in `account-notes/[account].md`.** The firm's average case value, lead-to-signed rate, and acceptable cost per signed case give you the target CPL/CPA. These are operator-recorded business inputs — use them.
+2. **An explicit operator override.** If the operator states a target (or different economics) for the task at hand, that supersedes the notes.
+3. **If neither exists, ask.** Request the firm's economics — average signed-case value, lead-to-signed rate, acceptable cost per signed case. Do not set a target without them.
+
+**Never back-solve a target from the account's own current CPA or spend.** Averaging what the account currently pays per conversion and calling that "the target" is circular: the current CPA reflects the account's current performance, including whatever is broken about it, so a target derived from it merely ratifies the status quo. It is a loop that can never improve the account — every "target" is just last period's result wearing a new label. This is the one forbidden move in target setting.
+
+**Why the instinct is wrong:** a target is a business decision about what a signed case is worth and what the firm will pay to win one. That decision lives with the firm, not in the auction data. Pull the account's CPA to _measure against_ the target; pull the target itself from the firm's economics.
+
+**Worked logic:** average signed-case value $12,000 × a 15% acquisition budget = $1,800 target cost per signed case; at a 30% lead-to-signed rate that is a ~$540 target CPL. If the account's current CPL is $900, it is 67% over the external target — that is a finding. You did not learn $540 by looking at the account; you brought it from the firm's economics.
+
+**When the external target sits well below current performance,** that gap is the finding — not a reason to abandon the target. Fix the drivers first (QS, landing page, structure). If you then move the live tCPA toward the economics target, step it down in increments (see the tCPA Direction Rule above) so the algorithm does not oscillate. The economics number is the destination; the increments are how you reach it without thrashing. "Realistic target" means achievable in steps, never "back-solved from current CPA."
+
+---
+
 ## Campaign-Level CPC Anomaly — Routing Protocol
 
 When campaign-level avg CPC looks anomalous (not search term level — the campaign performance summary), route the diagnosis based on direction:
