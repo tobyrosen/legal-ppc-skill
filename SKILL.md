@@ -32,6 +32,41 @@ Read these before any analysis:
 
 ---
 
+## Account Macro Context — Mandatory Reasoning Input
+
+Every audit, optimization, or diagnostic session must establish account macro context **before** any item-level work. Macro context is mandatory input to the reasoning, even when it is not surfaced in the output.
+
+**What "macro context" means:**
+
+- Spend trend: current period vs prior 90-day baseline
+- Conversion volume trend: current period vs prior 90-day baseline
+- Lead volume trend: from CRM where available, otherwise primary conversion action volume
+- CPL / CPA trend: current period vs prior 90-day baseline
+- Year-over-year comparison where the data spans long enough
+
+Pull this **before** running symptom-specific diagnosis. Every recommendation must be evaluated against the macro state of the account — recommending "raise bids on the Women campaign" lands differently when total account spend is already up 40% this month with conversions down. Tactical recommendations made in isolation from the macro frame are tunnel vision, even when the items themselves are correct.
+
+**Output rule — surface conditionally, not every session:**
+
+- The macro snapshot is NOT included in the user-facing output by default. Users do not need to see a trend dump every session.
+- Surface a **flag** in the output only when the macro signal is material enough to warrant attention:
+  - Material trend shift (e.g., conversion volume down 25%+ vs prior period)
+  - Trend reversal (account was trending up, now reversing)
+  - **Contradiction** with the tactical recommendation about to be made (e.g., recommending bid-up when spend is already up 40% MoM)
+  - Pattern that explains other findings (e.g., a sudden YoY drop alongside structural changes that may be the cause)
+- When surfacing a flag, frame it as a question or observation tied to the broader account direction — not as a separate audit section.
+
+**Format when flagging:**
+
+```text
+[MACRO FLAG] [one-line description of the trend]
+[Why it matters in the context of the work being done]
+```
+
+Example: a session optimizing keyword structure finds the work tactically correct, but conversions are down 35% MoM. The macro flag surfaces because the proposed keyword expansion may amplify spend in a period where the account is already underperforming — worth pausing to investigate the conversion drop before scaling.
+
+---
+
 ## Reference Files
 
 | File                                     | Purpose                                                                          | When to Use                                                |
@@ -156,6 +191,26 @@ This is the single most common mistake made after a tracking cleanup. The instin
 **The instinct to "tighten" tCPA when CPA is high is wrong.** When the algorithm is already under pressure to find converting traffic, lowering the target tells it to spend less per conversion — which means it enters fewer auctions and gets fewer conversions, not cheaper ones. This is the most common bidding mistake in legal PPC.
 
 **Exception:** If budget is clearly not the constraint (budget-lost IS is near 0) and rank-lost IS is very high, the issue is bid quality — tCPA can be raised to give the algorithm room to compete, not lowered.
+
+---
+
+## Target Setting — Targets Come From Firm Economics, Not Account Data
+
+A bidding target (tCPA, target CPL, target cost per signed case) is an **external input** — not something you back-solve from the account's own numbers. The account's current CPA tells you how performance compares to the target; it is never the _source_ of the target.
+
+**Where a target comes from, in priority order:**
+
+1. **Firm economics in `account-notes/[account].md`.** The firm's average case value, lead-to-signed rate, and acceptable cost per signed case give you the target CPL/CPA. These are operator-recorded business inputs — use them.
+2. **An explicit operator override.** If the operator states a target (or different economics) for the task at hand, that supersedes the notes.
+3. **If neither exists, ask.** Request the firm's economics — average signed-case value, lead-to-signed rate, acceptable cost per signed case. Do not set a target without them.
+
+**Never back-solve a target from the account's own current CPA or spend.** Averaging what the account currently pays per conversion and calling that "the target" is circular: the current CPA reflects the account's current performance, including whatever is broken about it, so a target derived from it merely ratifies the status quo. It is a loop that can never improve the account — every "target" is just last period's result wearing a new label. This is the one forbidden move in target setting.
+
+**Why the instinct is wrong:** a target is a business decision about what a signed case is worth and what the firm will pay to win one. That decision lives with the firm, not in the auction data. Pull the account's CPA to _measure against_ the target; pull the target itself from the firm's economics.
+
+**Worked logic:** average signed-case value $12,000 × a 15% acquisition budget = $1,800 target cost per signed case; at a 30% lead-to-signed rate that is a ~$540 target CPL. If the account's current CPL is $900, it is 67% over the external target — that is a finding. You did not learn $540 by looking at the account; you brought it from the firm's economics.
+
+**When the external target sits well below current performance,** that gap is the finding — not a reason to abandon the target. Fix the drivers first (QS, landing page, structure). If you then move the live tCPA toward the economics target, step it down in increments (see the tCPA Direction Rule above) so the algorithm does not oscillate. The economics number is the destination; the increments are how you reach it without thrashing. "Realistic target" means achievable in steps, never "back-solved from current CPA."
 
 ---
 
@@ -398,13 +453,14 @@ This closes the feedback loop. The skill recommended the action; now it confirms
 
 ### Step 3 — Run pre-flight checks
 
-Before any symptom-specific diagnosis, run the three pre-flight checks from `references/diagnosis-trees.md`:
+Before any symptom-specific diagnosis, run the pre-flight checks from `account-audit-checklist.md` and `references/diagnosis-trees.md`:
 
+- **PF-0: Account macro context** (reasoning input — surface as flag only when material; see "Account Macro Context" section above)
 - PF-1: Conversion tracking verification
 - PF-2: Structural red flags
 - PF-3: Change history read
 
-All three are mandatory and none are deferred by a vague brief. Run PF-1, PF-2, and PF-3 before any symptom-specific diagnosis, regardless of brief clarity. PF-1 is the most urgent — conversion tracking issues invalidate every other finding and should be checked first. PF-2 and PF-3 follow immediately after, not after the brief is clarified. A vague brief about "performance feeling off" is still a brief. All three pre-flights run.
+All four are mandatory and none are deferred by a vague brief. PF-0 grounds every subsequent recommendation in the account's actual direction — it does not produce a user-facing section by default, but its findings inform whether and how to surface a macro flag. PF-1 is the most urgent symptom-specific check — conversion tracking issues invalidate every other finding. A vague brief about "performance feeling off" is still a brief. All four pre-flights run.
 
 ### Step 4 — Pull data, flag everything
 
@@ -475,3 +531,54 @@ _(Replace with your own accounts. One row per account. Add an account-notes file
 ## Session Log Template and Skill Development Loop _(Toby version only)_
 
 See `references/session-management.md` for the session log template and skill development loop instructions.
+
+---
+
+## Audit Mode & Search-Query Mining (agency-agents mine 2026-06-02)
+
+Net-new capability added from the paid-search division of the agency-agents mine — the highest-RA-revenue item in that mine. Turns Google Ads account access into a sellable deliverable (new-account takeover, win-back pitch, pre-scale readiness, account-health diagnosis, client-facing roadmap). **ra-clients owns scoping this against the existing eval harness and confirming googleAdsServer MCP data availability per section before treating any audit as client-ready.**
+
+### Audit posture (PAID-1..14)
+
+- No setting unchecked, no dollar unaccounted for.
+- Automated data pull first, strategic analysis second.
+- Every finding maps to business impact and is graded by severity.
+
+### Forensic audit sections
+
+1. **Executive Summary** — account-health verdict, top 3 risks, top 3 opportunities, expected business impact.
+2. **Account Structure** — taxonomy, granularity, naming, labels, geo/device/dayparting.
+3. **Bidding & Budget** — strategy fit, learning-period violations, budget-constrained campaigns, floor/ceiling issues.
+4. **Keyword & Targeting** — match-type distribution, negative coverage, quality-score distribution, audience observation vs targeting.
+5. **Competitive Positioning** — auction insights, impression-share gaps, overlap, top-of-page metrics.
+6. **Landing-Page Fit** — speed, mobile, message match, conversion by LP, redirect chains.
+7. **Compliance** — legal-services policy, bar-advertising claim risk, prohibited/absolute claims.
+8. **Historical/Change-History Forensics** — when degradation started, what changed before/after.
+9. **Recommendation Roadmap** — severity, expected impact, owner, 30/60/90-day sequencing. Add impact estimation (PAID-9) and technical→business executive translation (PAID-10).
+
+### Search-query mining / n-gram waste (PAID-40..47)
+
+Augments the existing negative-keyword library:
+
+- Spend-weighted irrelevant-query detection; n-gram frequency analysis for recurring modifiers.
+- Zero-conversion / high-CPC low-value query flags; query→ad→LP alignment scoring.
+- Negative-keyword decision tree; tiered negatives (account / campaign / ad-group / shared lists) with conflict detection.
+- Query sculpting to route searches to the right ad groups; brand vs non-brand leakage detection; competitor interception/defense.
+- Output: waste table, n-gram table, recommended negatives by level, conflicts/risks, query-sculpting recs, business-impact estimate.
+
+### Tracking-QA gate (PAID-48) — runs BEFORE any audit result is trusted
+
+- If conversion tracking is broken/suspicious, the analysis is provisional.
+- Check Ads vs GA4 / CRM / call-tracking consistency where available; flag enhanced-conversion match-rate + discrepancy benchmarks for ra-clients to validate.
+- Output must say "tracking unreliable" loudly when applicable. ("Bad tracking is worse than no tracking.")
+
+### Secondary adjuncts (not first priority)
+
+- **RSA builder (PAID-16..18):** headline buckets, coherent combinations, character limits — cross-linked with ads-creative-development.
+- **Paid-social diagnostic appendix (PAID-25..31):** funnel structure, audience engineering, frequency, SKAN/privacy mitigation, CRM tracking, MQL lead-quality KPI (PAID-31) — only if ra-clients wants legal-ppc (or a sibling) to own paid-social.
+- **Algorithm-recovery module (MKTA-42):** penalty/update identification + remediation for SEO/PPC-adjacent account review.
+- **ROI reporting with a spend threshold (SUP-18).**
+
+### Eval-harness note
+
+ra-clients to add eval cases under `evals/` for audit-mode + query-mining before this is client-facing — left to ra-clients because the harness format and Google Ads MCP data availability are theirs to confirm (per INTEGRATION-PLAN acceptance criteria 3.6).

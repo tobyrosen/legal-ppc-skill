@@ -7,7 +7,7 @@ Queries are organized by diagnostic task. All queries are pure GAQL — execute 
 - `cost_micros` is in millionths of the account currency. Divide by 1,000,000 for dollar value.
 - `metrics.average_cpc` is already in the account currency (not micros).
 - `cpc_bid_micros` on keywords/ad groups is in micros.
-- Date placeholders: replace `LAST_30_DAYS`, `LAST_90_DAYS`, `LAST_7_DAYS` with `BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'` for custom ranges.
+- **Valid `DURING` date literals only:** `LAST_7_DAYS`, `LAST_14_DAYS`, `LAST_30_DAYS`, `THIS_MONTH`, `LAST_MONTH`, `THIS_WEEK_MON_TODAY`, `LAST_WEEK_MON_SUN`. **There is no `LAST_60_DAYS` or `LAST_90_DAYS`** — they error with `INVALID_VALUE_WITH_DURING_OPERATOR`. For a 90-day (or any custom) window, use `segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'` with explicit dates (end = today, start = today − N days).
 - GAQL does not support subqueries or calculated fields — do division (cost_micros/1e6) after retrieval.
 
 ---
@@ -126,18 +126,17 @@ ORDER BY conversion_action.name
 
 ```gaql
 SELECT
-  conversion_action.name,
-  conversion_action.status,
-  conversion_action.include_in_conversions_metric,
+  segments.conversion_action_name,
+  segments.conversion_action_category,
   metrics.all_conversions,
   metrics.conversions
-FROM conversion_action
+FROM customer
 WHERE segments.date DURING LAST_30_DAYS
-  AND conversion_action.status = 'ENABLED'
-ORDER BY metrics.all_conversions DESC
+ORDER BY metrics.conversions DESC
 ```
 
-**What to look for:** Actions with `include_in_conversions_metric = TRUE` but zero `metrics.conversions` in 30 days — either the tag is broken or the action is misconfigured. Actions with very high `all_conversions` but low `conversions` suggest a primary/secondary classification issue.
+**Why this segments off `customer`, not `conversion_action`:** `metrics.conversions` is PROHIBITED on the `conversion_action` resource (`PROHIBITED_METRIC_IN_SELECT_OR_WHERE_CLAUSE` — only `metrics.all_conversions` is allowed there). To get true `conversions` volume per action you must segment a metrics-bearing resource: `FROM customer` for account-wide per-action totals, or `FROM campaign` (add `campaign.name`) to also see which campaign drove each action. Cross-reference `segments.conversion_action_name` against the config from 2.1 (status, `include_in_conversions_metric`) — those config fields are not available alongside segmented metrics.
+**What to look for:** Actions with high `all_conversions` but low/zero `conversions` (e.g. an `ENGAGEMENT`-category action) are secondary/soft actions, not real leads — they should not be primary. An action that is `include_in_conversions_metric = TRUE` (per 2.1) but shows zero `conversions` over 30 days is either broken or misconfigured.
 
 ---
 
@@ -158,7 +157,7 @@ WHERE segments.date DURING LAST_30_DAYS
 ORDER BY metrics.cost_micros DESC
 ```
 
-**Use:** Evaluate whether campaigns have enough conversion volume to support their current bid strategy. Smart bidding (tCPA, Maximize Conversions) is unreliable below ~15–20 conversions/month per campaign. Adjust date range to `LAST_90_DAYS` for a longer view.
+**Use:** Evaluate whether campaigns have enough conversion volume to support their current bid strategy. Smart bidding (tCPA, Maximize Conversions) is unreliable below ~15–20 conversions/month per campaign. For a longer (90-day) view, switch the date filter to `segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'` (start = today − 90) — `LAST_90_DAYS` is not a valid GAQL literal.
 
 ---
 
@@ -256,7 +255,7 @@ SELECT
   metrics.conversions,
   metrics.cost_per_conversion
 FROM keyword_view
-WHERE segments.date DURING LAST_90_DAYS
+WHERE segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'
   AND campaign.status = 'ENABLED'
   AND ad_group.status = 'ENABLED'
   AND ad_group_criterion.status = 'ENABLED'
@@ -320,6 +319,7 @@ WHERE segments.date DURING LAST_30_DAYS
   AND ad_group.status = 'ENABLED'
   AND metrics.impressions > 0
 ORDER BY metrics.cost_micros DESC
+LIMIT 150
 ```
 
 **What to look for:** Search terms that are irrelevant to the firm's practice areas. Cross-reference against the negative keyword library. `search_term_view.status = 'NONE'` means the term is not yet added as a keyword or excluded — these are candidates for review. `EXCLUDED` means it's already blocked.
@@ -340,10 +340,11 @@ SELECT
   metrics.cost_micros,
   metrics.conversions
 FROM search_term_view
-WHERE segments.date DURING LAST_90_DAYS
+WHERE segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'
   AND campaign.status = 'ENABLED'
   AND ad_group.status = 'ENABLED'
 ORDER BY metrics.impressions DESC
+LIMIT 150
 ```
 
 **Use:** Broader view for negative keyword mining. Sort by impressions to find irrelevant terms eating impression share without necessarily spending a lot.
@@ -427,7 +428,7 @@ SELECT
   metrics.conversions,
   metrics.cost_per_conversion
 FROM campaign
-WHERE segments.date DURING LAST_90_DAYS
+WHERE segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'
   AND campaign.status != 'REMOVED'
 ORDER BY metrics.cost_micros DESC
 ```
@@ -449,7 +450,7 @@ SELECT
   metrics.conversions,
   metrics.cost_per_conversion
 FROM campaign
-WHERE segments.date DURING LAST_90_DAYS
+WHERE segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'
   AND campaign.status != 'REMOVED'
 ORDER BY campaign.name, segments.week
 ```
@@ -527,13 +528,18 @@ SELECT
   change_event.resource_change_operation,
   change_event.changed_fields
 FROM change_event
-WHERE change_event.change_date_time DURING LAST_30_DAYS
+WHERE change_event.change_date_time >= 'YYYY-MM-DD 00:00:00'
+  AND change_event.change_date_time <= 'YYYY-MM-DD 23:59:59'
 ORDER BY change_event.change_date_time DESC
 LIMIT 500
 ```
 
-**Note:** change_event API limit is 30 days — LAST_60_DAYS and LAST_90_DAYS will error.
-**What to look for:**
+**`change_event` has three hard constraints — all required, or the query errors:**
+
+1. **Bounded date range.** Filter `change_event.change_date_time` with BOTH a `>=` start and a `<=` end (or `BETWEEN`). A bare `>=` errors with `CHANGE_DATE_RANGE_INFINITE`. Do NOT use `DURING LAST_30_DAYS` — its start resolves to exactly 30 days ago and trips `START_DATE_TOO_OLD` (the window must be _strictly inside_ 30 days). Set start = today − 29 days, end = today.
+2. **A `LIMIT` is mandatory** (≤ 10000), or the query errors with `LIMIT_NOT_SPECIFIED`.
+3. **30-day ceiling.** Change history older than 30 days is unavailable — `LAST_60_DAYS` / `LAST_90_DAYS` do not exist and would error regardless.
+   **What to look for:**
 
 - `client_type = 'GOOGLE_ADS_AUTOMATED_RULE'` or `'GOOGLE_ADS_RECOMMENDATIONS'` — auto-applied changes from Google. Each one is worth reviewing.
 - Gaps of weeks with no changes — neglected account.
@@ -553,9 +559,11 @@ SELECT
   change_event.resource_change_operation,
   change_event.changed_fields
 FROM change_event
-WHERE change_event.change_date_time DURING LAST_30_DAYS
+WHERE change_event.change_date_time >= 'YYYY-MM-DD 00:00:00'
+  AND change_event.change_date_time <= 'YYYY-MM-DD 23:59:59'
   AND change_event.client_type IN ('GOOGLE_ADS_AUTOMATED_RULE', 'GOOGLE_ADS_RECOMMENDATIONS')
 ORDER BY change_event.change_date_time DESC
+LIMIT 500
 ```
 
 **Use:** Isolates Google-initiated changes specifically. In a well-managed account, this list should be short or empty for most change types. A long list of auto-applied changes is a red flag regardless of whether individual changes look benign.
@@ -642,6 +650,7 @@ ORDER BY campaign.name, ad_group.name
 ```gaql
 SELECT
   campaign.name,
+  campaign.status,
   geographic_view.country_criterion_id,
   geographic_view.location_type,
   metrics.impressions,
@@ -662,6 +671,7 @@ ORDER BY metrics.cost_micros DESC
 ```gaql
 SELECT
   campaign.name,
+  campaign.status,
   user_location_view.targeting_location,
   metrics.impressions,
   metrics.clicks,
@@ -672,6 +682,8 @@ WHERE segments.date DURING LAST_30_DAYS
   AND campaign.status = 'ENABLED'
 ORDER BY metrics.cost_micros DESC
 ```
+
+**Required SELECT field:** `geographic_view` and `user_location_view` reject a `campaign.status` filter unless `campaign.status` is also in the SELECT clause (`EXPECTED_REFERENCED_FIELD_IN_SELECT_CLAUSE`). Both queries above include it for this reason — don't remove it.
 
 ---
 
@@ -857,15 +869,16 @@ _Note: Per-ad-group query splitting beyond per-campaign will yield marginal addi
 
 **Date range options:**
 
-```text
+```gaql
 DURING LAST_7_DAYS
 DURING LAST_14_DAYS
 DURING LAST_30_DAYS
-DURING LAST_90_DAYS
 DURING THIS_MONTH
 DURING LAST_MONTH
 BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'
 ```
+
+There is no `LAST_60_DAYS` or `LAST_90_DAYS` literal — for any window longer than 30 days (or any custom range), use `BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'` with explicit dates.
 
 **Filtering by status:**
 
