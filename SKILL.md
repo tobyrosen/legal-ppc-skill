@@ -551,7 +551,7 @@ Net-new capability added from the paid-search division of the agency-agents mine
 3. **Bidding & Budget** — strategy fit, learning-period violations, budget-constrained campaigns, floor/ceiling issues.
 4. **Keyword & Targeting** — match-type distribution, negative coverage, quality-score distribution, audience observation vs targeting.
 5. **Competitive Positioning** — impression-share gaps + top-of-page metrics (API-sourced via GAQL). Auction-insights competitor breakdown + overlap rate are a known API blind spot — NOT available via GAQL; request a UI screenshot per the blind-spot protocol and never present them as auto-pulled. See `account-audit-checklist.md` §7.
-6. **Landing-Page Fit** — message match + conversion-by-LP are reasoned from final URLs (API-sourced, query 12.1). Page speed, mobile-friendliness, and redirect chains are NOT in the Google Ads API — they require an external tool (PageSpeed Insights / a crawler) or manual review; flag them as such, never present them as auto-pulled.
+6. **Landing-Page Fit** — assessed manually or with external tools (the rendered page, PageSpeed Insights, a crawler), not from the Google Ads API. Never present landing-page findings as auto-pulled.
 7. **Compliance** — legal-services policy, bar-advertising claim risk, prohibited/absolute claims.
 8. **Historical/Change-History Forensics** — when degradation started, what changed before/after.
 9. **Recommendation Roadmap** — severity, expected impact, owner, 30/60/90-day sequencing. Add impact estimation (PAID-9) and technical→business executive translation (PAID-10).
