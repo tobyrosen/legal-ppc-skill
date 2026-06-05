@@ -194,6 +194,8 @@ ORDER BY campaign.name, ad_group.name
 
 **Required filter:** `ad_group_criterion.negative = FALSE` is mandatory. `ad_group_criterion` returns both positive and negative keywords — omitting this filter causes ad-group-level negatives to appear as positive keywords, producing false BROAD match flags and misidentified waste (P6).
 
+**Output-format note (verified live 2026-06-05):** `quality_info.*` are nested message fields. A plain table formatter can silently DROP them — the keyword shows but `quality_score` is absent, making QS look unavailable when it actually sources fine. Pull this query with `format='json'` (or read the nested `qualityInfo` object) to get `qualityScore` plus the three component labels (`creativeQualityScore`, `postClickQualityScore`, `searchPredictedCtr`). Confirmed live: brand keywords returned QS 7–10 with `ABOVE_AVERAGE`/`AVERAGE` labels.
+
 ---
 
 ### 3.2 Match Type Distribution
