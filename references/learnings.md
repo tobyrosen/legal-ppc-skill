@@ -104,8 +104,8 @@ If yes to any: hold on blocking informational intent; analyze actual search term
 
 **Observed cases:**
 
-- `cheap` (BROAD) in Client A Catawba - Child Custody ad group — flagged as a positive keyword needing conversion. It was an ad-group-level negative. (2 sessions)
-- `5 signs`, `elder`, `dallas`, `pro bono` in Client C Jenkins LA+ — flagged as active junk positive keywords. All were ad group-level negatives. Caught via `ad_group_criterion` direct query after the `keyword_view` query returned them without the filter.
+- `cheap` (BROAD) in a Client A Child Custody ad group — flagged as a positive keyword needing conversion. It was an ad-group-level negative. (2 sessions)
+- `5 signs`, `elder`, `dallas`, `pro bono` in a Client C LA+ campaign — flagged as active junk positive keywords. All were ad group-level negatives. Caught via `ad_group_criterion` direct query after the `keyword_view` query returned them without the filter.
 
 **Secondary:** `ad_group.status` omission caused a keyword in Client A Brand's PAUSED "Male Divorce Lawyer" ad group to be flagged as an active BROAD match issue. It was not serving.
 
