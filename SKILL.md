@@ -457,7 +457,7 @@ Before any symptom-specific diagnosis, run the pre-flight checks from `account-a
 
 - **PF-0: Account macro context** (reasoning input — surface as flag only when material; see "Account Macro Context" section above)
 - PF-1: Conversion tracking verification
-- PF-2: Structural red flags
+- PF-2: Structural red flags — includes ad-level policy status. Pull GAQL 7.3 (`ad_group_ad.policy_summary.approval_status` / `.review_status`) and flag any ad with `approval_status` in {`DISAPPROVED`, `APPROVED_LIMITED`} or `review_status` in {`UNDER_REVIEW`, `REVIEW_IN_PROGRESS`}. Policy is API-checked first — a screenshot is the fallback only for the human-readable disapproval reason, not for the approval status itself. A campaign reading `serving_status = SERVING` does not clear ad-level policy issues.
 - PF-3: Change history read
 
 All four are mandatory and none are deferred by a vague brief. PF-0 grounds every subsequent recommendation in the account's actual direction — it does not produce a user-facing section by default, but its findings inform whether and how to surface a macro flag. PF-1 is the most urgent symptom-specific check — conversion tracking issues invalidate every other finding. A vague brief about "performance feeling off" is still a brief. All four pre-flights run.

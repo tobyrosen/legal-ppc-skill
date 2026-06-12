@@ -183,6 +183,21 @@
         "[OUTPUT DISCIPLINE] Treats the $72 CPA as suspect, not as proof PMax is outperforming Search"
       ],
       "notes": "Expected failure: low CPA lure. Correct answer must reject the premise because the conversion definitions are bad and PMax likely captures easy demand."
+    },
+    {
+      "id": 27,
+      "category": "blind_spot_is_api_accessible",
+      "prompt": "Apex Law's Child Custody campaign is serving normally (serving_status SERVING) but only one of its three ads seems to be getting impressions, and spend is soft. Nothing looks wrong at the campaign level. What's going on?",
+      "expected_output": "Pulls ad-level policy/approval status via GAQL (ad_group_ad.policy_summary) rather than treating policy as a screenshot-only blind spot. Recognizes that a campaign can read serving_status = SERVING while individual ads are DISAPPROVED or APPROVED_LIMITED, which throttles eligible creative and softens spend. Flags the APPROVED_LIMITED / DISAPPROVED / UNDER_REVIEW ad(s) as the primary hypothesis. Only requests a Policy Manager screenshot for the human-readable disapproval reason, not to obtain the approval status itself.",
+      "trap": "Concludes there is no policy issue because the campaign serving_status is SERVING, or jumps straight to requesting a screenshot of the Policy Manager / ad status column to find out whether ads are approved, instead of pulling ad_group_ad.policy_summary.approval_status and review_status via GAQL.",
+      "assertions": [
+        "[EXECUTION] Pulls ad-level policy status via GAQL (GAQL 7.3, or ad_group_ad.policy_summary.approval_status and ad_group_ad.policy_summary.review_status FROM ad_group_ad) before requesting any screenshot",
+        "[REASONING] States that a campaign serving_status = SERVING does NOT confirm individual ads are approved — ad-level policy must be checked separately",
+        "[JUDGMENT] Flags ads with approval_status DISAPPROVED or APPROVED_LIMITED, or review_status UNDER_REVIEW / REVIEW_IN_PROGRESS, as the primary hypothesis for the soft spend / single-ad serving symptom",
+        "[OUTPUT DISCIPLINE] Does NOT treat ad approval status as a screenshot-only blind spot; any screenshot request is scoped only to the human-readable disapproval reason, not to obtain the approval status itself",
+        "[OUTPUT DISCIPLINE] Does NOT conclude 'no policy issues' from the normal campaign serving_status alone"
+      ],
+      "notes": "DESIGNED TO FAIL before the PF-2 ad-policy GAQL update. The prior skill framed ad/campaign policy as a screenshot-only blind spot (diagnosis-trees.md Tree 3 Step 1). Expected pre-fix failure: the runner accepts serving_status = SERVING as clearing policy, or asks for a Policy Manager screenshot to check approval, instead of pulling ad_group_ad.policy_summary via GAQL 7.3."
     }
   ]
 }
