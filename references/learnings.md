@@ -144,4 +144,72 @@ If yes to any: hold on blocking informational intent; analyze actual search term
 
 ---
 
+### P9 — Thin-Signal + High-CPC Smart Bidding → Switch to Max Clicks With a CPC Cap
+
+**Source:** 2026-06-11 + 2026-06-15 walkthroughs (elder abuse account, heaviest-spend campaign) | **Status:** Confirmed (2 sessions, same account; pattern generalizes)
+
+**Pattern:** A campaign on Maximize Conversions whose conversion volume sits *below* the ~15–20/30d reliability floor AND that carries a high avg CPC bids blind and burns budget. Maximize Conversions has no usable signal to optimize against (lumpy, sub-floor weekly conversions), so every auction it wins at a high CPC is a near-random spend of budget. The classic instinct — adjust the target or wait for the algorithm to "learn" — does not apply, because there is nothing to learn from.
+
+**Observed case:** Heaviest-spend campaign at 30-day = 57 clicks, 9 conv, ~$4,187 spend, **$73 avg CPC**, **$465 CPL**, with 25% of impressions lost to budget. 9 conv/30d is under the floor; weekly conv was 4/1/0/4 (lumpy). Switched from Maximize Conversions to **Maximize Clicks with a CPC cap** to rebuild click volume and cap runaway auction prices while a real conversion signal accumulates.
+
+**Implications for diagnosis:**
+
+- When a smart-bidding campaign shows sub-floor conversion volume AND a high avg CPC for the practice area, the play is Maximize Clicks + CPC cap — not a target tweak, not "let it learn." The cap stops single auctions from eating the daily budget; Max Clicks buys the volume needed to rebuild signal.
+- This is the bridge between the "Smart Bidding — Post-Tracking-Fix Protocol" low-volume flag (which already says *consider switching to Maximize Conversions* when volume drops below the floor) and the **Campaign-Level CPC Anomaly** routing: when the campaign is BOTH below the floor AND running an anomalously high CPC, Maximize Conversions is not the safe harbor — Max Clicks + cap is.
+- Trade-off to flag every time: Max Clicks optimizes for clicks, not conversions. Set a revisit window (3–4 weeks) and watch CVR — if click volume comes back but conversion rate craters, the cleaner volume has done its job and it's time to move back toward a conversion-based strategy.
+
+---
+
+### P10 — A Term That Has Converted Is Never Auto-Negated, However "Wrong" It Looks
+
+**Source:** 2026-06-15 walkthrough (nonprofit-referral term kept) | **Status:** Confirmed (generalizes; reinforces existing search-term integrity rules)
+
+**Pattern:** A search term can *look* like obvious waste — a nonprofit/referral name, an apparent geo mismatch, an off-practice-area string — and still be a real source of converted business. Pattern-matching a term to a "negate" category on appearance alone, without pulling its conversion data, throws away converting traffic.
+
+**Observed case:** A nonprofit-referral term that read as a clean negative ("referral mismatch") had in fact drawn spend AND a conversion in a sibling campaign. Standing decision: **KEEP — do not negative, do not re-flag in future checks.** The earlier "looks like a referral mismatch" flag was wrong because it was made on the term's shape, not its conversion record.
+
+**Implication:** Before excluding ANY term — including ones that match a negative-library category by appearance — check whether it has converted. A converting term is not waste, full stop. This is the positive-intent complement to the existing search-term integrity rules (P6/P8): those stop you flagging *non-serving* history as active; this one stops you negating *actively-converting* traffic because it pattern-matches a junk category. When a prior session has already ruled "keep" on a converting term, that ruling stands — do not re-litigate it each check.
+
+---
+
+### P11 — Geo-Mismatch Negation: Negate the Geo Token, Never the Core Service Term
+
+**Source:** 2026-06-15 walkthrough (geo-mismatched query containing the core service term) | **Status:** Confirmed (generalizes)
+
+**Pattern:** When a query is geo-mismatched (a location the account does not serve) but *also contains the firm's core service term*, a naive negative on the whole phrase — or worse, on the service words — would block exactly the traffic the firm wants. The fix is surgical: negate the GEO token only.
+
+**Observed case:** A query combined the firm's core service ("[core service term]") with a non-target city ("[city]"). Resolution: add the **city** as the negative, **keep** the core service term serving. Negating the service term would have suppressed the firm's primary intent across every other geo.
+
+**Implication:** On any geo-mismatched query, decompose it before negating. Identify the geo token vs. the service token. Negate the geo; never the service. A phrase-level or service-token negative is collateral damage — it removes good traffic to solve a location problem. This is a precision rule that sits under the negative-keyword decision tree: match-the-negative-to-the-actual-problem, not to the whole offending phrase.
+
+---
+
+### P12 — A "Structural" CPA Ceiling Can Lift From Creative Alone — Re-Pull Before Assuming It Still Binds
+
+**Source:** 2026-06-15 walkthrough (standing CPA-gap item resolved by ad refresh) | **Status:** Confirmed (generalizes; reinforces "Account Notes vs. Live Data")
+
+**Pattern:** A long-standing high-CPA item gets blamed on a landing-page or structural limit and parked as "can't fix without the LP / out of scope." That standing flag then persists across sessions as accepted fact. But a creative-level change (ad refresh + near-me / intent-matched headlines) can close the gap on its own — and if nobody re-pulls, the account keeps carrying a *stale* structural flag that no longer reflects reality.
+
+**Observed case:** An ad group ran a standing ~$125 CPA gap vs. its sibling (problem AG ~$157 CPA vs. sibling ~$32), long attributed to a landing-page-quality ceiling controlled by a third party (out of scope). After an ad refresh + near-me headlines, the freshest window showed the gap fully closed (~$100 CPA vs. ~$89 sibling) with **no LP change**. The "structural LP ceiling" thesis had eased; the standing flag was stale.
+
+**Implication:** A "structural" / "out-of-scope" / "LP-gated" CPA flag is a hypothesis with a shelf life, not a permanent fact. Before re-asserting it in a new session, re-pull live data — the gap may already have closed via creative. This is a direct application of **Account Notes vs. Live Data**: the note records *prior* state; the current CPA must come from a live query. Do not let a standing structural flag persist unverified, and explicitly retire it when the data shows it no longer binds. (Corollary: when low conversion volume makes the sibling's CPA unreliable, treat the comparison as directional — see the 15–20 conv reliability threshold.)
+
+---
+
+### P13 — Judge a Volume-Driving Ad Group on Marginal Contribution, Not CPA-vs-Sibling
+
+**Source:** 2026-06-15 walkthrough (expansion ad group KEEP decision) | **Status:** Confirmed (generalizes)
+
+**Pattern:** An expansion / test ad group that runs at a small CPA premium over its incumbents but drives a large share of the campaign's conversions is a KEEP, not a kill. Killing it to "save" the per-conversion premium loses the volume it generates — trading real conversions for pennies of CPA efficiency. The premium is the cost of the marginal volume, and that volume is usually worth more than the spread.
+
+**Observed case:** An expansion ad group running ~$10–20/conv above the two incumbents was the **#1 conversion driver — ~50% of the campaign's ad-group conversions** (~23 conv, ~$110 CPA since launch). Its weekly trend climbed hard (0 → 4 → 12). Early dead weeks (0-conv launch period) had dragged its blended since-launch CPA upward, making the standing average look worse than the current marginal performance. Decision: **KEEP + monitor**; revisit only if its weekly CPA detaches upward from the incumbents for 2–3 consecutive weeks.
+
+**Implications for diagnosis:**
+
+- Evaluate a volume-driving ad group on its **marginal contribution** (how much volume it adds, at what marginal CPA) — not on a static CPA-vs-sibling comparison. A KEEP at a small premium that supplies half the conversions beats a "clean" account that lost that volume.
+- **Weight the trend, and discount early dead weeks.** A test's blended since-launch CPA is dragged by its zero-conversion launch period; the relevant signal is the recent weekly trajectory, not the launch-inclusive average. A climbing weekly trend on a still-young ad group argues KEEP even when the lifetime average looks middling.
+- Set an explicit kill condition rather than killing on the spot: e.g., "revisit only if weekly CPA detaches upward from incumbents for 2–3 consecutive weeks." This protects volume while keeping a real off-ramp.
+
+---
+
 *Next synthesis session: after 4–8 total sessions. At that point, review all session logs, confirm which provisional entries appear cross-account, and remove the provisional marker.*
