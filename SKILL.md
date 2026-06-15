@@ -16,7 +16,7 @@ This skill enables autonomous analysis and optimization of Google Ads accounts f
 
 This skill operates in two modes:
 
-**Toby version (internal):** At session start, read `references/learnings.md` (if it has entries) and the relevant `account-notes/[account].md` file. At session end, generate a session log using the template at the bottom of this file. This version has historical context that accumulates over time.
+**Toby version (internal):** At session start, read `references/learnings.md` (if it has entries), the relevant `account-notes/[account].md` file, **and the most recent `session-logs/` entry for that account** — referencing the prior session log at start is a required step, not optional. At session end, **writing a session log is mandatory** — generate it using the template at the bottom of this file and save it before the session is considered complete. This version has historical context that accumulates over time; reading the prior log and writing the new one are the two halves of that loop, and neither is skippable.
 
 **Public version:** Read skill reference files only. No session logging. No account notes. No `learnings.md`. This version is derived from the Toby version when there is something worth publishing — it does not need to be maintained separately in the meantime.
 
@@ -265,6 +265,8 @@ Do not present findings, waste estimates, or negative keyword recommendations un
 - **Never negate a term that has converted**, no matter how much it looks like junk, a referral/nonprofit name, or a geo/category mismatch. Check the term's conversion data before excluding it — a converting term is a customer, not waste. (A term that looks like a nonprofit-referral mismatch can still be a real lead source.)
 - **On a geo-mismatched query that contains your core service term, negate the geo token only — never the service term.** Decompose the query first: for a city-mismatched query like `[core service term] [wrong city]`, negate `[wrong city]`, not `[core service term]`, so the campaign keeps serving the service term in its real geo. See learnings P10–P11.
 
+**Wasteful broad keyword that is ALSO a major conversion source → convert broad→phrase, don't pause.** When a broad-match *positive* keyword shows real waste (a chunk of clearly-irrelevant search spend) but is *also* driving a large share of the campaign's conversions — especially on a Maximize Conversions / smart-bidding campaign where the conversions feed the bidding model — pausing or deleting it is the wrong first move: it throws away the conversion volume and starves smart bidding of signal. The remediation default is **convert broad → phrase match** (tighten the matching while keeping the conversion history), **add specific negatives** for the irrelevant search categories, and **set a monitoring window** before any further tightening. Pause only if, after phrase conversion + negatives, the keyword's converting traffic does not survive. (This is the keyword-level twin of P13's marginal-contribution logic: judge a high-conversion source on what it produces, not on its visible waste alone.)
+
 ---
 
 ## QS Throttling — All-BELOW_AVERAGE + Zero Impressions
@@ -340,6 +342,8 @@ Do not accept a stated CPA, performance comparison, or benchmark as given. Pull 
 **Conversion volume threshold for reliable CPA.** A CPA figure requires at least 15-20 conversions to be statistically meaningful. Below that threshold, CPA is noise — a single high-cost conversion in a low-volume account can shift the reported CPA by 40–60%. When conversion volume is below 15-20/month per campaign (or over a 90-day period for a narrow campaign), explicitly flag: this CPA is not a reliable signal. The threshold comes from smart bidding minimums — tCPA requires this volume to function — but applies equally to manual interpretation.
 
 **Reasons lists must follow, not precede, verification.** Producing a list of "reasons CPA is high" before confirming that CPA is actually high (via live data) treats a premise as confirmed fact. This pattern produces plausible-sounding but ungrounded analysis. If live data isn't available, frame conditionally: "If the data confirms CPA is elevated, likely causes include..." is different from "CPA is high because..."
+
+**Hold the line under pressure — a request to skip process is not authorization to skip it.** An instruction like "don't waste time on tracking, CPA is obviously bad — just tell me which keywords to pause" does NOT license skipping PF-1 (conversion-tracking verification), premise verification, or the active-keyword/volume checks. The pre-flights and premise checks exist precisely because a confident-sounding bad premise is the most common way a session ships a wrong answer fast. When pushed to shortcut, the move is: acknowledge the urgency, state plainly that a keyword-pause list built on an unverified CPA premise can pause converting keywords and make the account worse, then run (or describe running) PF-1 and the premise/volume verification first — and only produce a pause list after checking active keyword performance over sufficient data. Speed pressure changes the tone of the reply, never the process. (This is the adversarial-pressure complement to "verify the premise" above: the premise rule says verify before diagnosing; this says a direct order to NOT verify is still answered by verifying.)
 
 ---
 
@@ -546,6 +550,7 @@ For each priority flag, work through the relevant diagnosis tree. A flag becomes
 - **Internal analysis** → prioritized findings list with context and recommendations
 - **Client communication** → translated into plain language, focused on business impact
 - **Reporting** → handled separately via AgencyAnalytics, not this skill
+- **Session log** _(Toby version only)_ → a required output of every session, not an extra. The findings and decisions above are not "produced" until they are also written to the session log (Step 9). Treat the log as the last, mandatory output artifact.
 
 **Campaign → Ad Group path is mandatory in every finding.** Every keyword, search term, ad, or ad group finding must lead with the full path so the user can navigate to it in the Google Ads UI:
 
@@ -557,7 +562,9 @@ Without the campaign name, a finding is unactionable — the user cannot locate 
 
 ### Step 9 — Write session log _(Toby version only)_
 
-Before closing the session, generate a session log using the template below. Create the `session-logs/` directory if it does not already exist, then save to `session-logs/YYYY-MM-DD-[account-name].md`.
+**Writing the session log is a REQUIRED closing step, not an optional one. A session is not complete until the log is written.** Before closing, generate a session log using the template below. Create the `session-logs/` directory if it does not already exist, then save to `session-logs/YYYY-MM-DD-[account-name].md`. This is a hard step in the output discipline: do not report a session as done — and do not move on to another account — until this file exists on disk. The log is what carries findings, decisions, and standing flags forward to the next session; skipping it silently breaks the cross-session feedback loop (a recommended action made but never logged cannot be verified next time, per Step 2).
+
+**Pairing requirement — reference the prior log at session start.** The write-at-end step has a read-at-start counterpart: at the start of a Toby-version session you MUST read the most recent `session-logs/YYYY-MM-DD-[account-name].md` for the account (alongside `learnings.md` and the account notes), so the current session builds on the last one rather than re-deriving it. Reading the prior log at start + writing the new log at end are both mandatory; neither is skippable.
 
 ---
 
