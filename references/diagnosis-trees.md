@@ -68,10 +68,11 @@ Enhanced Conversions for Leads hashes and matches first-party contact data (emai
 
 ### PF-2: Structural Red Flags
 
-Pull: GAQL 1.1 (all campaigns), GAQL 1.3 (ad rotation settings)
+Pull: GAQL 1.1 (all campaigns), GAQL 1.3 (ad rotation settings), GAQL 7.3 (ad policy / approval status)
 
 Evaluate against the good-account checklist from the knowledge base. These are binary flags — either present or not:
 
+- **Ad policy / approval status?** Pull GAQL 7.3. Ad-level policy is API-accessible — check it here, do not default to a screenshot. Flag any ad where `ad_group_ad.policy_summary.approval_status` is `DISAPPROVED` or `APPROVED_LIMITED`, or where `ad_group_ad.policy_summary.review_status` is `UNDER_REVIEW` or `REVIEW_IN_PROGRESS`. A campaign reading `serving_status = SERVING` does NOT clear ad-level policy issues. A screenshot is the fallback only for the human-readable disapproval reason, not for the approval status itself.
 - **Performance Max campaign present?** Flag. PMax is almost universally wrong for law firms without overwhelming conversion history. Note which campaigns are PMax type.
 - **Display/content network enabled on any search campaign?** Check `network_settings.target_content_network`. Flag if `TRUE` without a deliberate reason on record.
 - **Search partners enabled?** Check `network_settings.target_partner_search_network`. Flag if `TRUE` — usually degrades lead quality in legal.
@@ -219,17 +220,25 @@ Note: this symptom is counterintuitive. Budget not spending is not a sign that t
 
 ---
 
-**Step 1: Is the campaign actually eligible to serve?**
+**Step 1: Is the campaign actually eligible to serve — and are its ads approved?**
 
 Pull: GAQL 1.1. Check `campaign.status` and `campaign.serving_status`.
 
 Expected: `status = ENABLED`, `serving_status = SERVING`.
 
-If serving_status shows anything other than SERVING:
+Then pull GAQL 7.3 (ad policy / approval status) for the campaign. Ad-level policy is API-accessible — check it here before requesting any screenshot. Flag any ad where `ad_group_ad.policy_summary.approval_status` is `DISAPPROVED` or `APPROVED_LIMITED`, or where `ad_group_ad.policy_summary.review_status` is `UNDER_REVIEW` or `REVIEW_IN_PROGRESS`. A campaign can read `serving_status = SERVING` at the campaign level while its ads are disapproved or limited at the ad level — that is exactly the case where budget underspends because the eligible creative is being throttled by policy. Do not conclude "no policy issues" from a normal campaign serving_status; confirm it against the ad-level policy summary.
 
-> ⚠️ **BLIND SPOT — Serving status details and policy flags are not fully accessible via API**
+If serving_status shows anything other than SERVING, the API returns a serving status code but not the full explanation for why a campaign isn't serving:
+
+> ⚠️ **BLIND SPOT — Campaign serving-status explanation is not fully accessible via API**
 > The API returns a serving status code but not the full explanation for why a campaign isn't serving.
-> → Please share a screenshot of the campaign status column in the Google Ads UI, and check the Policy Manager for any active disapprovals or account-level issues.
+> → Please share a screenshot of the campaign status column in the Google Ads UI.
+
+If GAQL 7.3 surfaces disapproved or limited ads, that is the finding — the disapproval reason text is the only screenshot fallback:
+
+> ⚠️ **BLIND SPOT — Human-readable disapproval reason is not fully expanded via API**
+> GAQL 7.3 returns the approval and review status codes (`DISAPPROVED`, `APPROVED_LIMITED`, `UNDER_REVIEW` / `REVIEW_IN_PROGRESS`), but the Policy Manager's detailed explanation of _why_ an ad was disapproved is not fully expanded in the API policy summary.
+> → For any ad flagged DISAPPROVED or APPROVED_LIMITED by GAQL 7.3, please share a screenshot of the Policy Manager entry for that ad so the specific policy reason can be addressed.
 
 ---
 

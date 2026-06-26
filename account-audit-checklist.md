@@ -64,8 +64,9 @@ _GAQL: 2.1 (all conversion actions), 2.2 (recent conversion volume)_
 
 ### PF-2: Structural Red Flags
 
-_GAQL: 1.1 (all campaigns), 1.3 (ad rotation)_
+_GAQL: 1.1 (all campaigns), 1.3 (ad rotation), 7.3 (ad policy / approval status)_
 
+- [ ] Ad policy checked via GAQL 7.3 (`ad_group_ad.policy_summary.approval_status` / `.review_status`) — flag any ad with `approval_status` in {`DISAPPROVED`, `APPROVED_LIMITED`} or `review_status` in {`UNDER_REVIEW`, `REVIEW_IN_PROGRESS`}. A campaign reading `serving_status = SERVING` does not clear ad-level policy issues; screenshot is the fallback only for the human-readable disapproval reason.
 - [ ] No Performance Max campaigns (PMax is almost always wrong for law firms)
 - [ ] Display/content network disabled on all search campaigns (`target_content_network = FALSE`)
 - [ ] Search Partners disabled on all campaigns (`target_partner_search_network = FALSE`) — or documented reason it's enabled

@@ -516,6 +516,27 @@ ORDER BY campaign.name, ad_group.name
 
 ---
 
+### 7.3 Ad Policy / Approval Status
+
+```gaql
+SELECT
+  campaign.id,
+  campaign.name,
+  ad_group.id,
+  ad_group.name,
+  ad_group_ad.ad.id,
+  ad_group_ad.status,
+  ad_group_ad.policy_summary.approval_status,
+  ad_group_ad.policy_summary.review_status
+FROM ad_group_ad
+WHERE ad_group_ad.status != 'REMOVED'
+ORDER BY campaign.name, ad_group.name
+```
+
+**What to look for:** Ad approval and review status are API-accessible — pull them here first, do not default to a screenshot. Flag any ad where `ad_group_ad.policy_summary.approval_status` is `DISAPPROVED` (ad is not serving) or `APPROVED_LIMITED` (serving with restrictions — limited reach, geography, or audience), OR where `ad_group_ad.policy_summary.review_status` is `UNDER_REVIEW` or `REVIEW_IN_PROGRESS` (approval pending — the ad may not be fully serving yet; the live API commonly returns `REVIEW_IN_PROGRESS` for ads still under review). `DISAPPROVED` is the most urgent: a disapproved ad in an otherwise-serving campaign silently starves that ad group of eligible creative. `APPROVED_LIMITED` is the common trap on a campaign whose `serving_status` reads `SERVING` at the campaign level while individual ads are throttled by policy. Cross-reference flagged ads against the campaign's `serving_status` (query 1.1) — a normal campaign serving_status does NOT clear ad-level policy issues. A screenshot of the Policy Manager is the fallback only for the human-readable disapproval reason, which the API summary does not fully expand.
+
+---
+
 ## 8. Change History
 
 ### 8.1 Recent Changes — Last 30 Days
