@@ -12,6 +12,16 @@ This skill enables autonomous analysis and optimization of Google Ads accounts f
 
 ---
 
+## Output Format — plain text, NEVER images (Toby, locked 2026-06-29)
+
+Present the check's data as **plain text** in the Telegram message — concise per-account lines (campaign → spend / conv / CPL / impression share split / weekly-trend note). **NEVER render the PPC-check data as an image / PNG / table-card.** Toby has explicitly said the rendered images are _not helpful_ for the Monday/Thursday checks and does not want them. This **overrides** the global `communication.md` "Presenting numbers and data → visual table image" rule _for PPC checks specifically_ (that rule's own carve-out already exempts recurring research-base data from disposable ONGs — the PPC check is exactly that case). No markdown tables either (pipes render as junk on Telegram) — short lines / bullets only, one metric group per line.
+
+**Always include DIRECTION (Toby, 2026-06-29):** every account reports **up/down vs the previous week AND vs the previous 30 days** for spend, conversions, and CPL — never a bare current-period figure. Pull last-7d vs prior-7d (or the two latest complete weeks) and last-30d vs prior-30d (`FROM customer`, explicit `segments.date BETWEEN` ranges), and state each metric's % move + the better/worse direction (CPL down = better).
+
+Present DATA, one account at a time; the analytical calls are Toby's.
+
+---
+
 ## Version Note
 
 This skill operates in two modes:
@@ -375,7 +385,7 @@ If MCP tools are available, use them. Don't reason from a snapshot when you can 
 
 ## Using Sub-Agents for Heavy Analysis
 
-For tasks that involve pulling and analyzing large search term datasets across multiple campaigns, spawn parallel sub-agents — one per campaign — using the `Agent` tool with `subagent_type: "general-purpose"`. This:
+For tasks that involve pulling and analyzing large search term datasets across multiple campaigns, run parallel sub-agent analyses — one per campaign. Delegate via the delegate lane (`delegate.py`); use a Claude subagent only when explicitly chosen per the delegation policy in `~/.claude/rules/actions.md`. This:
 
 - Prevents search term files from consuming the main context window
 - Enables parallel data pulls (faster wall-clock time)
@@ -471,7 +481,7 @@ When you hit something you can't see via the API, use the blind spot protocol fr
 > ⚠️ **BLIND SPOT — [what cannot be seen]**
 > → Please share a screenshot of [exact location, with applicable filters/date range].
 
-**For search term reviews across more than 2 campaigns:** suggest the sub-agent pattern before pulling data (see "Using Sub-Agents" above). This is the default approach for multi-campaign pulls — don't wait for the user to ask.
+**For search term reviews across more than 2 campaigns:** suggest the parallel sub-agent pattern before pulling data (see "Using Sub-Agents" above), routed per the delegation policy in `~/.claude/rules/actions.md` — don't wait for the user to ask.
 
 ### Step 5 — Maintain a running action list
 
