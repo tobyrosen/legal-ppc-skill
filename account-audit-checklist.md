@@ -16,7 +16,7 @@ These run before anything else. Pre-flight findings take priority over every oth
 
 _GAQL: 1.1 (campaigns, current + prior periods), 2.3 (conversion volume by campaign), 11.1 (budget/spend by period)_
 
-This step is mandatory **reasoning input**, not a default user-facing output section. Pull it every time, surface only when flag-worthy.
+This step is mandatory **reasoning input**, not a default user-facing output section. Pull it every time, surface only when flag-worthy. PULL is unconditional every session; only SURFACING is conditional on materiality.
 
 - [ ] Spend trend pulled: current period vs prior 90-day baseline (account-level and per-campaign)
 - [ ] Conversion volume trend pulled: current period vs prior 90-day baseline
