@@ -105,6 +105,8 @@ If the MCP changes, update this note only. The query library remains valid.
 **Login/MCC customer ID:** _(set in your MCP config — replace with your own MCC/manager account ID)_
 **First step in any new session:** `list_accounts()` — confirms which accounts are accessible.
 
+> **Account scope — hard stop.** `list_accounts()` shows what is _accessible_, not what is _in scope_. Only query accounts confirmed against the operator's private current-client roster, which is maintained outside this skill. If `list_accounts()` returns an account you cannot confirm is a current client, do not query it — surface it to the operator and stop. "All accounts," "every account," and "the whole MCC" always mean _all roster accounts_, never the full accessible list. If no roster is available in your context, do not run any multi-account pull.
+
 ---
 
 ## GAQL Query Integrity — Keywords and Search Terms

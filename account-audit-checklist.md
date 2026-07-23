@@ -12,6 +12,8 @@ Work through each section in order. Mark each item ✓ (pass), ✗ (flag), or �
 
 These run before anything else. Pre-flight findings take priority over every other finding.
 
+- [ ] Account scope confirmed: target account(s) verified against the operator's private current-client roster; nothing unconfirmed queried. (Hard stop — see SKILL.md "Account scope".)
+
 ### PF-0: Account Macro Context (Reasoning Input)
 
 _GAQL: 1.1 (campaigns, current + prior periods), 2.3 (conversion volume by campaign), 11.1 (budget/spend by period)_
