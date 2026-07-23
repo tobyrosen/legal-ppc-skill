@@ -27,6 +27,8 @@ Copy this template and fill it out at the end of every session. Save to `session
 - [ ] Search term review
 - [ ] Other: \_\_\_
 
+- PF-1 conversion tracking config: [verified — primary conversion actions listed by name with a config-state verdict, e.g. "tracking clean (N primaries: <action names>)"; volume counts alone do NOT satisfy this line]
+
 ## Diagnostic Path
 
 [Ordered account of what was checked and why — not a polished narrative, just what actually happened]

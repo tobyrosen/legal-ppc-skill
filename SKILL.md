@@ -66,6 +66,8 @@ Pull this **before** running symptom-specific diagnosis. Every recommendation mu
   - Pattern that explains other findings (e.g., a sudden YoY drop alongside structural changes that may be the cause)
 - When surfacing a flag, frame it as a question or observation tied to the broader account direction — not as a separate audit section.
 
+Distinguish PULL from SURFACE: the macro/trailing-window data is pulled **every** session without exception — "not surfaced by default" governs only whether it appears in the output, never whether it is computed. This holds for narrow, urgent, or "just the number" asks: a spend/conversion/CPL figure is never reported bare — the WoW and 30-day-vs-prior-30-day direction ships with it every time, even when the brief is a one-line request.
+
 **Format when flagging:**
 
 ```text
@@ -157,6 +159,8 @@ Cheap CPC on a competitive legal term is a red flag that the data includes pause
 2. Ask: "Can you confirm which ad groups these terms came from, and whether the query filtered for ENABLED ad groups only?"
 3. Do NOT present terms with suspicious CPCs as active waste findings until the source is confirmed.
 4. If the source is confirmed as a paused ad group, they are historical — no action needed.
+
+Handed search-term data is subject to the same ~50% coverage ceiling as data you pull — an export that looks complete is not. Before presenting any finding from handed data, state that coverage is unknown and either (a) request the campaign's actual total spend for the period so the ratio can be computed, or (b) if that is unavailable, disclose explicitly that findings cover only the visible portion and cannot be scaled. Never treat a pasted or exported search-terms list as full-coverage.
 
 ---
 
@@ -366,6 +370,8 @@ Account notes are NOT used for:
 
 If MCP tools are available, use them. Don't reason from a snapshot when you can query the live account.
 
+This applies to any capture or snapshot database exactly as it does to account notes: a snapshot is prior state, never the source of a reported current figure. Any spend, CPL, conversion, or direction number that goes into a report must come from a live GAQL pull for the reporting period, regardless of how recently a capture ran or how tight the time pressure is. "It's already in the snapshot" is not grounds to skip the live query.
+
 ---
 
 ## Impression Share — Two Separate Metrics
@@ -510,6 +516,8 @@ For each priority flag, work through the relevant diagnosis tree. A flag becomes
 - **Internal analysis** → prioritized findings list with context and recommendations
 - **Client communication** → translated into plain language, focused on business impact
 - **Reporting** → handled separately via AgencyAnalytics, not this skill
+
+Stop short of the verdict. You may state what the data shows, what is likely wrong, and the decision framework that applies — you may NOT issue the go/no-go call ("pause it," "it's good," "scale it," "yes/no"). When asked for a straight yes/no on pause/scale/kill, present the relevant figures and the framework and return the decision to the operator explicitly. The recommendation apparatus in the trees produces _candidate_ actions for the operator to decide, never a final ruling delivered as yours.
 
 **Campaign → Ad Group path is mandatory in every finding.** Every keyword, search term, ad, or ad group finding must lead with the full path so the user can navigate to it in the Google Ads UI:
 
