@@ -4,7 +4,8 @@ Queries are organized by diagnostic task. All queries are pure GAQL — execute 
 
 **Notes on values:**
 
-- `cost_micros` is in millionths of the account currency. Divide by 1,000,000 for dollar value.
+- `cost_micros` is in millionths of the **account's** currency. Divide by 1,000,000 to get the value in that currency — which is not necessarily dollars. Never label a converted figure a dollar value without confirming the account's currency.
+- **Pull the currency before reporting any cost figure:** `SELECT customer.currency_code FROM customer`. Report each account in its native currency (symbol or ISO code). Cross-currency totals, averages, or rankings require an operator-approved FX source, with the rate and effective date stated in the output — never sum, average, or rank raw numbers across currencies.
 - `metrics.average_cpc` is already in the account currency (not micros).
 - `cpc_bid_micros` on keywords/ad groups is in micros.
 - **Valid `DURING` date literals only:** `LAST_7_DAYS`, `LAST_14_DAYS`, `LAST_30_DAYS`, `THIS_MONTH`, `LAST_MONTH`, `THIS_WEEK_MON_TODAY`, `LAST_WEEK_MON_SUN`. **There is no `LAST_60_DAYS` or `LAST_90_DAYS`** — they error with `INVALID_VALUE_WITH_DURING_OPERATOR`. For a 90-day (or any custom) window, use `segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'` with explicit dates (end = today, start = today − N days).
@@ -200,7 +201,8 @@ ORDER BY campaign.name, ad_group.name
 
 ### 3.2 Match Type Distribution
 
-```gaql
+```text
+-- ILLUSTRATIVE ONLY — not runnable: GAQL does not support COUNT().
 SELECT
   campaign.name,
   ad_group_criterion.keyword.match_type,
@@ -324,7 +326,9 @@ ORDER BY metrics.cost_micros DESC
 LIMIT 150
 ```
 
-**What to look for:** Search terms that are irrelevant to the firm's practice areas. Cross-reference against the negative keyword library. `search_term_view.status = 'NONE'` means the term is not yet added as a keyword or excluded — these are candidates for review. `EXCLUDED` means it's already blocked.
+**What to look for:** Search terms that are irrelevant to the firm's practice areas. Cross-reference against the negative keyword library.
+
+**Status meaning (mandatory — matches SKILL.md "Search term queries"):** `search_term_view.status = 'NONE'` means the term matched **historically** and is not currently served by any keyword. `NONE` is **never** an active finding — not current waste, not a current structure problem. Do not flag it, and do not treat it as a review candidate. Only terms whose status describes their present state are eligible for active review: `ADDED` (a keyword currently matches it — review its performance) and `EXCLUDED` (already blocked — no action needed). `ADDED_EXCLUDED` counts as excluded.
 
 **Required filter:** `ad_group.status = 'ENABLED'` is mandatory. Without it, results include historical terms from paused/removed ad groups, producing false findings (P8).
 
