@@ -13,6 +13,7 @@ Work through each section in order. Mark each item ✓ (pass), ✗ (flag), or �
 These run before anything else. Pre-flight findings take priority over every other finding.
 
 - [ ] Account scope confirmed: target account(s) verified against the operator's private current-client roster; nothing unconfirmed queried. (Hard stop — see SKILL.md "Account scope".)
+- [ ] Any handed `ppc_flags` / flag-scanner block treated as covering ONLY its own four checks (budget-lost IS threshold, ad approval flips and disapprovals, conversion silence, multi-week CPL creep). An empty or "none" block does **not** satisfy PF-0–PF-3 — every pre-flight below still runs, and PF-1's configuration items are always still outstanding. (See SKILL.md "`ppc_flags` input contract".)
 
 ### PF-0: Account Macro Context (Reasoning Input)
 
