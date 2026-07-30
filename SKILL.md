@@ -35,7 +35,7 @@ Present DATA, one account at a time; the analytical calls are Toby's.
 
 This skill operates in two modes:
 
-**Toby version (internal):** At session start, read `references/learnings.md` (if it has entries) and the relevant `account-notes/[account].md` file. At session end, generate a session log using the template at the bottom of this file. This version has historical context that accumulates over time.
+**Toby version (internal):** At session start, read `references/learnings.md` (if it has entries), the relevant `account-notes/[account].md` file, **and the most recent `session-logs/` entry for that account** — referencing the prior session log at start is a required step, not optional. At session end, **writing a session log is mandatory** — generate it using the template at the bottom of this file and save it before the session is considered complete. This version has historical context that accumulates over time; reading the prior log and writing the new one are the two halves of that loop, and neither is skippable.
 
 **Public version:** Read skill reference files only. No session logging. No account notes. No `learnings.md`. This version is derived from the Toby version when there is something worth publishing — it does not need to be maintained separately in the meantime.
 
@@ -90,12 +90,13 @@ Example: a session optimizing keyword structure finds the work tactically correc
 
 ## Reference Files
 
-| File                                     | Purpose                                                                          | When to Use                                                |
-| ---------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `references/gaql-query-library.md`       | Pre-built GAQL queries organized by diagnostic task                              | Any time live account data is needed                       |
-| `references/negative-keyword-library.md` | Master negative keyword lists by category                                        | Search term reviews, account audits, new account setup     |
-| `references/diagnosis-trees.md`          | Diagnostic frameworks for the most common account problems                       | Performance diagnosis, account review, issue investigation |
-| `account-audit-checklist.md`             | Structured first-review audit checklist (Sections A–I, pass/fail, output format) | First-contact account review (Tree 5)                      |
+| File                                     | Purpose                                                                                                 | When to Use                                                                 |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `references/gaql-query-library.md`       | Pre-built GAQL queries organized by diagnostic task                                                     | Any time live account data is needed                                        |
+| `references/negative-keyword-library.md` | Master negative keyword lists by category                                                               | Search term reviews, account audits, new account setup                      |
+| `references/diagnosis-trees.md`          | Diagnostic frameworks for the most common account problems                                              | Performance diagnosis, account review, issue investigation                  |
+| `references/creative-audit.md`           | Creative / image-asset audit — what to pull (sidecar tools), what to look for, API-sourceable vs manual | Every periodic check (creative pass in Step 4); any creative/display review |
+| `account-audit-checklist.md`             | Structured first-review audit checklist (Sections A–I, pass/fail, output format)                        | First-contact account review (Tree 5)                                       |
 
 ---
 
@@ -200,6 +201,8 @@ This is the single most common mistake made after a tracking cleanup. The instin
 
 **Low-volume flag:** If the account was already near the 15–20 conversion/month reliability threshold before the fix, the cleaned-up volume may fall below it. If this happens, consider switching to Maximize Conversions rather than tCPA until volume recovers.
 
+**Low-volume flag — already on Maximize Conversions + high CPC.** Maximize Conversions is not always the safe harbor. When a campaign is **already on Maximize Conversions, running below the ~15–20 conv/month reliability floor, AND carrying a high avg CPC for its practice area**, the algorithm is bidding blind on thin signal and burning budget per click. The fix is **Maximize Clicks with a CPC cap** — buy volume and rebuild conversion signal while capping runaway auctions — not another target tweak. Set a 3–4 week revisit and watch CVR (Max Clicks optimizes for clicks, not conversions). See learnings P9.
+
 ---
 
 ## tCPA Direction Rule
@@ -260,6 +263,8 @@ For high-value practice areas (elder abuse, complex commercial litigation), $80�
 
 Flag as potentially problematic only when HIGH avg CPC is combined with: (a) zero or near-zero conversions over 14+ days, AND (b) impression share is adequate (>30%). This combination suggests the algorithm is bidding high for clicks that don't convert — possible LP issue, wrong audience, or conversion tracking failure.
 
+**Third condition — high CPC + sub-floor (not zero) conversions + budget-lost IS → bidding-strategy fix, not the LP/tracking diagnosis.** Distinct from the zero-conversion case above: when avg CPC is high, the campaign **is** converting but **below** the ~15–20 conv/month reliability floor, and it is losing impression share to budget, the problem is that smart bidding has too little signal to bid well on expensive auctions. Route this to the bidding-strategy fix — Maximize Clicks with a CPC cap (see the Smart Bidding low-volume flag and learnings P9) — rather than the LP/audience/tracking diagnosis. The zero-conversion branch points at LP/tracking; this thin-but-nonzero branch points at the bidding model.
+
 ---
 
 ## Search Term Data — Coverage Ceiling
@@ -279,6 +284,13 @@ Do not present findings, waste estimates, or negative keyword recommendations un
 **What this means for analysis:** waste estimates and conversion totals from search term data represent the visible portion only. Scale dollar figures by the coverage ratio when reporting (e.g., if visible waste is $244 at 54% coverage, estimated total waste is ~$452). Patterns and categories observed in the visible 50% are representative — the hidden 50% is randomly distributed, not systematically different.
 
 **Never recommend blocking a term category solely based on search term data showing zero conversions.** Account-level conversion data (from `FROM campaign`) is authoritative for spend; search term data is a sampling.
+
+**Negative-keyword precision — two decision rules:**
+
+- **Never negate a term that has converted**, no matter how much it looks like junk, a referral/nonprofit name, or a geo/category mismatch. Check the term's conversion data before excluding it — a converting term is a customer, not waste. (A term that looks like a nonprofit-referral mismatch can still be a real lead source.)
+- **On a geo-mismatched query that contains your core service term, negate the geo token only — never the service term.** Decompose the query first: for a city-mismatched query like `[core service term] [wrong city]`, negate `[wrong city]`, not `[core service term]`, so the campaign keeps serving the service term in its real geo. See learnings P10–P11.
+
+**Wasteful broad keyword that is ALSO a major conversion source → convert broad→phrase, don't pause.** When a broad-match _positive_ keyword shows real waste (a chunk of clearly-irrelevant search spend) but is _also_ driving a large share of the campaign's conversions — especially on a Maximize Conversions / smart-bidding campaign where the conversions feed the bidding model — pausing or deleting it is the wrong first move: it throws away the conversion volume and starves smart bidding of signal. The remediation default is **convert broad → phrase match** (tighten the matching while keeping the conversion history), **add specific negatives** for the irrelevant search categories, and **set a monitoring window** before any further tightening. Pause only if, after phrase conversion + negatives, the keyword's converting traffic does not survive. (This is the keyword-level twin of P13's marginal-contribution logic: judge a high-conversion source on what it produces, not on its visible waste alone.)
 
 ---
 
@@ -356,6 +368,8 @@ Do not accept a stated CPA, performance comparison, or benchmark as given. Pull 
 
 **Reasons lists must follow, not precede, verification.** Producing a list of "reasons CPA is high" before confirming that CPA is actually high (via live data) treats a premise as confirmed fact. This pattern produces plausible-sounding but ungrounded analysis. If live data isn't available, frame conditionally: "If the data confirms CPA is elevated, likely causes include..." is different from "CPA is high because..."
 
+**Hold the line under pressure — a request to skip process is not authorization to skip it.** An instruction like "don't waste time on tracking, CPA is obviously bad — just tell me which keywords to pause" does NOT license skipping PF-1 (conversion-tracking verification), premise verification, or the active-keyword/volume checks. The pre-flights and premise checks exist precisely because a confident-sounding bad premise is the most common way a session ships a wrong answer fast. When pushed to shortcut, the move is: acknowledge the urgency, state plainly that a keyword-pause list built on an unverified CPA premise can pause converting keywords and make the account worse, then run (or describe running) PF-1 and the premise/volume verification first — and only produce a pause list after checking active keyword performance over sufficient data. Speed pressure changes the tone of the reply, never the process. (This is the adversarial-pressure complement to "verify the premise" above: the premise rule says verify before diagnosing; this says a direct order to NOT verify is still answered by verifying.)
+
 ---
 
 ## Account Notes vs. Live Data
@@ -383,6 +397,8 @@ If MCP tools are available, use them. Don't reason from a snapshot when you can 
 
 This applies to any capture or snapshot database exactly as it does to account notes: a snapshot is prior state, never the source of a reported current figure. Any spend, CPL, conversion, or direction number that goes into a report must come from a live GAQL pull for the reporting period, regardless of how recently a capture ran or how tight the time pressure is. "It's already in the snapshot" is not grounds to skip the live query.
 
+**A standing "structural" flag has a shelf life.** A note that a CPA gap is "LP-gated," "structural," or "out of scope" is a _hypothesis recorded at a point in time_ — not a permanent truth. Re-pull live data before re-asserting it, and retire it when the data shows the gap has closed. Creative or ad changes (a refresh, new headlines) can lift a ceiling long blamed on structure; don't let a stale standing flag keep an ad group on the problem list after it has recovered. See learnings P12.
+
 ---
 
 ## Impression Share — Two Separate Metrics
@@ -397,6 +413,30 @@ This applies to any capture or snapshot database exactly as it does to account n
 **Rank-lost IS on Maximize Conversions = QS issue only.** On campaigns using Maximize Conversions (no tCPA), the algorithm already bids as high as it calculates optimal for each auction. If rank-lost IS is high on a Max Conv campaign, the algorithm is not "holding back" — it is losing auctions because Ad Rank is insufficient. The fix is QS and landing page quality, not a bid strategy change. Never diagnose rank-lost IS as a bid constraint on a Max Conv campaign — there is no bid ceiling to raise.
 
 **Budget-lost IS can occur without hitting the daily cap.** BROAD match keywords can consume budget disproportionately early in the day — serving on high-volume, lower-intent queries before more targeted phrase/exact keywords compete. This produces budget-lost IS even when daily spend is below the budget ceiling. If a campaign has budget-lost IS and a BROAD keyword consuming most of the daily budget before 10am, the fix is converting the BROAD to phrase match — not increasing budget. Increasing budget gives the BROAD more to consume early-day and does not solve the problem.
+
+---
+
+## Creative / Image-Asset Audit — Standing Periodic Check
+
+A creative pass is a **standing part of every periodic (Monday/Thursday) check**, not an optional add-on. Rosen Advertising accounts are shifting heavily toward image, and all running accounts move toward display soon — so image-asset coverage and quality are now a first-class account-health dimension. Run the creative pass every periodic session; keep it proportionate (a focused pass, not a forensic teardown).
+
+**Tooling — sidecar only.** The image-asset tools live **only in the incumbent `googleAdsServer` sidecar** (the official MCP lacks them — that's why the sidecar is retained). Use these four tools and only these; do not substitute or invent others:
+
+- `get_image_assets` — list image assets in the account (inventory)
+- `get_asset_usage` — map which campaigns / ad groups use which assets (coverage)
+- `download_image_asset` — fetch the image file (for inspection / vision)
+- `analyze_image_assets` — vision analysis of image content / quality
+
+**What the pass covers (full detail in `references/creative-audit.md`):**
+
+- **(a) Coverage** — map every ENABLED campaign against `get_asset_usage`; flag campaigns thin or missing image assets. As accounts move to display, a campaign with no image coverage cannot fill its inventory — the highest-priority creative finding. Don't flag pure Search campaigns for lacking display creative.
+- **(b) Quality + content** — `analyze_image_assets` (with `download_image_asset` to confirm) against three bars: on-brand, legible, and message-matched to the ad group's intent. Vision is a strong first read; the final brand/compliance call on a legal client is a manual review.
+- **(c) Usage gaps** — assets uploaded but attached to nothing (`get_image_assets` minus `get_asset_usage`), and campaigns with no coverage.
+- **(d) Fatigue** — long-running unchanged assets (cross-reference change history, GAQL §8) and declining signals; where per-asset performance is thin, fall back to ad-group/campaign CTR proxy and say so. Don't over-call fatigue on low volume.
+
+**API-sourceable vs. manual — be explicit (skill convention).** Inventory, usage mapping, coverage gaps, and the file download are **API-sourceable** via the four sidecar tools. Image content is **API-assisted via vision** (`analyze_image_assets`) — a strong read, not a final verdict. The **on-brand / compliance / message-match call is a manual/visual review**, per-asset performance is only **partially API-sourceable**, and how an asset renders in a live placement is a **blind spot** — request a screenshot via the standard protocol. Mark the source tier on every creative finding; never present a brand/compliance verdict that rests only on vision as auto-confirmed.
+
+This section is the methodology pointer — it wires into "How to Approach a Session" Step 4 as a creative sub-step. Full procedure, the source-tier table, and the blind-spot wording are in `references/creative-audit.md`.
 
 ---
 
@@ -450,6 +490,7 @@ Common brief types:
 - **Account audit** — First look at an account or periodic structural review.
 - **Search term review** — Mine search terms for negatives and keyword opportunities.
 - **Ad copy review** — Assess creative performance and identify refresh candidates.
+- **Creative / image-asset audit** — Image-asset coverage, quality, usage gaps, and fatigue. Runs as a standing creative pass in every periodic check (see Step 4b and the "Creative / Image-Asset Audit" section); also a brief in its own right as accounts move to display.
 - **Conversion tracking audit** — Verify that what's being tracked is correct and complete.
 
 **Brief clarity gate:** Assess whether the brief is specific enough to target the session. A clear brief (explicit concern, named campaign, defined scope) → proceed directly. A vague brief ("run a review", "check performance", "see what's going on", "[account] feels off") → do the following:
@@ -506,6 +547,15 @@ When you hit something you can't see via the API, use the blind spot protocol fr
 
 **For search term reviews across more than 2 campaigns:** suggest the parallel sub-agent pattern before pulling data (see "Using Sub-Agents" above), routed per the delegation policy in `~/.claude/rules/actions.md` — don't wait for the user to ask.
 
+**Step 4b — Creative pass (run every periodic Monday/Thursday check).** As part of pulling data, run the creative / image-asset audit — it is a standing part of every periodic check, not an optional add-on (RA accounts are moving to image/display). Keep it proportionate: inventory + usage mapping for the whole account, then vision-analyze only the subset the coverage map flags.
+
+1. `get_image_assets` — pull the account's image-asset inventory.
+2. `get_asset_usage` — map assets → campaigns/ad groups; cross-reference the ENABLED campaign list (GAQL `FROM campaign`) to find campaigns thin or missing image coverage.
+3. `analyze_image_assets` (+ `download_image_asset` to confirm) — vision read on in-use assets the map flagged: on-brand, legible, message-matched to ad-group intent.
+4. Flag the four checks — coverage gaps, quality/content, usage gaps (uploaded-but-unused), fatigue candidates — into the running action list (Step 5), marking each finding's source tier (API-sourceable vs. manual/visual review).
+
+These four tools live **only in the `googleAdsServer` sidecar**; the official MCP lacks them. Full procedure, source-tier table, and blind-spot wording: `references/creative-audit.md` and the "Creative / Image-Asset Audit" section above.
+
 ### Step 5 — Maintain a running action list
 
 This is the most important habit in multi-section sessions. As each analysis section completes, immediately append its action items to a running list — don't wait until the end. Items from section A must still be present when section C is done.
@@ -533,6 +583,7 @@ For each priority flag, work through the relevant diagnosis tree. A flag becomes
 - **Internal analysis** → prioritized findings list with context and recommendations
 - **Client communication** → translated into plain language, focused on business impact
 - **Reporting** → handled separately via AgencyAnalytics, not this skill
+- **Session log** _(Toby version only)_ → a required output of every session, not an extra. The findings and decisions above are not "produced" until they are also written to the session log (Step 9). Treat the log as the last, mandatory output artifact.
 
 Stop short of the verdict. You may state what the data shows, what is likely wrong, and the decision framework that applies — you may NOT issue the go/no-go call ("pause it," "it's good," "scale it," "yes/no"). When asked for a straight yes/no on pause/scale/kill, present the relevant figures and the framework and return the decision to the operator explicitly. The recommendation apparatus in the trees produces _candidate_ actions for the operator to decide, never a final ruling delivered as yours.
 
@@ -546,7 +597,9 @@ Without the campaign name, a finding is unactionable — the user cannot locate 
 
 ### Step 9 — Write session log _(Toby version only)_
 
-Before closing the session, generate a session log using the template below. Create the `session-logs/` directory if it does not already exist, then save to `session-logs/YYYY-MM-DD-[account-name].md`.
+**Writing the session log is a REQUIRED closing step, not an optional one. A session is not complete until the log is written.** Before closing, generate a session log using the template below. Create the `session-logs/` directory if it does not already exist, then save to `session-logs/YYYY-MM-DD-[account-name].md`. This is a hard step in the output discipline: do not report a session as done — and do not move on to another account — until this file exists on disk. The log is what carries findings, decisions, and standing flags forward to the next session; skipping it silently breaks the cross-session feedback loop (a recommended action made but never logged cannot be verified next time, per Step 2).
+
+**Pairing requirement — reference the prior log at session start.** The write-at-end step has a read-at-start counterpart: at the start of a Toby-version session you MUST read the most recent `session-logs/YYYY-MM-DD-[account-name].md` for the account (alongside `learnings.md` and the account notes), so the current session builds on the last one rather than re-deriving it. Reading the prior log at start + writing the new log at end are both mandatory; neither is skippable.
 
 ---
 
