@@ -568,14 +568,17 @@ These fire when a user reaches a specific page URL (typically a thank-you or con
 Google-native call tracking. These are the most reliable action type and rarely break without an account-level change. Confirm via GAQL:
 
 ```gaql
-SELECT call_view.call_tracking_display_name, call_view.duration_seconds, call_view.call_status,
-       segments.date
+SELECT
+  call_view.start_call_date_time,
+  call_view.call_duration_seconds,
+  call_view.call_status,
+  call_view.type
 FROM call_view
-ORDER BY segments.date DESC
-LIMIT 30
+WHERE call_view.start_call_date_time >= '2026-06-23 00:00:00'  -- adjust to the trailing-30-day window at run time
+ORDER BY call_view.start_call_date_time DESC
 ```
 
-If call_view returns records, Google forwarding is active and confirmed working. If it returns nothing despite call extensions being live, the call extension itself may be missing a Google forwarding number.
+The date window must be set at run time. If call_view returns records, call tracking is capturing calls. If it returns zero records over a normal-volume window, investigate the forwarding and tracking configuration.
 
 **UPLOAD_CLICKS (third-party call tracking platform — CallRail, CTM, etc.):**
 These platforms upload call data to Google Ads via the offline conversions API. Two common silent failure modes:

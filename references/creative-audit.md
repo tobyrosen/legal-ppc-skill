@@ -8,12 +8,12 @@ Reference for the creative pass that runs as a standing part of every periodic a
 
 The image-asset tools are NOT in the official Google Ads MCP. They exist **only in the incumbent `googleAdsServer` sidecar** — which is precisely why the sidecar is retained alongside the official MCP. Four tools, and only these four, drive the creative pass:
 
-| Tool                   | What it does                                                        | Use for                                                              |
-| ---------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------- |
-| `get_image_assets`     | Lists image assets in the account                                  | Asset inventory — what creative exists at all                        |
-| `get_asset_usage`      | Maps which campaigns / ad groups use which assets                  | Coverage mapping — which campaigns have image coverage, which don't  |
-| `download_image_asset` | Fetches the actual image file                                      | Pulling a file for visual inspection or vision analysis              |
-| `analyze_image_assets` | Vision analysis of image content / quality                         | On-brand / legible / message-match assessment without manual eyeball |
+| Tool                   | What it does                                      | Use for                                                              |
+| ---------------------- | ------------------------------------------------- | -------------------------------------------------------------------- |
+| `get_image_assets`     | Lists image assets in the account                 | Asset inventory — what creative exists at all                        |
+| `get_asset_usage`      | Maps which campaigns / ad groups use which assets | Coverage mapping — which campaigns have image coverage, which don't  |
+| `download_image_asset` | Fetches the actual image file                     | Pulling a file for visual inspection or vision analysis              |
+| `analyze_image_assets` | Vision analysis of image content / quality        | On-brand / legible / message-match assessment without manual eyeball |
 
 If the sidecar tool names change, update this table only — the workflow below remains valid. Do not substitute or invent other tool names; these four are the complete surface for image-asset work.
 
@@ -26,7 +26,7 @@ If the sidecar tool names change, update this table only — the workflow below 
 Run these in order; later steps depend on the inventory from the first.
 
 1. **Asset inventory** — `get_image_assets` for the account. This is the universe of image creative that exists, regardless of whether it's in use. Note asset IDs, names, dimensions/type where returned.
-2. **Usage mapping** — `get_asset_usage` to map assets → campaigns / ad groups. This is the join that answers "which campaigns have image coverage and which don't." Cross-reference against the live campaign list (pull campaigns via GAQL `FROM campaign WHERE campaign.status = 'ENABLED'`) so you know the full set of campaigns that *should* have coverage, not just the ones that already do.
+2. **Usage mapping** — `get_asset_usage` to map assets → campaigns / ad groups. This is the join that answers "which campaigns have image coverage and which don't." Cross-reference against the live campaign list (pull campaigns via GAQL `FROM campaign WHERE campaign.status = 'ENABLED'`) so you know the full set of campaigns that _should_ have coverage, not just the ones that already do.
 3. **Performance where available** — pull asset-level or ad-level metrics where the API exposes them. Asset-level performance for images is thin in the Google Ads API; treat it as **partially API-sourceable** (see the API-sourceability table below). Where per-asset performance is unavailable, fall back to ad-group / campaign-level CTR and impression trends (GAQL section 7) as a proxy and say so explicitly.
 4. **Visual content** — for assets that warrant a closer look (new, high-spend, or coverage-critical), run `analyze_image_assets` for a vision read, and `download_image_asset` when you need the file itself for manual review or to attach to a finding.
 
@@ -93,16 +93,16 @@ Fold creative findings into the session's running action list (SKILL.md Step 5) 
 
 Match the skill's standing convention of marking what is and is not API-sourceable (see the audit sections in SKILL.md and the blind-spot protocol in `references/diagnosis-trees.md`). State this on every creative finding so the operator knows the source tier:
 
-| Item                                          | Source tier                                                                                 |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Asset inventory (what exists)                 | **API-sourceable** — `get_image_assets`                                                      |
-| Asset → campaign/ad-group usage mapping       | **API-sourceable** — `get_asset_usage`                                                       |
-| Coverage gaps (missing / thin / unused)       | **API-sourceable** — derived from the two tools above + the GAQL campaign list              |
-| Image file itself                             | **API-sourceable** — `download_image_asset`                                                  |
-| Image content / quality first read            | **API-assisted (vision)** — `analyze_image_assets`; treat as a strong read, not a final call |
-| On-brand / compliance / message-match verdict | **Manual / visual review** — vision informs it; the final legal-brand call is a human review |
-| Per-asset performance                          | **Partially API-sourceable** — thin in the API; fall back to ad-group/campaign proxy and say so |
-| How the asset renders in a live placement     | **NOT API-sourceable** — blind spot; request a screenshot per the protocol below            |
+| Item                                          | Source tier                                                                                     |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Asset inventory (what exists)                 | **API-sourceable** — `get_image_assets`                                                         |
+| Asset → campaign/ad-group usage mapping       | **API-sourceable** — `get_asset_usage`                                                          |
+| Coverage gaps (missing / thin / unused)       | **API-sourceable** — derived from the two tools above + the GAQL campaign list                  |
+| Image file itself                             | **API-sourceable** — `download_image_asset`                                                     |
+| Image content / quality first read            | **API-assisted (vision)** — `analyze_image_assets`; treat as a strong read, not a final call    |
+| On-brand / compliance / message-match verdict | **Manual / visual review** — vision informs it; the final legal-brand call is a human review    |
+| Per-asset performance                         | **Partially API-sourceable** — thin in the API; fall back to ad-group/campaign proxy and say so |
+| How the asset renders in a live placement     | **NOT API-sourceable** — blind spot; request a screenshot per the protocol below                |
 
 For anything in the bottom three rows, do not present it as auto-pulled. Use the blind-spot protocol when the rendered placement is what's in question:
 

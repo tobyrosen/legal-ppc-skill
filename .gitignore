@@ -1,7 +1,11 @@
 # Internal files — not included in public release
 account-notes/
+# ...except the synthetic template example referenced by SKILL.md's Accounts table
+!account-notes/example-family-law.md
 # ...except the committed synthetic eval fixtures (real account-notes/ stays ignored)
 !evals/fixtures/account-notes/
+# ...except the synthetic template example referenced by SKILL.md's Accounts table
+!account-notes/example-family-law.md
 session-logs/
 references/learnings.md
 skills/

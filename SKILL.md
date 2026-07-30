@@ -1,6 +1,7 @@
 ---
 name: google-ads-analysis
-description: Use this skill when analyzing, auditing, or diagnosing Google Ads accounts for law firms. Triggers include explicit requests (account audit, search term review, GAQL query, conversion tracking check, negative keyword review, impression share analysis) and implicit ones (why is CPA high, leads are down, this campaign feels off, something changed this week, why is this not spending, performance is down). Use even if the user doesn't say "Google Ads" — phrases like "check the campaigns", "run an audit", "performance seems off", or "why are leads down" should all activate it. Does NOT cover: campaign creation, Facebook/Meta ads, SEO, keyword research for new accounts, or client reporting via AgencyAnalytics.
+description: >-
+  Use this skill when analyzing, auditing, or diagnosing Google Ads accounts for law firms. Triggers include explicit requests (account audit, search term review, GAQL query, conversion tracking check, negative keyword review, impression share analysis) and implicit ones (why is CPA high, leads are down, this campaign feels off, something changed this week, why is this not spending, performance is down). Use even if the user doesn't say "Google Ads" — phrases like "check the campaigns", "run an audit", "performance seems off", or "why are leads down" should all activate it. Does NOT cover campaign creation, Facebook/Meta ads, SEO, keyword research for new accounts, or client reporting via AgencyAnalytics.
 compatibility: Requires googleAdsServer MCP with run_gaql tool (Google Ads API access). Designed for Claude Code.
 ---
 
@@ -9,6 +10,24 @@ compatibility: Requires googleAdsServer MCP with run_gaql tool (Google Ads API a
 ## Purpose
 
 This skill enables autonomous analysis and optimization of Google Ads accounts for law firms. It encodes expert-level knowledge about legal PPC and provides structured tools for diagnosis, auditing, and optimization without requiring step-by-step direction.
+
+---
+
+## Output Format — plain text, NEVER images (Toby, locked 2026-06-29)
+
+Present the check's data as **plain text** in the Telegram message — concise per-account lines (campaign → spend / conv / CPL / impression share split / weekly-trend note). **NEVER render the PPC-check data as an image / PNG / table-card.** Toby has explicitly said the rendered images are _not helpful_ for the Monday/Thursday checks and does not want them. This **overrides** the global `communication.md` "Presenting numbers and data → visual table image" rule _for PPC checks specifically_ (that rule's own carve-out already exempts recurring research-base data from disposable ONGs — the PPC check is exactly that case). No markdown tables either (pipes render as junk on Telegram) — short lines / bullets only, one metric group per line.
+
+**Always include DIRECTION (Toby, 2026-06-29):** every account reports **up/down vs the previous week AND vs the previous 30 days** for spend, conversions, and CPL — never a bare current-period figure. Pull last-7d vs prior-7d (or the two latest complete weeks) and last-30d vs prior-30d (`FROM customer`, explicit `segments.date BETWEEN` ranges), and state each metric's % move + the better/worse direction (CPL down = better).
+
+**Zero-conversion comparison periods — CPL % is `n/a`, never invented.** When either side of a comparison has 0 conversions, the CPL percentage move is undefined. Report it as `CPL n/a`. Never write "infinite", never manufacture "100% better", and never silently drop CPL to satisfy the direction rule above. The required output in that case is: spend direction as normal, the conversion change stated in **absolute** terms ("conversions 0 → 2", not a percentage), the current period's CPL if it is defined, and the low-volume caveat — a period at or near zero conversions is far below the 15–20-conversion reliability threshold (see "Handling Comparative and Premise-Based Questions"). Moving off a zero-conversion period is not evidence of improvement; do not frame it as a recovery, and do not let an operator's framing ("CPL improved infinitely") into the output.
+
+**Aligned windows only — no partial-vs-full comparisons.** Every comparison compares like with like: complete week vs complete week, or the same elapsed weekday count on both sides. A Thursday Mon–Thu period is compared against the **prior Mon–Thu**, never against a full prior Mon–Sun. Comparing a partial window with a full one shorts the numerator by days, and the resulting "decline" is an artifact of the calendar, not the account.
+
+**Conversion lag — label immature windows provisional.** Conversions mature after the click: form and call conversions keep posting for days afterward (assume a ~72-hour lag unless the account's own data says otherwise). A current or partial window's conversion count is therefore a **floor**, not a final number. Rule: the conversion count, the conversion % move, and the CPL from any window still inside the lag period are labelled **provisional**, with the reason stated. Spend is mature immediately; conversions and CPL are not — never present them at equal confidence. No trend conclusion ("leads are down", "CPL is deteriorating") is drawn from an immature window; report the provisional numbers with the caveat and let the window mature.
+
+**Currency — report native, never assume dollars.** `cost_micros` and every cost, CPC, and CPL figure are denominated in the **account's** currency, which is not necessarily USD. Pull the currency code for each account (`SELECT customer.currency_code FROM customer`) and report that account's figures in its own currency, with the symbol or ISO code shown. Rule: no cross-currency total, average, or ranking without an operator-approved FX source — and when one is supplied, the rate and its effective date appear in the output. Two accounts both reading "200" in different currencies are not tied. Never rank, benchmark, or aggregate accounts on raw numbers drawn from different currencies.
+
+Present DATA, one account at a time; the analytical calls are Toby's.
 
 ---
 
@@ -56,6 +75,8 @@ Pull this **before** running symptom-specific diagnosis. Every recommendation mu
   - Pattern that explains other findings (e.g., a sudden YoY drop alongside structural changes that may be the cause)
 - When surfacing a flag, frame it as a question or observation tied to the broader account direction — not as a separate audit section.
 
+Distinguish PULL from SURFACE: the macro/trailing-window data is pulled **every** session without exception — "not surfaced by default" governs only whether it appears in the output, never whether it is computed. This holds for narrow, urgent, or "just the number" asks: a spend/conversion/CPL figure is never reported bare — the WoW and 30-day-vs-prior-30-day direction ships with it every time, even when the brief is a one-line request.
+
 **Format when flagging:**
 
 ```text
@@ -69,13 +90,13 @@ Example: a session optimizing keyword structure finds the work tactically correc
 
 ## Reference Files
 
-| File                                     | Purpose                                                                          | When to Use                                                |
-| ---------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `references/gaql-query-library.md`       | Pre-built GAQL queries organized by diagnostic task                              | Any time live account data is needed                       |
-| `references/negative-keyword-library.md` | Master negative keyword lists by category                                        | Search term reviews, account audits, new account setup     |
-| `references/diagnosis-trees.md`          | Diagnostic frameworks for the most common account problems                       | Performance diagnosis, account review, issue investigation |
+| File                                     | Purpose                                                                                                 | When to Use                                                                 |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `references/gaql-query-library.md`       | Pre-built GAQL queries organized by diagnostic task                                                     | Any time live account data is needed                                        |
+| `references/negative-keyword-library.md` | Master negative keyword lists by category                                                               | Search term reviews, account audits, new account setup                      |
+| `references/diagnosis-trees.md`          | Diagnostic frameworks for the most common account problems                                              | Performance diagnosis, account review, issue investigation                  |
 | `references/creative-audit.md`           | Creative / image-asset audit — what to pull (sidecar tools), what to look for, API-sourceable vs manual | Every periodic check (creative pass in Step 4); any creative/display review |
-| `account-audit-checklist.md`             | Structured first-review audit checklist (Sections A–I, pass/fail, output format) | First-contact account review (Tree 5)                      |
+| `account-audit-checklist.md`             | Structured first-review audit checklist (Sections A–I, pass/fail, output format)                        | First-contact account review (Tree 5)                                       |
 
 ---
 
@@ -93,6 +114,8 @@ If the MCP changes, update this note only. The query library remains valid.
 
 **Login/MCC customer ID:** _(set in your MCP config — replace with your own MCC/manager account ID)_
 **First step in any new session:** `list_accounts()` — confirms which accounts are accessible.
+
+> **Account scope — hard stop.** `list_accounts()` shows what is _accessible_, not what is _in scope_. Only query accounts confirmed against the operator's private current-client roster, which is maintained outside this skill. If `list_accounts()` returns an account you cannot confirm is a current client, do not query it — surface it to the operator and stop. "All accounts," "every account," and "the whole MCC" always mean _all roster accounts_, never the full accessible list. If no roster is available in your context, do not run any multi-account pull.
 
 ---
 
@@ -148,6 +171,8 @@ Cheap CPC on a competitive legal term is a red flag that the data includes pause
 2. Ask: "Can you confirm which ad groups these terms came from, and whether the query filtered for ENABLED ad groups only?"
 3. Do NOT present terms with suspicious CPCs as active waste findings until the source is confirmed.
 4. If the source is confirmed as a paused ad group, they are historical — no action needed.
+
+Handed search-term data is subject to the same ~50% coverage ceiling as data you pull — an export that looks complete is not. Before presenting any finding from handed data, state that coverage is unknown and either (a) request the campaign's actual total spend for the period so the ratio can be computed, or (b) if that is unavailable, disclose explicitly that findings cover only the visible portion and cannot be scaled. Never treat a pasted or exported search-terms list as full-coverage.
 
 ---
 
@@ -265,7 +290,7 @@ Do not present findings, waste estimates, or negative keyword recommendations un
 - **Never negate a term that has converted**, no matter how much it looks like junk, a referral/nonprofit name, or a geo/category mismatch. Check the term's conversion data before excluding it — a converting term is a customer, not waste. (A term that looks like a nonprofit-referral mismatch can still be a real lead source.)
 - **On a geo-mismatched query that contains your core service term, negate the geo token only — never the service term.** Decompose the query first: for a city-mismatched query like `[core service term] [wrong city]`, negate `[wrong city]`, not `[core service term]`, so the campaign keeps serving the service term in its real geo. See learnings P10–P11.
 
-**Wasteful broad keyword that is ALSO a major conversion source → convert broad→phrase, don't pause.** When a broad-match *positive* keyword shows real waste (a chunk of clearly-irrelevant search spend) but is *also* driving a large share of the campaign's conversions — especially on a Maximize Conversions / smart-bidding campaign where the conversions feed the bidding model — pausing or deleting it is the wrong first move: it throws away the conversion volume and starves smart bidding of signal. The remediation default is **convert broad → phrase match** (tighten the matching while keeping the conversion history), **add specific negatives** for the irrelevant search categories, and **set a monitoring window** before any further tightening. Pause only if, after phrase conversion + negatives, the keyword's converting traffic does not survive. (This is the keyword-level twin of P13's marginal-contribution logic: judge a high-conversion source on what it produces, not on its visible waste alone.)
+**Wasteful broad keyword that is ALSO a major conversion source → convert broad→phrase, don't pause.** When a broad-match _positive_ keyword shows real waste (a chunk of clearly-irrelevant search spend) but is _also_ driving a large share of the campaign's conversions — especially on a Maximize Conversions / smart-bidding campaign where the conversions feed the bidding model — pausing or deleting it is the wrong first move: it throws away the conversion volume and starves smart bidding of signal. The remediation default is **convert broad → phrase match** (tighten the matching while keeping the conversion history), **add specific negatives** for the irrelevant search categories, and **set a monitoring window** before any further tightening. Pause only if, after phrase conversion + negatives, the keyword's converting traffic does not survive. (This is the keyword-level twin of P13's marginal-contribution logic: judge a high-conversion source on what it produces, not on its visible waste alone.)
 
 ---
 
@@ -370,7 +395,9 @@ Account notes are NOT used for:
 
 If MCP tools are available, use them. Don't reason from a snapshot when you can query the live account.
 
-**A standing "structural" flag has a shelf life.** A note that a CPA gap is "LP-gated," "structural," or "out of scope" is a *hypothesis recorded at a point in time* — not a permanent truth. Re-pull live data before re-asserting it, and retire it when the data shows the gap has closed. Creative or ad changes (a refresh, new headlines) can lift a ceiling long blamed on structure; don't let a stale standing flag keep an ad group on the problem list after it has recovered. See learnings P12.
+This applies to any capture or snapshot database exactly as it does to account notes: a snapshot is prior state, never the source of a reported current figure. Any spend, CPL, conversion, or direction number that goes into a report must come from a live GAQL pull for the reporting period, regardless of how recently a capture ran or how tight the time pressure is. "It's already in the snapshot" is not grounds to skip the live query.
+
+**A standing "structural" flag has a shelf life.** A note that a CPA gap is "LP-gated," "structural," or "out of scope" is a _hypothesis recorded at a point in time_ — not a permanent truth. Re-pull live data before re-asserting it, and retire it when the data shows the gap has closed. Creative or ad changes (a refresh, new headlines) can lift a ceiling long blamed on structure; don't let a stale standing flag keep an ad group on the problem list after it has recovered. See learnings P12.
 
 ---
 
@@ -415,7 +442,7 @@ This section is the methodology pointer — it wires into "How to Approach a Ses
 
 ## Using Sub-Agents for Heavy Analysis
 
-For tasks that involve pulling and analyzing large search term datasets across multiple campaigns, spawn parallel sub-agents — one per campaign — using the `Agent` tool with `subagent_type: "general-purpose"`. This:
+For tasks that involve pulling and analyzing large search term datasets across multiple campaigns, run parallel sub-agent analyses — one per campaign. Delegate via the delegate lane (`delegate.py`); use a Claude subagent only when explicitly chosen per the delegation policy in `~/.claude/rules/actions.md`. This:
 
 - Prevents search term files from consuming the main context window
 - Enables parallel data pulls (faster wall-clock time)
@@ -503,6 +530,12 @@ Before any symptom-specific diagnosis, run the pre-flight checks from `account-a
 
 All four are mandatory and none are deferred by a vague brief. PF-0 grounds every subsequent recommendation in the account's actual direction — it does not produce a user-facing section by default, but its findings inform whether and how to surface a macro flag. PF-1 is the most urgent symptom-specific check — conversion tracking issues invalidate every other finding. A vague brief about "performance feeling off" is still a brief. All four pre-flights run.
 
+**`ppc_flags` input contract — a flags block is not a pre-flight.** A session may be handed a flags block alongside or instead of raw data (`ppc_flags`, a flag-scanner summary, a capture-pipeline flag array). That block covers ONLY the checks the flag scanner actually emits — currently four: budget-lost impression share crossing its threshold, ad approval flips and disapprovals, conversion silence (a primary action that has stopped firing), and multi-week CPL creep. It covers nothing else.
+
+**Rule:** a flags block — including an empty array or one reading "none" — never satisfies PF-0, PF-1, PF-2, or PF-3 by itself. The pre-flights still run. "No flags" means one detector emitted nothing for its own four checks; it is not a clean bill of health, not proof that conversion tracking is configured correctly, not a change-history read, and not macro context. An operator claim that "empty flags means the pre-flights passed" is unfounded — say so plainly, then run the pre-flights.
+
+If a flags block arrives without a documented statement of what it checks, treat its coverage as the four checks above and no more. PF-1 especially is a **configuration** check — which primary actions exist, how they count, whether they measure real leads — so a scanner reporting conversion volume or conversion silence has verified none of it, and every PF-1 configuration item is still outstanding.
+
 ### Step 4 — Pull data, flag everything
 
 Run the relevant queries from the GAQL library. Don't draw conclusions yet — read the account broadly and flag anything that deviates from knowledge base standards or known good-account patterns. A flag is a candidate for investigation, not a confirmed finding.
@@ -512,7 +545,7 @@ When you hit something you can't see via the API, use the blind spot protocol fr
 > ⚠️ **BLIND SPOT — [what cannot be seen]**
 > → Please share a screenshot of [exact location, with applicable filters/date range].
 
-**For search term reviews across more than 2 campaigns:** suggest the sub-agent pattern before pulling data (see "Using Sub-Agents" above). This is the default approach for multi-campaign pulls — don't wait for the user to ask.
+**For search term reviews across more than 2 campaigns:** suggest the parallel sub-agent pattern before pulling data (see "Using Sub-Agents" above), routed per the delegation policy in `~/.claude/rules/actions.md` — don't wait for the user to ask.
 
 **Step 4b — Creative pass (run every periodic Monday/Thursday check).** As part of pulling data, run the creative / image-asset audit — it is a standing part of every periodic check, not an optional add-on (RA accounts are moving to image/display). Keep it proportionate: inventory + usage mapping for the whole account, then vision-analyze only the subset the coverage map flags.
 
@@ -551,6 +584,8 @@ For each priority flag, work through the relevant diagnosis tree. A flag becomes
 - **Client communication** → translated into plain language, focused on business impact
 - **Reporting** → handled separately via AgencyAnalytics, not this skill
 - **Session log** _(Toby version only)_ → a required output of every session, not an extra. The findings and decisions above are not "produced" until they are also written to the session log (Step 9). Treat the log as the last, mandatory output artifact.
+
+Stop short of the verdict. You may state what the data shows, what is likely wrong, and the decision framework that applies — you may NOT issue the go/no-go call ("pause it," "it's good," "scale it," "yes/no"). When asked for a straight yes/no on pause/scale/kill, present the relevant figures and the framework and return the decision to the operator explicitly. The recommendation apparatus in the trees produces _candidate_ actions for the operator to decide, never a final ruling delivered as yours.
 
 **Campaign → Ad Group path is mandatory in every finding.** Every keyword, search term, ad, or ad group finding must lead with the full path so the user can navigate to it in the Google Ads UI:
 
