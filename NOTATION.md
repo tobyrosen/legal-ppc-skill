@@ -12,7 +12,7 @@ Daily writer: ra-clients (during PPC checks, per the locked legal-ppc-skill flow
 
 ## 1. The one rule that matters
 
-**The journal is the only write surface.** `RA-Clients/GoogleAds/journal/<slug>.jsonl` —
+**The journal is the only write surface.** `$PPC_JOURNAL_ROOT/journal/<slug>.jsonl` —
 append-only JSONL, one entry per line. Account-notes and session-log markdown files are
 generated views. Nobody hand-edits a rendered file; a hand edit is drift and will be
 overwritten by the next render.
@@ -21,10 +21,10 @@ overwritten by the next render.
 
 | Path                                                                | What                                                                                  | Written by                          |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------- |
-| `RA-Clients/GoogleAds/journal/<slug>.jsonl`                         | The journal (system of record)                                                        | `journal.py append` during checks   |
-| `RA-Clients/GoogleAds/journal/vocab.json`                           | Controlled tag vocabulary                                                             | ra-proj (deliberate additions only) |
-| `RA-Clients/GoogleAds/notes/<slug>.md`                              | Rendered account notes (open rules, pending by review date, recent outcomes, context) | `journal.py render`                 |
-| `RA-Clients/GoogleAds/session-logs/<date>-<slug>.md`                | Rendered per-check log                                                                | `journal.py render`                 |
+| `$PPC_JOURNAL_ROOT/journal/<slug>.jsonl`                            | The journal (system of record)                                                        | `journal.py append` during checks   |
+| `$PPC_JOURNAL_ROOT/journal/vocab.json`                              | Controlled tag vocabulary                                                             | ra-proj (deliberate additions only) |
+| `$PPC_JOURNAL_ROOT/notes/<slug>.md`                                 | Rendered account notes (open rules, pending by review date, recent outcomes, context) | `journal.py render`                 |
+| `$PPC_JOURNAL_ROOT/session-logs/<date>-<slug>.md`                   | Rendered per-check log                                                                | `journal.py render`                 |
 | skill `journal/` dir (schema.json, vocab schema, journal.py, tests) | Method + tooling                                                                      | ra-proj                             |
 
 Account slugs match the operator's existing capture set: one lower-case, hyphenated firm slug per
@@ -80,9 +80,9 @@ That is the tuning database Toby asked for.
 
 ## 6. Source of truth / copy sync (closes the two-copy problem)
 
-- **Data lives in exactly one place:** `RA-Clients/GoogleAds/` (journal + rendered views). Skill copies carry NO account data.
-- **Canonical method copy:** `RA-Projects/legal-ai-ecosystem/legal-ppc-skill/`. Verified 2026-08-10: `~/.claude/skills/google-ads-analysis` is a SYMLINK to the canonical dir — there is exactly one physical copy; edits to canonical are live immediately. If the symlink is ever replaced by a real copy, restore the symlink rather than maintaining two files. (`RA-Clients/GoogleAds/google-ads-analysis{,.plugin}` are historical Mar/Apr research artifacts, not live copies.)
-- `vocab.json` exists in two places by design: the runtime copy at `RA-Clients/GoogleAds/journal/vocab.json` is what `journal.py` validates against (bundled skill copy is the fallback). When editing the vocabulary, edit the bundled canonical copy and sync to the runtime copy — keep them byte-identical.
+- **Data lives in exactly one place:** `$PPC_JOURNAL_ROOT/` (journal + rendered views). Skill copies carry NO account data.
+- **Canonical method copy:** `RA-Projects/legal-ai-ecosystem/legal-ppc-skill/`. Verified 2026-08-10: `~/.claude/skills/google-ads-analysis` is a SYMLINK to the canonical dir — there is exactly one physical copy; edits to canonical are live immediately. If the symlink is ever replaced by a real copy, restore the symlink rather than maintaining two files. (`$PPC_JOURNAL_ROOT/google-ads-analysis{,.plugin}` are historical Mar/Apr research artifacts, not live copies.)
+- `vocab.json` exists in two places by design: the runtime copy at `$PPC_JOURNAL_ROOT/journal/vocab.json` is what `journal.py` validates against (bundled skill copy is the fallback). When editing the vocabulary, edit the bundled canonical copy and sync to the runtime copy — keep them byte-identical.
 - Legacy `account-notes/` + `session-logs/` under the skill copies are frozen after backfill: contents migrated into the journals, each dir left with a `POINTER.md` naming the new locations. Legacy files are kept (history), never updated again.
 
 ## 7. Tag vocabulary (v1 seed — grows via vocab.json)

@@ -41,11 +41,11 @@ Present DATA, one account at a time; the analytical calls are Toby's.
 
 This skill operates in two modes:
 
-**Toby version (internal):** Account memory lives in `~/Cowork/RA-Clients/GoogleAds/journal/<account>.jsonl` (notation standard: `NOTATION.md`). At session start, run `python3 ~/Cowork/RA-Projects/legal-ai-ecosystem/legal-ppc-skill/journal/journal.py due <account>`, then read `references/learnings.md` (if it has entries), the rendered `~/Cowork/RA-Clients/GoogleAds/notes/<account>.md`, and the most recent rendered `~/Cowork/RA-Clients/GoogleAds/session-logs/` entry for that account. During the check, append every meaningful event with `journal.py append`; at session end, run `journal.py render <account>` and `journal.py validate <account>`. Rendered notes and session logs are never hand-edited.
+**Toby version (internal):** Account memory lives in `$PPC_JOURNAL_ROOT/journal/<account>.jsonl` (notation standard: `NOTATION.md`). At session start, run `python3 journal/journal.py due <account>`, then read `references/learnings.md` (if it has entries), the rendered `$PPC_JOURNAL_ROOT/notes/<account>.md`, and the most recent rendered `$PPC_JOURNAL_ROOT/session-logs/` entry for that account. During the check, append every meaningful event with `journal.py append`; at session end, run `journal.py render <account>` and `journal.py validate <account>`. Rendered notes and session logs are never hand-edited.
 
 **Public version:** Read skill reference files only. No journal data, rendered session logs, rendered account notes, or `learnings.md`. This version is derived from the Toby version when there is something worth publishing — it does not need to be maintained separately in the meantime.
 
-**Config overrides.** The configuration baseline (`references/agency-defaults.md`) ships in both versions; per-account departures from it do not. In the **Toby version** an account's overrides live in its journal as `rule` entries carrying the `config-override` tag, and are read from the **Config overrides** section of the rendered `~/Cowork/RA-Clients/GoogleAds/notes/<account>.md`. In the **public version** there is no override data at all: `account-notes/example-family-law.md` carries a fictional example showing the shape, and a public-version config check treats every departure from the baseline as a DEVIATION, stating in its output that no override set was available.
+**Config overrides.** The configuration baseline (`references/agency-defaults.md`) ships in both versions; per-account departures from it do not. In the **Toby version** an account's overrides live in its journal as `rule` entries carrying the `config-override` tag, and are read from the **Config overrides** section of the rendered `$PPC_JOURNAL_ROOT/notes/<account>.md`. In the **public version** there is no override data at all: `account-notes/example-family-law.md` carries a fictional example showing the shape, and a public-version config check treats every departure from the baseline as a DEVIATION, stating in its output that no override set was available.
 
 ---
 
@@ -56,7 +56,7 @@ Read these before any analysis:
 - **`references/google-ads-knowledge-base.md`** — Core philosophy and principles. The lens through which all findings are evaluated. Non-negotiable starting point.
 - **`references/agency-defaults.md`**: Configuration baseline: the values those principles resolve to. Every config check (PF-4) classifies live settings against this file plus recorded overrides.
 - **`references/learnings.md`** _(Toby version only)_ — Validated patterns extracted from past session logs. Read this after the knowledge base to supplement with empirically-observed patterns.
-- **`~/Cowork/RA-Clients/GoogleAds/notes/[account].md`** _(Toby version only)_ — Rendered account context, open rules, pending items, recent outcomes, and durable context. Read it; never hand-edit it.
+- **`$PPC_JOURNAL_ROOT/notes/[account].md`** _(Toby version only)_ — Rendered account context, open rules, pending items, recent outcomes, and durable context. Read it; never hand-edit it.
 
 ---
 
@@ -247,7 +247,7 @@ A bidding target (tCPA, target CPL, target cost per signed case) is an **externa
 
 **Where a target comes from, in priority order:**
 
-1. **Firm economics in the rendered `~/Cowork/RA-Clients/GoogleAds/notes/[account].md`** (recorded as journal `context`/`rule` entries)**.** The firm's average case value, lead-to-signed rate, and acceptable cost per signed case give you the target CPL/CPA. These are operator-recorded business inputs — use them.
+1. **Firm economics in the rendered `$PPC_JOURNAL_ROOT/notes/[account].md`** (recorded as journal `context`/`rule` entries)**.** The firm's average case value, lead-to-signed rate, and acceptable cost per signed case give you the target CPL/CPA. These are operator-recorded business inputs — use them.
 2. **An explicit operator override.** If the operator states a target (or different economics) for the task at hand, that supersedes the notes.
 3. **If neither exists, ask.** Request the firm's economics — average signed-case value, lead-to-signed rate, acceptable cost per signed case. Do not set a target without them.
 
@@ -397,7 +397,7 @@ A configuration finding is a departure from **our** baseline. Not from Google's 
 
 1. **Read the baseline.** `references/agency-defaults.md`. Note which entries are marked PROPOSED: a PROPOSED entry may produce a config item at most, never a red flag, until it is confirmed.
 2. **Read the account's overrides.**
-   - _Toby version:_ the **Config overrides** section of `~/Cowork/RA-Clients/GoogleAds/notes/<account>.md`, rendered from the journal.
+   - _Toby version:_ the **Config overrides** section of `$PPC_JOURNAL_ROOT/notes/<account>.md`, rendered from the journal.
    - _Public version:_ `account-notes/example-family-law.md` shows the shape. There is no real override set in the public skill, so a public-version config check reports every departure as a DEVIATION and says so in the output, rather than implying the account has been audited.
 3. **Pull live config.** `references/gaql-query-library.md` §14, the config baseline pull. Read the resource; never infer a setting's current value from the absence of a change event.
 4. **Classify every setting** in the baseline, one of three ways:
@@ -494,7 +494,7 @@ Do not accept a stated CPA, performance comparison, or benchmark as given. Pull 
 
 **Rendered journal notes describe prior state. They are not a substitute for current data.**
 
-`~/Cowork/RA-Clients/GoogleAds/notes/[account].md` is generated from the append-only journal and records what was true at the time of past sessions — prior CPA figures, pending actions, observations from weeks or months ago. Before drawing any diagnostic conclusion about the current state of the account, pull live data via GAQL.
+`$PPC_JOURNAL_ROOT/notes/[account].md` is generated from the append-only journal and records what was true at the time of past sessions — prior CPA figures, pending actions, observations from weeks or months ago. Before drawing any diagnostic conclusion about the current state of the account, pull live data via GAQL.
 
 **The rule:** If a conclusion requires knowing current account state (keyword status, current CPA, current conversion volume, current campaign settings), it must come from a live GAQL query — not from rendered journal notes alone.
 
@@ -631,8 +631,8 @@ This isn't gatekeeping — it's targeting. Pre-flight data makes clarifying ques
 
 Before any new analysis:
 
-1. Run `python3 ~/Cowork/RA-Projects/legal-ai-ecosystem/legal-ppc-skill/journal/journal.py due <account>`.
-2. Read `~/Cowork/RA-Clients/GoogleAds/notes/<account>.md`, especially `## Pending` and `## Standing Rules`.
+1. Run `python3 journal/journal.py due <account>`.
+2. Read `$PPC_JOURNAL_ROOT/notes/<account>.md`, especially `## Pending` and `## Standing Rules`.
 3. Pull current account state via GAQL for every due or pending item before judging it.
 
 **If the journal doesn't exist:** This is a new account with no prior journal history. Note this, skip prior-item verification, and create the first entries during the check with `journal.py append`. Proceed to Step 3.
@@ -695,7 +695,7 @@ Format each item as:
 - [ACTION] [target] — [one-line rationale] | [scope: account/campaign/ad-group]
 ```
 
-_(Toby version only)_ Append each meaningful observation, flag, decision, change, outcome, rule, or context item to `~/Cowork/RA-Clients/GoogleAds/journal/<account>.jsonl` with `journal.py append`. Use the copy-paste shapes in `journal/templates.md`. Never hand-edit the rendered notes.
+_(Toby version only)_ Append each meaningful observation, flag, decision, change, outcome, rule, or context item to `$PPC_JOURNAL_ROOT/journal/<account>.jsonl` with `journal.py append`. Use the copy-paste shapes in `journal/templates.md`. Never hand-edit the rendered notes.
 
 ### Step 6 — Prioritize flags by impact
 
@@ -731,9 +731,9 @@ Without the campaign name, a finding is unactionable — the user cannot locate 
 **The journal is the only write surface. A session is not complete until its entries are appended, rendered, and validated.** Before closing:
 
 1. Append any remaining entries with `journal.py append <account>`; every decision/change includes `expect.statement` and `expect.review_by`, and every outcome includes `re` and `verdict`.
-2. Run `python3 ~/Cowork/RA-Projects/legal-ai-ecosystem/legal-ppc-skill/journal/journal.py render <account>`.
-3. Run `python3 ~/Cowork/RA-Projects/legal-ai-ecosystem/legal-ppc-skill/journal/journal.py validate <account>`. Do not fix data silently; surface any failure.
-4. Confirm that `~/Cowork/RA-Clients/GoogleAds/session-logs/YYYY-MM-DD-<account>.md` exists as the generated view for this session.
+2. Run `python3 journal/journal.py render <account>`.
+3. Run `python3 journal/journal.py validate <account>`. Do not fix data silently; surface any failure.
+4. Confirm that `$PPC_JOURNAL_ROOT/session-logs/YYYY-MM-DD-<account>.md` exists as the generated view for this session.
 
 **Pairing requirement — reference the prior rendered log at session start.** At the start of a Toby-version session, read the most recent generated log for the account alongside `learnings.md` and the rendered account notes. Do not hand-edit either generated Markdown file.
 
@@ -743,10 +743,10 @@ Without the campaign name, a finding is unactionable — the user cannot locate 
 
 Add your accounts here. The `login_customer_id` is your MCC ID (if using a manager account).
 
-| Account              | ID         | Notes                                                            |
-| -------------------- | ---------- | ---------------------------------------------------------------- |
-| Example — Family Law | 1234567890 | See `~/Cowork/RA-Clients/GoogleAds/notes/example-family-law.md`. |
-| MCC/Login            | 0000000000 | Use as login_customer_id when querying sub-accounts              |
+| Account              | ID         | Notes                                                |
+| -------------------- | ---------- | ---------------------------------------------------- |
+| Example — Family Law | 1234567890 | See `$PPC_JOURNAL_ROOT/notes/example-family-law.md`. |
+| MCC/Login            | 0000000000 | Use as login_customer_id when querying sub-accounts  |
 
 _(Replace with your own accounts. One row per account. Account memory is created through the journal, never by hand-writing a notes file.)_
 

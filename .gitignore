@@ -7,3 +7,5 @@ account-notes/
 session-logs/
 references/learnings.md
 skills/
+__pycache__/
+*.pyc

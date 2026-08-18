@@ -44,6 +44,8 @@ Load it in Claude Code with a Google Ads MCP. Give it a brief, or say the accoun
 
 The public skill ships the methodology, query library, config baseline, and playbooks, with fictional example notes only. The operator version additionally reads the per-account journal, rendered notes, session logs, and learnings; per-account config overrides live in that journal, not in this repo.
 
+Operator mode configuration: set `PPC_JOURNAL_ROOT` to the directory that holds `journal/`, `notes/`, and `session-logs/` (default `~/.legal-ppc-skill`, always outside this repo) and `PPC_JOURNAL_TZ` to your IANA timezone (default: the machine's local zone). Entry ids and "today" are computed in that zone.
+
 ---
 
 ## Adapting the config baseline

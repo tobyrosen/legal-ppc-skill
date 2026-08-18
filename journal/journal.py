@@ -5,20 +5,51 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from collections import Counter, defaultdict
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone, tzinfo
 from pathlib import Path
 from typing import Any, Iterable
+from zoneinfo import ZoneInfo
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-COWORK_ROOT = SCRIPT_DIR.parents[3]
-DATA_ROOT = COWORK_ROOT / "RA-Clients" / "GoogleAds"
+# Where journals, rendered notes, and session logs live: always OUTSIDE the
+# skill repo. Operators set PPC_JOURNAL_ROOT; otherwise a sibling
+# `RA-Clients/GoogleAds` layout is used if present, else ~/.legal-ppc-skill.
+
+
+def _data_root() -> Path:
+    env = os.environ.get("PPC_JOURNAL_ROOT")
+    if env:
+        return Path(env).expanduser()
+    if len(SCRIPT_DIR.parents) > 3:
+        legacy = SCRIPT_DIR.parents[3] / "RA-Clients" / "GoogleAds"
+        if legacy.is_dir():
+            return legacy
+    return Path.home() / ".legal-ppc-skill"
+
+
+DATA_ROOT = _data_root()
 SCHEMA_PATH = SCRIPT_DIR / "schema.json"
 BUNDLED_VOCAB_PATH = SCRIPT_DIR / "vocab.json"
-BANGKOK_TZ = timezone(timedelta(hours=7), name="Asia/Bangkok")
+
+
+def _operator_tz() -> tzinfo:
+    """Operator timezone: PPC_JOURNAL_TZ (IANA name such as America/New_York),
+    else the machine's local zone. Entry ids and 'today' are computed in it."""
+    name = os.environ.get("PPC_JOURNAL_TZ")
+    if name:
+        try:
+            return ZoneInfo(name)
+        except Exception:  # noqa: BLE001
+            pass
+    return datetime.now().astimezone().tzinfo or timezone.utc
+
+
+LOCAL_TZ = _operator_tz()
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 TYPE_ORDER = ("obs", "flag", "decision", "change", "outcome", "rule", "context")
 VERDICT_ORDER = ("met", "not_met", "mixed", "unclear")
@@ -212,7 +243,7 @@ def _local_day(ts: object) -> str | None:
         return None
     if parsed is None or parsed.tzinfo is None or parsed.utcoffset() is None:
         return None
-    return parsed.astimezone(BANGKOK_TZ).strftime("%Y%m%d")
+    return parsed.astimezone(LOCAL_TZ).strftime("%Y%m%d")
 
 
 def validate_records(
@@ -409,7 +440,7 @@ def append_entry(slug: str, entry: dict[str, Any]) -> dict[str, Any]:
 
     candidate = dict(entry)
     candidate.setdefault("account", slug)
-    candidate.setdefault("ts", datetime.now(BANGKOK_TZ).isoformat(timespec="seconds"))
+    candidate.setdefault("ts", datetime.now(LOCAL_TZ).isoformat(timespec="seconds"))
     candidate.setdefault("id", _next_id(slug, candidate["ts"], records))
 
     combined = records + [(candidate, len(records) + 1)]
@@ -512,7 +543,7 @@ def _config_override_markdown(entries: list[dict[str, Any]]) -> list[str]:
 
 
 def _note_markdown(slug: str, entries: list[dict[str, Any]]) -> str:
-    source = f"RA-Clients/GoogleAds/journal/{slug}.jsonl"
+    source = f"{DATA_ROOT.name}/journal/{slug}.jsonl"
     resolved = _resolved_targets(entries)
     open_entries = [
         entry
@@ -662,7 +693,7 @@ def render(slug: str) -> tuple[Path, list[Path]]:
     by_session: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for entry in entries:
         by_session[entry["session"]].append(entry)
-    journal_source = f"RA-Clients/GoogleAds/journal/{slug}.jsonl"
+    journal_source = f"{DATA_ROOT.name}/journal/{slug}.jsonl"
     session_paths: list[Path] = []
     session_dir = DATA_ROOT / "session-logs"
     session_dir.mkdir(parents=True, exist_ok=True)
@@ -790,7 +821,7 @@ def main(argv: list[str] | None = None) -> int:
 
         if args.command == "due":
             as_of = (
-                datetime.now(BANGKOK_TZ).date()
+                datetime.now(LOCAL_TZ).date()
                 if not args.as_of
                 else date.fromisoformat(args.as_of)
             )
