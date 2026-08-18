@@ -1,0 +1,107 @@
+[
+  {
+    "tag": "watch",
+    "meaning": "A specific anomaly or developing item that needs another look before action is justified.",
+    "when_to_use": "Use for one-off or early signals explicitly carried to a later check."
+  },
+  {
+    "tag": "monitor",
+    "meaning": "A recurring directional condition tracked across multiple checks.",
+    "when_to_use": "Use for standing trends such as a multi-window CPL test rather than a single anomaly."
+  },
+  {
+    "tag": "carried",
+    "meaning": "An unchanged item brought forward from a prior check or agenda.",
+    "when_to_use": "Use when the current entry deliberately preserves an earlier unresolved watch or plan."
+  },
+  {
+    "tag": "known-issue",
+    "meaning": "A recognized condition whose existence and handling are already understood.",
+    "when_to_use": "Use to prevent duplicate escalation while retaining the condition in account memory."
+  },
+  {
+    "tag": "budget",
+    "meaning": "Budget settings, budget changes, delivery caps, or budget-lost impression share.",
+    "when_to_use": "Use when the observation, decision, change, or outcome materially concerns spend limits."
+  },
+  {
+    "tag": "negatives",
+    "meaning": "Negative-keyword strategy, proposed exclusions, applied sets, or search-term waste they address.",
+    "when_to_use": "Use for negative-keyword work and decisions about match type or application timing."
+  },
+  {
+    "tag": "impression-share",
+    "meaning": "Search impression share and its budget-lost or rank-lost components.",
+    "when_to_use": "Use when auction visibility or the budget-versus-rank ceiling is material."
+  },
+  {
+    "tag": "cpl-direction",
+    "meaning": "Cost-per-lead movement evaluated across weekly, 30-day, or comparison windows.",
+    "when_to_use": "Use for directional CPL tests, especially when spend and conversion volume move differently."
+  },
+  {
+    "tag": "tracking",
+    "meaning": "Whether lead, call, form, CRM, or analytics signals are present and flowing.",
+    "when_to_use": "Use for tracking health checks, tracker setup, or suspected breaks."
+  },
+  {
+    "tag": "conversion-config",
+    "meaning": "Conversion-action definitions, primary/secondary status, goal sets, attribution, and duplicate-tag configuration.",
+    "when_to_use": "Use when account conversion settings or counting methodology are the subject."
+  },
+  {
+    "tag": "lead-quality",
+    "meaning": "Evidence about whether reported conversions represent qualified or signed-client potential.",
+    "when_to_use": "Use when raw conversion volume or CPL must be reconciled with CRM or quotable-lead quality."
+  },
+  {
+    "tag": "outage",
+    "meaning": "A website or landing-page availability incident affecting ad traffic.",
+    "when_to_use": "Use for downtime, recovery, escalation, and later incident outcomes."
+  },
+  {
+    "tag": "vendor",
+    "meaning": "An external vendor's action, access, delivery, response, or ownership boundary.",
+    "when_to_use": "Use for agency, hosting, developer, or other third-party activity affecting the account."
+  },
+  {
+    "tag": "launch",
+    "meaning": "The deployment and first-delivery period for a new campaign, market, tracker, or channel.",
+    "when_to_use": "Use from launch setup through the first planned performance read."
+  },
+  {
+    "tag": "expansion",
+    "meaning": "New geography, campaign, ad-group, keyword, or inventory growth work.",
+    "when_to_use": "Use for planned, executed, or evaluated account expansion."
+  },
+  {
+    "tag": "remarketing",
+    "meaning": "Remarketing audiences, lookalikes, audience size, and their campaign delivery.",
+    "when_to_use": "Use for audience-based follow-up campaigns and their serving split."
+  },
+  {
+    "tag": "pre-reactivation",
+    "meaning": "A constraint or cleanup that must be handled before paused inventory can safely serve again.",
+    "when_to_use": "Use for dormant-campaign naming, policy, keyword, or configuration checks before re-enabling."
+  },
+  {
+    "tag": "client-comms",
+    "meaning": "A client or vendor communication, reporting commitment, approval, or response dependency.",
+    "when_to_use": "Use when the operational state depends on an email, Basecamp note, report, or client reply."
+  },
+  {
+    "tag": "billing",
+    "meaning": "Payment method, card, billing-link, or funding state that affects publication or delivery.",
+    "when_to_use": "Use when billing setup or failure is the operative account constraint."
+  },
+  {
+    "tag": "config-override",
+    "meaning": "A deliberate, approved departure from the agency configuration baseline in references/agency-defaults.md.",
+    "when_to_use": "Use on the rule entry that records an account's standing config deviation, so config checks report it as an override match rather than a flag. Requires the config_override object."
+  },
+  {
+    "tag": "undated",
+    "meaning": "A migrated legacy item with no reliable date in its source text.",
+    "when_to_use": "Use only during migration when ts must use the source file's earliest plausible date."
+  }
+]

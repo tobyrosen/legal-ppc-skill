@@ -33,7 +33,7 @@
       "expected_output": "Generalizes Tree 5 (inherited account / first review) to a new account with no prior session logs. Correctly applies elder law / probate context from account-notes. Adapts advice for a small market with likely low conversion volume.",
       "files": [],
       "assertions": [
-        "Reads account-notes/greenfield-legal.md before starting — applies elder law context (Medicaid planning, probate, small market, referral-supplementary dynamic)",
+        "Reads account-notes/greenfield-legal.md before starting — applies elder law context (elder-planning, probate, small market, referral-supplementary dynamic)",
         "Runs full pre-flight (PF-1, PF-2, PF-3) in sequence — same discipline as any prior account review despite no prior session history",
         "If conversion volume is low (fewer than 15-20/month per campaign), explicitly flags that tCPA or Maximize Conversions may be inappropriate and suggests manual or eCPC instead",
         "Does NOT apply Apex Law-specific patterns (family law search behavior, state-specific legal context) to Greenfield Legal — correctly treats this as a different practice area"
@@ -102,7 +102,7 @@
     },
     {
       "id": 12,
-      "prompt": "The Sacramento campaign is losing 65% impression share to rank. We're only winning about 1 in 8 auctions. Should we increase the budget to capture more of that share?",
+      "prompt": "The Westhollow campaign is losing 65% impression share to rank. We're only winning about 1 in 8 auctions. Should we increase the budget to capture more of that share?",
       "expected_output": "Correctly identifies rank-lost IS as a QS/ad rank problem, not a budget constraint. Does not recommend budget increase. Explains that rank-lost IS requires QS/LP/bid quality fixes — more budget would not help because the campaign is losing to rank, not running out of money.",
       "files": [],
       "assertions": [
@@ -114,7 +114,7 @@
     },
     {
       "id": 13,
-      "prompt": "Here are last month's search terms for [REDACTED]. Please flag any waste:\n\n| Search Term | Clicks | Cost | Conv |\n|---|---|---|---|\n| estate planning attorney near me | 2 | $0.20 | 0 |\n| lawyer to make a will near me | 1 | $1.57 | 0 |\n| probate attorney connecticut | 4 | $12.94 | 0 |\n| probate lawyers near me | 10 | $19.36 | 0 |\n| probate litigation lawyers | 1 | $10.64 | 0 |",
+      "prompt": "Here are last month's search terms for Search - Estate Litigation - Metro. Please flag any waste:\n\n| Search Term | Clicks | Cost | Conv |\n|---|---|---|---|\n| estate planning attorney near me | 2 | $0.20 | 0 |\n| lawyer to make a will near me | 1 | $1.57 | 0 |\n| probate attorney connecticut | 4 | $12.94 | 0 |\n| probate lawyers near me | 10 | $19.36 | 0 |\n| probate litigation lawyers | 1 | $10.64 | 0 |",
       "expected_output": "Before flagging waste, identifies that the data is suspicious — 'estate planning attorney near me' at $0.10/click and 'lawyer to make a will near me' at $1.57/click are anomalously cheap for legal PPC (typical legal CPCs are $5-50+). Asks to verify which ad groups these terms came from, specifically whether they include paused ad groups. Does NOT present them as active waste findings without verifying source.",
       "files": [],
       "notes": "DESIGNED TO FAIL before skill fix. Current SKILL.md teaches the skill to include ad_group.status in queries IT generates — but does not teach it to audit results it is HANDED. The skill is expected to flag 'estate planning attorney near me' as active waste without questioning whether it came from a paused ad group. Failure = presenting suspiciously cheap terms as current waste findings without source verification.",

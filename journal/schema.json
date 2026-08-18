@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/google-ads-journal-entry-v1.json",
+  "title": "Google Ads journal entry v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "ts",
+    "account",
+    "platform",
+    "type",
+    "status",
+    "source",
+    "session"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*-[0-9]{8}-[0-9]{2}$"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "account": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "platform": {
+      "enum": [
+        "google",
+        "meta",
+        "callrail",
+        "ga4",
+        "hubspot",
+        "site",
+        "admin",
+        "other"
+      ]
+    },
+    "type": {
+      "enum": [
+        "obs",
+        "flag",
+        "decision",
+        "change",
+        "outcome",
+        "rule",
+        "context"
+      ]
+    },
+    "status": {
+      "enum": ["open", "closed", "superseded"]
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "ids", "names"],
+      "properties": {
+        "level": {
+          "enum": [
+            "account",
+            "campaign",
+            "ad_group",
+            "keyword",
+            "ad",
+            "budget",
+            "tracking",
+            "conversion",
+            "landing_page",
+            "audience"
+          ]
+        },
+        "ids": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "names": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      },
+      "uniqueItems": true
+    },
+    "body": {
+      "type": "string"
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["window", "provisional", "kv"],
+      "properties": {
+        "window": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["from", "to"],
+          "properties": {
+            "from": { "type": "string", "format": "date" },
+            "to": { "type": "string", "format": "date" }
+          }
+        },
+        "provisional": { "type": "boolean" },
+        "kv": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        }
+      }
+    },
+    "expect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "review_by"],
+      "properties": {
+        "statement": { "type": "string", "minLength": 1 },
+        "review_by": { "type": "string", "format": "date" }
+      }
+    },
+    "re": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*-[0-9]{8}-[0-9]{2}$"
+      }
+    },
+    "verdict": {
+      "enum": ["met", "not_met", "mixed", "unclear"]
+    },
+    "config_override": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["setting", "account_value", "agency_default"],
+      "properties": {
+        "setting": { "type": "string", "minLength": 1 },
+        "account_value": { "type": "string", "minLength": 1 },
+        "agency_default": { "type": "string", "minLength": 1 },
+        "applies_to": { "type": "string", "minLength": 1 }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor", "ref"],
+      "properties": {
+        "actor": { "enum": ["toby", "ra-clients", "ra-proj", "automation"] },
+        "ref": {
+          "type": ["string", "null"],
+          "pattern": "^tg-[0-9]+$"
+        }
+      }
+    },
+    "session": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9][a-z0-9-]*$"
+    },
+    "migrated": {
+      "const": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": { "enum": ["decision", "change"] }
+        }
+      },
+      "then": {
+        "required": ["expect"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": { "const": "outcome" }
+        }
+      },
+      "then": {
+        "required": ["re", "verdict"]
+      }
+    },
+    {
+      "if": {
+        "required": ["config_override"]
+      },
+      "then": {
+        "properties": {
+          "type": { "const": "rule" },
+          "status": { "enum": ["open", "superseded"] }
+        }
+      }
+    }
+  ]
+}

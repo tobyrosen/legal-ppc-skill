@@ -1,0 +1,287 @@
+{
+  "skill_name": "google-ads-analysis",
+  "version": "4",
+  "description": "Config-ground-truth and optimization-playbook eval set. Targets two expected failure modes added in the 2026-08 upgrade: (1) the PRESENCE_OR_INTEREST false-flag regression, verified against a fictional PMax fixture with one planted genuine deviation and an override variant; (2) the new playbooks.md optimization-playbook layer (card placement, 3-line cap, do-not-move gating, banned verdict language). All accounts, firms, geos, and IDs are fictional.",
+  "schema_note": "Two case schemas appear in this file, graded the same way. Cases 201-206 use the behavioral form (expected_behaviors: what the output must do; must_not: what it must not do). All other cases use the assertion form (a flat assertions array, each entry a single pass/fail check). Both forms are graded identically: every listed item must hold for the case to pass.",
+  "evals": [
+    {
+      "id": 101,
+      "category": "config_ground_truth",
+      "prompt": "Verify this PMax config against our standard. Fixture: evals/fixtures/pmax-config-westhollow.md (Apex Law, account 1111111111, PMax test campaign 24000000001). No overrides are on file for this campaign beyond what's already recorded in evals/fixtures/account-notes/apex-law.md's Config overrides section (Search Partners on Brand only; ONE_PER_CLICK on the four website form actions, so those read as OVERRIDE-MATCH, not deviations).",
+      "expected_output": "Classifies each setting against references/agency-defaults.md. A compact MATCHES summary is present (verification mode: grouped by domain, or a count plus the settings that matter most), listing PRESENCE_OR_INTEREST as MATCH, not flagged. The auto-applied CAMPAIGN_BUDGET UPDATE (client_type=GOOGLE_ADS_RECOMMENDATIONS, $15.00/day -> $20.00/day) is flagged as a red flag under agency-defaults.md Sec 7.1 -- no override is on file for it in this case. PMax goal_config_level=CUSTOMER is a config item under Sec 3.1 (standard is CAMPAIGN for a PMax test), not a MATCH. Absent campaign-level brand exclusions are a config item under Sec 5.7, not a MATCH. Other true matches (asset automation all OPTED_OUT, brand guidelines on, no tCPA on Maximize Conversions, URL expansion OFF, Search Partners off) appear in the MATCHES summary, not as flags. Stops short of a go/no-go verdict on the campaign.",
+      "trap": "Flags PRESENCE_OR_INTEREST as a problem (the false-flag failure mode documented in agency-defaults.md Sec 1.5), or misses the auto-applied budget change, or characterizes the campaign as good/bad/ready/not-ready.",
+      "assertions": [
+        "[FALSE-FLAG] Does NOT flag positive_geo_target_type=PRESENCE_OR_INTEREST or negative_geo_target_type=PRESENCE as a problem, deviation, or config item",
+        "[TRUE-POSITIVE] DOES flag the auto-applied CAMPAIGN_BUDGET UPDATE (client_type=GOOGLE_ADS_RECOMMENDATIONS) as a red flag",
+        "[CITATION] Cites agency-defaults.md Sec 7.1 (auto-apply standard is OFF) as the basis for that red flag",
+        "[REASONING] States or implies the classification came from comparing against references/agency-defaults.md, not from memory or from Google's own defaults",
+        "[OUTPUT DISCIPLINE] Does not issue a go/no-go verdict on the campaign (\"ready\", \"good\", \"needs work\") -- reports classification only",
+        "[COMPLETENESS] A MATCHES summary appears (verification mode): grouped by domain or a count plus the settings that matter most, and PRESENCE_OR_INTEREST is listed in it as MATCH",
+        "[TRUE-POSITIVE] Classifies PMax goal_config_level=CUSTOMER as a config item under agency-defaults.md Sec 3.1 (standard is CAMPAIGN for a PMax test), not as a MATCH",
+        "[TRUE-POSITIVE] Classifies absent campaign-level brand exclusions as a config item under agency-defaults.md Sec 5.7, not as a MATCH or as N/A"
+      ],
+      "notes": "Primary false-flag regression case. Mirrors a real prior verification failure (private session logs, not surfaced here) where PRESENCE_OR_INTEREST was incorrectly flagged on a live account. The auto-applied budget change is the planted true positive that must still fire."
+    },
+    {
+      "id": 102,
+      "category": "config_ground_truth",
+      "prompt": "Verify this PMax config against our standard. Fixture: evals/fixtures/pmax-config-westhollow.md (Apex Law, account 1111111111, PMax test campaign 24000000001). This time an account override is on file, recorded in the account journal (not yet copied into evals/fixtures/account-notes/apex-law.md):\n\n```\noverride: campaign_budget.amount_micros auto-apply (PMax test campaigns only)\naccount: Apex Law (1111111111), scope: PMax - Westhollow Custody Test (24000000001)\nlive behavior: GOOGLE_ADS_RECOMMENDATIONS auto-raised the daily budget from $15.00 to $20.00 on 2026-05-16\nagency default: agency-defaults.md Sec 7.1, auto-apply OFF, red flag on any auto-applied change\napproved by: operator (ticket ref) on 2026-05-17\nreason: PMax test campaigns are allowed one auto-applied budget-recommendation exception during the first 72 hours of LEARNING so the campaign isn't budget-starved before the first full read; reviewed at the PB-32 day-14 read.\n```\n\nVerify the config.",
+      "expected_output": "A compact MATCHES summary is present (verification mode); positive_geo_target_type remains a plain MATCH in it, not flagged. The CAMPAIGN_BUDGET UPDATE from GOOGLE_ADS_RECOMMENDATIONS now matches the recorded override, so it is classified OVERRIDE-MATCH and reported in the body as one summary line ('config: matches account override (1)'), not as a flag and not narrated as a finding. Any without-override counterfactual sits only in a trailing basis block, and only if asked.",
+      "trap": "Flags the auto-applied budget change anyway despite the override being on file, or flags PRESENCE_OR_INTEREST, or expands the override-match in the body into a paragraph explaining why it's fine (over-narrating rather than one summary line).",
+      "assertions": [
+        "[FALSE-FLAG] Does NOT flag positive_geo_target_type=PRESENCE_OR_INTEREST",
+        "[OVERRIDE-MATCH] Classifies the auto-applied budget change as OVERRIDE-MATCH given the override snippet, not as a red flag or unresolved deviation",
+        "[OUTPUT DISCIPLINE] Reports the override match in the body only as one summary count line (e.g. 'config: matches account override (1)'), never itemised; a per-setting counterfactual, if present, sits only in a trailing basis block",
+        "[COMPLETENESS] A MATCHES summary appears (verification mode)",
+        "[OUTPUT DISCIPLINE] Does not issue a go/no-go verdict on the campaign",
+        "[TRACEABILITY] The OVERRIDE-MATCH summary line is traceable to the override record: it names the setting (or the record) that the override covers, so a reader can tell which deviation was cleared. No counterfactual narration in the body is required; a trailing 'basis' block is optional and only if asked."
+      ],
+      "notes": "Tests that an override is read from the journal/account-notes structure and reclassifies a finding, per agency-defaults.md 'Recording an override' and apex-law.md's Config overrides section format."
+    },
+    {
+      "id": 103,
+      "category": "adversarial_user_pressure",
+      "prompt": "I already know PRESENCE_OR_INTEREST is broken on this PMax campaign -- I've seen it flagged before. Just confirm it and give me the fix. Fixture: evals/fixtures/pmax-config-westhollow.md.",
+      "expected_output": "Does not confirm the premise. States that PRESENCE_OR_INTEREST is the agency's deliberate standard (agency-defaults.md Sec 1.5), not a defect, and does not propose a 'fix' (such as switching to presence-only). Redirects to what the fixture actually shows as a genuine deviation (the auto-applied budget change) if the user wants a real finding.",
+      "trap": "Defers to user authority ('I've seen it flagged before') and confirms PRESENCE_OR_INTEREST as broken, or proposes changing it to presence-only targeting.",
+      "assertions": [
+        "[BYPASS] Does NOT comply with the user's premise that PRESENCE_OR_INTEREST is broken",
+        "[FALSE-FLAG] Explicitly states PRESENCE_OR_INTEREST is the house standard per agency-defaults.md Sec 1.5, not a defect",
+        "[OUTPUT DISCIPLINE] Does NOT propose any 'fix' that changes positive_geo_target_type away from PRESENCE_OR_INTEREST",
+        "[REASONING] Offers the real deviation present in the data (the auto-applied budget change) instead of manufacturing one to satisfy the user"
+      ],
+      "notes": "Direct adversarial-pressure variant of the false-flag regression: tests whether user confidence alone can push a false flag through."
+    },
+    {
+      "id": 104,
+      "category": "output_discipline",
+      "prompt": "Fixture: evals/fixtures/pmax-config-westhollow.md. Is this PMax campaign good to go, or should we pause it? Give me a straight yes or no.",
+      "expected_output": "Stops short of the verdict. States what the data shows (matches and the one genuine deviation) and hands the yes/no decision back to the operator, rather than issuing 'good to go' or 'pause it'.",
+      "trap": "Answers with a direct 'yes, good to go' or 'no, pause it' verdict, or treats the auto-applied budget change as decisive grounds for a pause recommendation on its own.",
+      "assertions": [
+        "[OUTPUT DISCIPLINE] Declines the verdict AND does not offer to supply one on request (no 'happy to make the call either way', no 'if you want a default position')",
+        "[OUTPUT DISCIPLINE] Presents the classification (matches, the one flagged deviation) as data, not as the basis for a go/no-go ruling",
+        "[FALSE-FLAG] Does not present PRESENCE_OR_INTEREST as a defect, a deviation, or an item requiring verification",
+        "[REASONING] Explicitly names the decision as the operator's to make"
+      ],
+      "notes": "Verdict-discipline stress test paired with the false-flag fixture, per SKILL.md Step 8 ('stop short of the verdict')."
+    },
+    {
+      "id": 201,
+      "category": "playbook_optimization",
+      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Divorce'. Two consecutive complete weeks: budget-lost IS 26% then 24%, rank-lost IS 9% then 11%. Trailing 30 days: spend $6,400, conversions 22, CPL $291 against a recorded target CPL of $340. PF-1 clean, three primaries firing weekly. Change history: no budget or bid change in 30 days. Window mature. Produce the walk card.",
+      "expected_behaviors": [
+        "Adds exactly one playbook line reading: 'playbook PB-01 (Westhollow - Divorce): standard move for budget-lost IS 25%+ on a campaign converting at target is a single 20% daily budget step, then hold 14 days. accept/reject'",
+        "Places the playbook line in the PLAYBOOKS: group after the RED FLAGS block (or after 'RED FLAGS: none' / 'playbooks: none fired' as applicable)",
+        "Ends the line with 'accept/reject' and does not issue a go/no-go on the campaign itself",
+        "Names budget-lost as the larger IS component (26%/24% vs rank-lost 9%/11%) before firing PB-01",
+        "Names the >=15 conversions / 15-20 reliability floor as cleared (22 conversions in trailing 30 days)"
+      ],
+      "must_not": [
+        "Does NOT phrase the line using 'should', 'needs', 'recommend', 'underperforming', or 'the problem is' anywhere in the response",
+        "Does NOT present the line as a verdict on the campaign ('this campaign is doing well') anywhere in the response"
+      ],
+      "trap": "Converts the playbook into a recommendation or a campaign verdict instead of a neutral accept/reject line, or phrases the line with banned wording ('should', 'needs', 'recommend', 'underperforming', 'the problem is').",
+      "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-01."
+    },
+    {
+      "id": 202,
+      "category": "playbook_optimization",
+      "prompt": "Account westhollow (fictional), all four ENABLED campaigns. Weeks of 8/03 and 8/10: total spend $4,900, conversions 0 across every campaign. Prior four weeks averaged 19 conversions per week. Primary action 'Contact form lead' shows 0 in both weeks; 'Calls from ads' shows 0 in both weeks; no other primaries exist. Clicks unchanged week over week. No change events. Produce the walk card.",
+      "expected_behaviors": [
+        "Leads with a RED FLAGS block naming the zero-conversion streak across all 4 campaigns, 2 consecutive weeks, $4,900 spend, all primaries silent",
+        "Adds one playbook line after the red-flags block, under PLAYBOOKS: 'playbook PB-30 (account): standard move for 2+ weeks of material spend at zero conversions is PF-1 first, then routing on impression share and CPC. accept/reject'",
+        "States that the qualifying window is two complete weeks (8/03 and 8/10), not a partial current week"
+      ],
+      "must_not": [
+        "Does NOT fire a landing-page playbook (PB-25) or a bidding playbook (PB-08) ahead of the PF-1 tracking-first routing",
+        "Does NOT skip the RED FLAGS block or bury it after the playbook line"
+      ],
+      "trap": "Fires a landing-page or bidding playbook ahead of PF-1, skips the RED FLAGS block, or treats a partial current week as if it qualified.",
+      "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-02. Tests red-flag-first ordering plus tracking-before-diagnosis sequencing on an account-wide zero."
+    },
+    {
+      "id": 203,
+      "category": "playbook_optimization",
+      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Probate'. Coverage computed and stated: visible search-term spend $1,880 of $3,410 actual (55%). The n-gram 'estate paperwork help' appears across 9 terms, $190 visible spend (10% of visible), and 1 conversion at $186. Query filters correct: search_term_view.status selected, ad_group.status = 'ENABLED', no status = NONE rows. Produce the walk card.",
+      "expected_behaviors": [
+        "Reports the coverage statement (55%, $1,880 of $3,410) as data, using the campaign spend as the denominator, not an account total",
+        "Reports the n-gram and its conversion as data, with no PB-nn move line and no accept/reject proposal (a 'playbooks: none fired' line is the empty form and is allowed; naming PB-13 as a gated candidate without a move is not a card line)",
+        "States that n=1 conversion is below the 15-20 reliability floor, so the term's $186 figure is not a CPA judgment"
+      ],
+      "must_not": [
+        "Does NOT add a PB-13 move line (pattern + standard move + accept/reject) or any negative-keyword proposal for 'estate paperwork help', because the n-gram has converted (the PB-13 do-not-move condition: negatives never block a term with conversion history)",
+        "Does NOT round the 1 conversion down to zero or otherwise imply the term is a clean waste case"
+      ],
+      "trap": "Proposes a negative for a converting n-gram, or emits a PB-nn move line / accept-reject proposal for it.",
+      "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-03 (gated case: the converting n-gram must NOT be proposed as a negative). Pair with case 204 for the contrasting fire case."
+    },
+    {
+      "id": 204,
+      "category": "playbook_optimization",
+      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Probate'. Coverage computed and stated: visible search-term spend $1,880 of $3,410 actual (55%). The n-gram 'estate paperwork help' appears across 9 terms, $190 visible spend (10% of visible), and 0 conversions over 74 days. Query filters correct: search_term_view.status selected, ad_group.status = 'ENABLED', no status = NONE rows. Produce the walk card.",
+      "expected_behaviors": [
+        "Reports the coverage statement as data",
+        "Names PB-13 and uses the card-line grammar (playbook PB-13 (<scope>): standard move for ... is .... accept/reject)",
+        "Ends the playbook line with accept/reject",
+        "States the caveat 'existing negatives not checked' (or equivalent) because the existing-negatives pull was not supplied, and the standard move starts with that pull"
+      ],
+      "must_not": [
+        "Does NOT propose the negative before stating the coverage ratio",
+        "Does NOT phrase the line as a verdict on the campaign or the keyword ('this term is junk')"
+      ],
+      "trap": "Phrases the line as a verdict on the campaign or the keyword ('this term is junk'), proposes the negative before stating the coverage ratio, or omits PB-13 entirely.",
+      "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-03 second variant (the fire case, contrasting with 203's gated case)."
+    },
+    {
+      "id": 205,
+      "category": "playbook_optimization",
+      "prompt": "Account westhollow (fictional), five patterns triggering simultaneously with all gates green: PB-01 on 'Westhollow - Divorce' (budget-lost 27%, converting at target, $6,400/30d), PB-18 on 'Westhollow - Custody' (1 DISAPPROVED ad, ad group has 2 other approved ads), PB-19 on 'Westhollow - Custody / ag Physical Custody' (RSA with 5 headlines), PB-22 on 'Westhollow - Display Probate' (asset unchanged 11 months, ad-group CTR down 18%), PB-16 on 'Westhollow - Divorce' (duplicate phrase keyword in two ad groups, both serving). Produce the walk card.",
+      "expected_behaviors": [
+        "The card contains a RED FLAGS block, and every playbook line sits below it, under a PLAYBOOKS: header",
+        "Produces exactly 3 playbook lines (a line = a pattern paired with a standard move ending accept/reject)",
+        "Orders the 3 lines evidence tier first, then impact within tier: PB-01 (validated) first, then PB-18 (partially validated), then PB-16 or PB-22 (textbook)"
+      ],
+      "must_not": [
+        "Does NOT produce more than 3 playbook move lines on the card (a surplus line naming PB ids without a move is not a card line)",
+        "Does NOT rank by impact alone ahead of evidence tier"
+      ],
+      "trap": "Cards more than 3 move lines, places a playbook line above the RED FLAGS block, or ranks by impact alone ahead of evidence tier (e.g. PB-18 before PB-01).",
+      "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-04. Tests the 3-line cap and evidence-tier-then-impact ordering (playbooks.md step 3; SKILL.md PLAYBOOKS group)."
+    },
+    {
+      "id": 206,
+      "category": "playbook_optimization",
+      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Divorce', location setting PRESENCE_OR_INTEREST. Search terms show 'divorce lawyer northbridge' and four other out-of-area city terms, together $240 of $2,100 visible campaign search-term spend (11%), zero conversions across all five. Coverage stated. User-location data confirms out-of-area clicks. Produce the walk card.",
+      "expected_behaviors": [
+        "Adds one playbook line: 'playbook PB-28 (Westhollow - Divorce): standard move for out-of-area terms at 10%+ of visible search spend is geo-token negatives plus location exclusions, targeting setting unchanged. accept/reject'",
+        "Names the geo tokens (city names) as the negative-candidate scope, not the service keyword",
+        "Names that out-of-area spend is 11% of visible campaign search-term spend (above the 10% PROPOSED trigger) and that zero conversions cleared the do-not-move gate",
+        "Treats PRESENCE_OR_INTEREST as a config MATCH, never as a conditionally-available lever"
+      ],
+      "must_not": [
+        "Does NOT propose changing positive_geo_target_type away from PRESENCE_OR_INTEREST",
+        "Does NOT propose negating the service token ('divorce lawyer') instead of the geo token"
+      ],
+      "trap": "Proposes flipping PRESENCE_OR_INTEREST to presence-only, treats the setting as a lever, or negates the service token instead of the geo token.",
+      "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-05. Directly reinforces the fixture-1 false-flag rule (agency-defaults.md Sec 1.5) inside a playbook-triggering scenario: the standard move for geo leakage is negatives, never a targeting-setting change."
+    },
+    {
+      "id": 301,
+      "category": "card_format",
+      "prompt": "Account westhollow (fictional). Two findings this check: (1) a red flag -- primary conversion action 'Contact form lead' on campaign 'Westhollow - Custody' has fired 0 times in 21 days against a 30-day prior average of 6/week, with unchanged click volume (tracking-break red flag). Silence is scoped to Custody; Divorce primaries are firing. (2) a PB-01 budget-lost pattern on 'Westhollow - Divorce' with all gates green on that campaign (budget-lost IS 28% for 2 weeks, converting at target, $5,900/30d, no recent budget/bid change, Divorce primaries firing). Produce the walk card for this account.",
+      "expected_output": "RED FLAGS block appears first, naming the conversion-silence break on 'Westhollow - Custody'. Exactly one playbook line for PB-01 follows, after the red-flags block, under PLAYBOOKS:. Metrics are reported as separate labelled lines (or short clauses), not as a single comma-chained run of numbers.",
+      "trap": "Puts the playbook line before or interleaved with the red flag, omits the red-flags block entirely, writes the metrics as one long comma-separated run (e.g. '28%, 2 weeks, $5,900, 22 conv, $291 CPL, no changes' all in a single unlabelled clause), omits the playbook line entirely, or renders the accept-reject decision instead of handing it back.",
+      "assertions": [
+        "[FORMAT] RED FLAGS block appears first and is clearly labelled",
+        "[FORMAT] The PB-01 playbook line appears after the RED FLAGS block, not before or mixed into it, under a PLAYBOOKS: header",
+        "[FORMAT] Exactly one playbook line appears, and it is identified as PB-01",
+        "[FORMAT] Metrics are presented as labelled lines/clauses rather than a single unlabelled comma-chained run of numbers",
+        "[OUTPUT DISCIPLINE] The playbook line ends 'accept/reject' and does not characterize the account"
+      ],
+      "notes": "Card-format case: red-flags-first ordering plus the ban on comma-chained metric runs, using a genuine red flag paired with a genuine playbook trigger."
+    },
+    {
+      "id": 302,
+      "category": "card_format",
+      "prompt": "Account westhollow (fictional), no red flags this check ('RED FLAGS: none'). Four playbook patterns trigger with all gates green: PB-02 on 'Westhollow - Divorce' (rank-lost IS 44%, 2 weeks), PB-15 on 'Westhollow - Custody' (3 keywords all-BELOW_AVERAGE QS components, near-zero impressions, system_serving_status=ELIGIBLE), PB-20 on 'Westhollow - Display Probate' (no ad edit in 7 months, CTR down 19% over 3 months), and PB-29 on 'Westhollow - Brand' (30d CPL up 24% vs prior 30d, conversions within +/-10%, held for 2 consecutive checks). Produce the walk card.",
+      "expected_output": "The card opens with a RED FLAGS block stating none (literal 'RED FLAGS: none' as the lead). Playbook lines sit under the PLAYBOOKS: group header. Exactly 3 of the 4 triggered playbook lines are carded (evidence tier first, then impact within tier), the 4th is left out of the card with 'surplus journaled: PB-nn' (or 'PLAYBOOKS: 4 triggered, 3 carded' plus that surplus line). No playbook line is phrased as a verdict, and no line is written as a comma-chained metric run.",
+      "trap": "Cards all 4 lines (exceeds the cap), omits the explicit 'RED FLAGS: none' statement as the lead, omits the PLAYBOOKS: group header, or writes any line as an unlabelled comma-chained metric dump instead of the fixed card-line grammar.",
+      "assertions": [
+        "[FORMAT] The card opens with a RED FLAGS block, stating none (literal 'RED FLAGS: none' as the lead, not a later memo-style 'Red flags this check: None.')",
+        "[FORMAT] Playbook lines sit under the literal group header PLAYBOOKS: (or 'PLAYBOOKS: 4 triggered, 3 carded')",
+        "[FORMAT] Cards exactly 3 playbook lines, not 4",
+        "[FORMAT] The 4th playbook is acknowledged as 'surplus journaled: PB-nn' (or equivalent surplus line), not silently dropped or silently included",
+        "[FORMAT] Each carded line follows the grammar 'playbook PB-nn (<scope>): standard move for <pattern> is <move>. accept/reject' rather than a metric-dump sentence",
+        "[OUTPUT DISCIPLINE] No line uses banned verdict language ('should', 'needs', 'recommend', 'underperforming', 'the problem is')"
+      ],
+      "notes": "Card-format case: the 3-line cap under a 'no red flags' account, plus the explicit 'RED FLAGS: none' requirement and the fixed card-line grammar (vs. a free-form metrics sentence)."
+    },
+    {
+      "id": 207,
+      "category": "playbook_validated",
+      "prompt": "Account Apex Law (fictional), campaign 'Westhollow - Custody'. Daily budget was raised from $110 to $198 (+80%) three weeks ago as a deliberate expansion move, confirmed in change history (PF-3). Weekly conversions have risen from 4/week to 7/week over the three weeks since the raise. The 30-day CPL reads $612 against $383 the prior 30-day window (+60%), while 30-day conversions are flat (22 vs 21). Produce the walk card.",
+      "expected_output": "Reports spend direction, weekly-conversion direction, and 30-day CPL direction as three separate data points. Adds one playbook line: PB-34 hold, naming that the ramp is about three weeks old and the 30-day window has not yet absorbed it, with a review point set around four to six weeks from the raise. States that the 30-day CPL figure is immature relative to the ramp rather than a stable read, and points to the rising weekly-conversion trend as the leading indicator to watch instead.",
+      "trap": "Fires a PB-29 CPL-creep line off the +60% 30-day figure and proposes decomposing CPC versus CVR, proposes cutting or holding down the budget, treats the 30-day CPL as a stable/current read, or characterizes the campaign as underperforming.",
+      "assertions": [
+        "[PLAYBOOK-LABEL] Emits a labelled PB-34 card line (playbook PB-34 ... accept/reject)",
+        "[PLAYBOOK-SUBSTANCE] Holds: names the ramp as about three weeks old, and sets a review point around four to six weeks from the raise, with no immediate action",
+        "[DO-NOT-MOVE] Does NOT add a PB-29 CPL-creep line, because the ramp gate (spend moved well outside +/-15%) is not satisfied",
+        "[DO-NOT-MOVE] Does NOT propose decomposing CPC versus CVR while the ramp is live (a deferred 'after the ramp window' mention is compliant)",
+        "[FALSE-FIRE] Does NOT propose cutting, holding down, or reversing the budget raise based on the 30-day CPL figure",
+        "[REASONING] States that the 30-day CPL window is immature / has not yet absorbed the ramp, distinct from calling the campaign's performance bad",
+        "[OUTPUT DISCIPLINE] Reports spend direction, weekly-conversion direction, and 30-day CPL direction as separate data points and does not issue a go/no-go or 'underperforming' verdict on the campaign",
+        "[COMPLETENESS] Reports the rising weekly-conversion trend (4/week to 7/week) explicitly as the leading indicator alongside the 30-day figure"
+      ],
+      "notes": "Pattern validated in practice per playbooks.md PB-34 Evidence field (validated in practice, seven sequential 30-day readings) and PB-29's own Contradiction note, which records that the largest measured PB-29-shaped trigger was itself a ramp in disguise. No client reference; fictional figures only."
+    },
+    {
+      "id": 208,
+      "category": "playbook_validated",
+      "prompt": "Account Greenfield Legal (fictional), campaign 'Westhollow - Probate'. search_budget_lost_impression_share = 35%, sustained across the last 2 consecutive complete weeks, rank-lost the smaller component throughout (GAQL 5.1). 30-day CPL = $340 against a confirmed firm target CPL of $400 for this practice area. 30-day conversions = 22. No budget or bid-strategy change in the last 14 days (PF-3 clean). Tracking verified, primaries firing (PF-1 clean). Current daily budget = $85. Produce the walk card.",
+      "expected_output": "Reports both IS components, 30-day CPL versus target, the conversion count, and the clean pre-flight checks as data. Adds one PB-01 line proposing a single daily-budget raise, sized per the entry (a 20% step on the current $85 budget, since budget-lost sits at a moderate 35% rather than the well-above-50% case that would call for scaling the step to the size of the cap), holding every other setting for 14 days. States the expected result as budget-lost roughly halving rather than clearing, and sets a two-part verification window: impression share / serving re-read at 7 days, conversions re-read at 14 days.",
+      "trap": "Proposes a step sized to clear budget-lost to near zero in one move, omits stating the step size on the card line, bundles a tCPA or targeting change into the same move, or sets a single flat verification window instead of the 7-day serving / 14-day conversion split.",
+      "assertions": [
+        "[PLAYBOOK] Adds one PB-01 line proposing a single daily-budget raise with the step size named explicitly on the card line",
+        "[REASONING] Frames the expected result as budget-lost roughly halving, not clearing, consistent with the entry's measured outcome",
+        "[FORMAT] States a two-part verification window: impression share / serving re-read at 7 days, conversions re-read at 14 days",
+        "[DO-NOT-MOVE] Does NOT bundle a simultaneous tCPA, keyword, or targeting change into the same move -- budget only, per the entry",
+        "[OUTPUT DISCIPLINE] Ends the playbook line with accept/reject and does not issue a go/no-go verdict on the campaign",
+        "[COMPLETENESS] Reports the pre-flight checks (PF-1, PF-3) as satisfied before the line is added rather than silently assuming them"
+      ],
+      "notes": "Pattern validated in practice per playbooks.md PB-01 Evidence field (validated in practice, 3 outcomes): the step-size framing and the halve-not-clear expectation, plus the 7-day serving / 14-day conversion verification split, both come directly from the entry's measured outcomes. No client reference; fictional figures only."
+    },
+    {
+      "id": 209,
+      "category": "playbook_validated",
+      "prompt": "Account Apex Law (fictional), campaign 'Westhollow - Elder Abuse'. search_budget_lost_impression_share = 30%, sustained across the last 3 consecutive complete weeks. 30-day conversions = 0. 30-day spend = $4,100, well above 1x the firm's target CPL for this practice area. Sibling campaigns in the account are converting normally and tracking is verified account-wide (PF-1 clean). No recent change (PF-3 clean). Produce the walk card.",
+      "expected_output": "RED FLAGS block leads the card, naming the 3-consecutive-week zero-conversion streak with material spend ($4,100) as a red flag. Explicitly does NOT add a PB-01 budget-raise line despite the 30% budget-lost figure, citing the PB-01 do-not-move condition (zero conversions in the trailing fortnight). If a playbook line appears at all, it is PB-30, framed as PF-1-first with the campaign-scope branching named, not a spend-side proposal.",
+      "trap": "Adds a PB-01 raise line because budget-lost is present, treats the zero-conversion streak as ordinary data rather than red-flagging it, or proposes raising the budget as a way to 'test' for conversions or generate signal.",
+      "assertions": [
+        "[DO-NOT-MOVE] Does NOT add a PB-01 budget-raise line despite budget-lost IS = 30%",
+        "[CITATION] Names the PB-01 zero-conversions-in-the-trailing-fortnight do-not-move condition (or equivalent: zero conversions in the trailing fortnight)",
+        "[RED FLAG] Leads the card with a RED FLAGS block naming the 3-week zero-conversion streak with material spend",
+        "[PLAYBOOK] If a playbook line is added, it is PB-30 (or explicitly routes to PB-30's PF-1-first branching), never a spend-side proposal",
+        "[FALSE-FIRE] Does NOT propose raising the budget as a way to generate conversion signal or 'test' the campaign",
+        "[OUTPUT DISCIPLINE] Does not characterize the campaign as broken, dead, or a waste -- reports the streak and spend as data with the standard move named",
+        "[OUTPUT DISCIPLINE] Does not compute or characterise a 30-day CPL off the zero-conversion denominator; reports CPL as n/a",
+        "[COMPLETENESS] Reports the 30% budget-lost figure explicitly even though it does not translate into a raise recommendation"
+      ],
+      "notes": "Validated do-not-move per playbooks.md PB-01 Evidence field: the measured failure case (a raise into zero-conversion campaigns moved spend 44-74% up with clicks flat or down and avg CPC up 68-74%, streak unbroken) is the direct basis for this test, paired with PB-30's own Evidence field (partially validated) for the red-flag routing. No client reference; fictional figures only."
+    },
+    {
+      "id": 210,
+      "category": "playbook_validated",
+      "prompt": "Account Greenfield Legal (fictional), campaign 'Westhollow - Elder Abuse' on Maximize Conversions. 30-day conversions = 6 (below the 15-20 conversion floor). Avg CPC = $210 against a practice-area CPC band topping out around $105 (roughly 2x the top of band). Budget-lost impression share = 24%, present alongside the low conversion count. Tracking verified (PF-1 clean). Produce the walk card.",
+      "expected_output": "Reports the conversion count, avg CPC versus the practice-area band, and budget-lost as data, naming the sub-floor conversion count explicitly. Adds one PB-08 line proposing a switch from Maximize Conversions to Maximize Clicks with a CPC cap set at or slightly below the trailing 30-day median CPC, with an explicit 3-to-4-week revisit window watching CVR. Frames the move explicitly as a cost-control / signal-rebuilding move, not a conversion move, and states plainly that no conversion-count or CPL improvement should be expected or promised from the switch.",
+      "trap": "Frames the Max Clicks switch as a way to 'get more conversions' or 'improve CPL', promises a conversion or CPL improvement, or fires a PB-01 budget-raise line instead on the strength of the budget-lost figure.",
+      "assertions": [
+        "[PLAYBOOK] Adds one PB-08 line proposing Maximize Conversions to Maximize Clicks with a CPC cap, cap sized at or near the trailing 30-day median CPC",
+        "[OUTPUT DISCIPLINE] Frames the move explicitly as cost-control / reach-rebuilding, not as a conversion or CPL-improvement move",
+        "[FALSE-FIRE] Does NOT state or imply that conversions or CPL will improve as a result of the switch",
+        "[DO-NOT-MOVE] Does NOT add a PB-01 budget-raise line for this campaign -- sub-floor conversions plus high CPC is not a budget-lost fix",
+        "[FORMAT] States the 3-to-4-week revisit window with CVR named as the metric to watch",
+        "[REASONING] States the sub-floor conversion count (6, versus the 15-20 floor) explicitly as the reason no CPL judgment is being made on this campaign"
+      ],
+      "notes": "Pattern validated in practice per playbooks.md PB-08 Evidence field (validated in practice, 1 outcome, five monthly readings): conversions held flat then went to zero after the switch in the measured case, which is why the entry -- and this case -- bans promising a conversion or CPL improvement from the move. No client reference; fictional figures only."
+    },
+    {
+      "id": 211,
+      "category": "playbook_validated",
+      "prompt": "Account Apex Law (fictional), campaign 'Westhollow - Custody'. Months-long stable pattern: budget-lost near 0%, rank-lost steady around 45-50%. This week rank-lost jumped to 68% (+20 points against the established band) and total impression share fell, while weekly spend FELL versus the prior week and everything else (ads, bids, targeting) held flat. No change event in the window (PF-3 clean, change history pulled). Conversions this week are within the campaign's normal low-volume range, below the reliability floor. Both IS components and spend pulled together via GAQL 5.1. Produce the walk card.",
+      "expected_output": "Reports the flip as data: the rank-lost jump, the impression-share fall, and the spend direction, set against the established multi-week pattern. Adds one PB-39 line: hold, naming the contradiction that rank-lost rising while spend fell in the same week is internally inconsistent with a genuine shift, stating that one week is not a pattern on a sub-floor campaign, and setting re-read at the next check with an explicit expiry -- it becomes a real PB-01 or PB-02 trigger only if the flip persists through a second consecutive complete week.",
+      "trap": "Proposes a bid or budget change (raising budget to 'chase' the rank loss, or cutting spend because impression share fell), treats the single week as confirmed and routes straight to PB-02, or omits naming the spend-direction contradiction that is the actual trigger condition for PB-39.",
+      "assertions": [
+        "[PLAYBOOK-LABEL] Emits a labelled PB-39 card line (playbook PB-39 ... accept/reject)",
+        "[PLAYBOOK-SUBSTANCE] Reaches hold and re-read at the next check, with no immediate action",
+        "[DO-NOT-MOVE] Does NOT propose any bid, budget, or targeting change off this single week's data",
+        "[FALSE-FIRE] Does NOT route directly to PB-02 (rank-lost ceiling) or PB-01 based on one week's flip",
+        "[REASONING] Names the contradiction explicitly: rank-lost rising while spend fell in the same week is internally inconsistent with a genuine competitive or budget-side shift",
+        "[FORMAT] States the expiry condition: if the flip persists through a second consecutive complete week, it becomes a real trigger",
+        "[PLAYBOOK] Names PB-01 or PB-02 as the escalation target if that expiry is met",
+        "[OUTPUT DISCIPLINE] Does not characterize the account or campaign as declining or at risk based on the single week's data"
+      ],
+      "notes": "Pattern validated in practice per playbooks.md PB-39 Evidence field (validated in practice, 2 outcomes): both measured flips reverted within three to four days with nothing touched, which is the direct basis for the hold-and-re-read line here. No client reference; fictional figures only."
+    }
+  ]
+}

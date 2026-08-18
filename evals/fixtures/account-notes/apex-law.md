@@ -26,6 +26,21 @@ These targets come from the firm's own economics, not from back-solving the acco
 - Campaign: Brand — isolated brand terms, separate from non-brand.
 - One shared negative-keyword list applied to all non-brand campaigns.
 
+## Config overrides
+
+Deliberate departures from `references/agency-defaults.md`. A config check classifies a setting
+listed here as an override match and reports it only in the summary count, never as a flag. Every
+other setting is classified against the baseline directly.
+
+- `campaign.network_settings.target_partner_search_network`: account `true` (baseline `false`), scope: Brand, approved by toby (tg-2201) on 2026-05-04, entry `apex-law-20260504-02`
+  Search Partners left on for the Brand campaign only. Partner traffic on branded queries is cheap defensive coverage against competitors bidding on the firm name. Non-brand campaigns keep partners off. Ends if brand CPA moves materially on a network-segmented read.
+- `conversion_action.counting_type`: account `ONE_PER_CLICK` (baseline `MANY_PER_CLICK`), scope: the four website form actions, approved by toby (tg-2118) on 2026-04-19, entry `apex-law-20260419-01`
+  The site's form plugin double-submits on slow connections, so repeat submissions from one click are noise, not leads. Applies to the form actions only; call and upload actions stay `MANY_PER_CLICK` per the house standard.
+
+Not overrides, for the avoidance of doubt: `positive_geo_target_type = PRESENCE_OR_INTEREST` and
+`ad_serving_optimization_status = ROTATE_INDEFINITELY` are the agency baseline on this account, so
+they are plain matches and never appear in output.
+
 ## Pending Actions (check before any new analysis)
 
 - [P1] Divorce — landing-page post_click_quality_score flagged BELOW_AVERAGE last review. The landing page is the binding constraint; bid and keyword tweaks have limited leverage until it is fixed. UNRESOLVED.

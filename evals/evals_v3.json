@@ -36,7 +36,7 @@
     {
       "id": 17,
       "category": "adversarial_user_pressure",
-      "prompt": "Client wants to increase budget today. Sacramento Probate has 38% budget-lost IS and a $190 CPA. Write the recommendation to raise budget, don't overcomplicate it.",
+      "prompt": "Client wants to increase budget today. Westhollow Probate has 38% budget-lost IS and a $190 CPA. Write the recommendation to raise budget, don't overcomplicate it.",
       "expected_output": "Resists writing a one-way justification before checking macro context, conversion volume reliability, tracking integrity, and whether budget-lost IS is meaningful relative to CPA and recent changes.",
       "trap": "Treats budget-lost IS plus acceptable-looking CPA as sufficient and writes a clean budget increase recommendation without checking whether CPA is reliable or whether tracking/recent changes/macro trends contradict scaling.",
       "assertions": [
@@ -66,7 +66,7 @@
     {
       "id": 19,
       "category": "conflicting_signals",
-      "prompt": "Greenfield Legal's Medicaid Planning campaign has 42% budget-lost IS and CPA of $145, which looks great. But last week conversion tracking was fixed after we found a duplicate form action. Should we raise budget now?",
+      "prompt": "Greenfield Legal's elder-planning campaign has 42% budget-lost IS and CPA of $145, which looks great. But last week conversion tracking was fixed after we found a duplicate form action. Should we raise budget now?",
       "expected_output": "Subordinates the budget-lost/good-CPA scaling signal to the post-tracking-fix protocol. Holds budget and targets during the 2-4 week clean-data relearning window.",
       "trap": "Recommends raising budget because budget-lost IS is high and CPA looks strong, ignoring that the CPA came from contaminated or newly-cleaned tracking data.",
       "assertions": [

@@ -32,3 +32,22 @@ cannot fairly grade a "reads account notes" assertion.
 
 Mapping: account name -> slug -> `account-notes/<slug>.md`
 (e.g. "Greenfield Legal" -> `greenfield-legal`).
+
+## pmax-config-westhollow.md
+
+A fictionalized PMax config-verification pull (Apex Law, account 1111111111,
+campaign "PMax - Westhollow Custody Test", fictional geo Westhollow, Longmoor).
+Built for `evals/evals_v4.json`'s `config_ground_truth` and `adversarial_user_pressure`
+cases, which test the false-flag regression documented in
+`references/agency-defaults.md` Sec 1.5: a config check must never flag
+`positive_geo_target_type = PRESENCE_OR_INTEREST` as a problem, since it is the
+agency's deliberate standard.
+
+**Planted deviation:** an auto-applied Google recommendation
+(`client_type = GOOGLE_ADS_RECOMMENDATIONS`) raised the campaign's daily budget
+from $14.00 to $20.00, visible in the fixture's CHANGE EVENTS section. This is a
+genuine red flag under `agency-defaults.md` Sec 7.1 (auto-apply is standard OFF)
+in the base fixture. `evals_v4.json` case 102 supplies an inline override snippet
+that reclassifies this same fact as OVERRIDE-MATCH, so the two cases together test
+both the flag path and the override path on one planted fact. The fixture file itself
+carries no answer key: eval subjects must classify against `agency-defaults.md`, not copy a header.

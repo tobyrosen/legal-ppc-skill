@@ -116,7 +116,7 @@ ORDER BY conversion_action.name
 **What to look for:**
 
 - Multiple actions with `include_in_conversions_metric = TRUE` — are these all intentional primary actions?
-- `counting_type = MANY_PER_CLICK` on phone call or form actions — usually wrong for legal (one lead = one conversion)
+- `counting_type = ONE_PER_CLICK` on phone call or form lead actions with no recorded override: a deviation from the house standard (agency-defaults.md Sec 3.4: `MANY_PER_CLICK` is standard on lead actions, situational rather than universally correct for legal PPC, since an agency may choose `ONE_PER_CLICK` where repeat events are noise, recorded as an override)
 - Mismatched attribution models across actions
 - `type` field: `WEBPAGE` actions should have verifiable tag sources; `AD_CALL` actions are auto-tracked; `UPLOAD_CLICKS` suggests offline import
 - Any action with a suspicious name (e.g., "All Web Site Visits" set as primary)
@@ -889,6 +889,575 @@ Do not present findings, waste estimates, or negative keyword recommendations wi
 ---
 
 _Note: Per-ad-group query splitting beyond per-campaign will yield marginal additional coverage (a few percentage points at most) once the per-campaign ceiling is reached. The ~50% ceiling is a hard API limit, not improvable through query structure._
+
+---
+
+## 14. Config Baseline Pull
+
+The queries that read every setting in `references/agency-defaults.md`. Run this set in pre-flight
+(PF-4), then classify each setting as MATCH, OVERRIDE-MATCH, or DEVIATION against the baseline.
+Structure queries: no date segmentation, no metrics.
+
+**Field names verified against Google Ads API v23.** Three v23 changes bite here:
+
+1. **`change_event` requires a `LIMIT`.** A `change_event` query without one fails with
+   `changeEventError.LIMIT_NOT_SPECIFIED`. The limit must be 10,000 or less.
+2. **`campaign_asset` has no `policy_summary`.** `campaign_asset.policy_summary.approval_status`
+   and `.review_status` return `queryError.UNRECOGNIZED_FIELD`. Campaign-level asset approval is
+   readable only via `campaign_asset.primary_status` and `.primary_status_reasons`.
+   `asset_group_asset.policy_summary.*` does still exist, so PMax asset-group approval is fully
+   readable; only the campaign-level assets are limited.
+3. **`campaign.url_expansion_opt_out` is gone.** Final URL expansion is read from
+   `campaign.asset_automation_settings`.
+
+Two more API behaviours to expect in the results:
+
+- **Boolean fields are omitted, not returned as `false`.** `campaign_conversion_goal.biddable` and
+  `customer_conversion_goal.biddable` are absent when not true. Absence is the negative case, not
+  missing data.
+- **`campaign_asset` queries require `campaign.id` in the SELECT**, or the query fails on a
+  required-field error.
+
+---
+
+### 14.1 Campaign Settings Baseline
+
+Covers agency-defaults §1 (networks, ad rotation, geo target type, dates, tracking template,
+serving state, AI Max, EU political) and the PMax guideline fields in §5.
+
+```gaql
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  campaign.serving_status,
+  campaign.primary_status,
+  campaign.primary_status_reasons,
+  campaign.advertising_channel_type,
+  campaign.advertising_channel_sub_type,
+  campaign.experiment_type,
+  campaign.network_settings.target_google_search,
+  campaign.network_settings.target_search_network,
+  campaign.network_settings.target_content_network,
+  campaign.network_settings.target_partner_search_network,
+  campaign.ad_serving_optimization_status,
+  campaign.geo_target_type_setting.positive_geo_target_type,
+  campaign.geo_target_type_setting.negative_geo_target_type,
+  campaign.start_date_time,
+  campaign.end_date_time,
+  campaign.tracking_url_template,
+  campaign.final_url_suffix,
+  campaign.ai_max_setting.enable_ai_max,
+  campaign.contains_eu_political_advertising,
+  campaign.selective_optimization.conversion_actions,
+  campaign.brand_guidelines_enabled,
+  campaign.brand_guidelines.main_color,
+  campaign.brand_guidelines.accent_color,
+  campaign.brand_guidelines.predefined_font_family,
+  campaign.asset_automation_settings,
+  campaign.text_guidelines.term_exclusions,
+  campaign.text_guidelines.messaging_restrictions,
+  campaign.dynamic_search_ads_setting.domain_name,
+  campaign.dynamic_search_ads_setting.use_supplied_urls_only
+FROM campaign
+WHERE campaign.status != 'REMOVED'
+ORDER BY campaign.name
+```
+
+**What to check:** §1.1 through §1.12, plus §5.2 to §5.5 on any `PERFORMANCE_MAX` row.
+`campaign.asset_automation_settings` returns a list of type/status pairs; the standard is every
+type `OPTED_OUT`, including the final-URL-expansion type. Brand guideline and text guideline fields
+are populated only on PMax campaigns; their absence on a Search campaign is not a finding.
+
+---
+
+### 14.2 Budget and Bidding Baseline
+
+Covers agency-defaults §2.
+
+```gaql
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  campaign.bidding_strategy_type,
+  campaign.bidding_strategy,
+  campaign.bidding_strategy_system_status,
+  campaign.maximize_conversions.target_cpa_micros,
+  campaign.target_cpa.target_cpa_micros,
+  campaign.target_cpa.cpc_bid_ceiling_micros,
+  campaign.target_cpa.cpc_bid_floor_micros,
+  campaign.target_spend.cpc_bid_ceiling_micros,
+  campaign.maximize_conversion_value.target_roas,
+  campaign.target_roas.target_roas,
+  campaign_budget.id,
+  campaign_budget.name,
+  campaign_budget.amount_micros,
+  campaign_budget.total_amount_micros,
+  campaign_budget.period,
+  campaign_budget.delivery_method,
+  campaign_budget.explicitly_shared,
+  campaign_budget.status
+FROM campaign
+WHERE campaign.status != 'REMOVED'
+ORDER BY campaign.name
+```
+
+**What to check:** §2.1 to §2.4. A target CPA field omitted from the response means no target is
+set, which is the standard below the volume floor. Read the strategy against the campaign's own
+30-day conversion count, not the account's.
+
+Portfolio strategies attached via `campaign.bidding_strategy` need the shared-strategy query
+(§11.2) to read their targets.
+
+---
+
+### 14.3 Geo, Language, Device, and Proximity Criteria
+
+Covers agency-defaults §1.7, §5.6, §6.6, §6.7.
+
+```gaql
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign_criterion.criterion_id,
+  campaign_criterion.type,
+  campaign_criterion.status,
+  campaign_criterion.negative,
+  campaign_criterion.bid_modifier,
+  campaign_criterion.location.geo_target_constant,
+  campaign_criterion.proximity.radius,
+  campaign_criterion.proximity.radius_units,
+  campaign_criterion.proximity.address.city_name,
+  campaign_criterion.proximity.address.province_name,
+  campaign_criterion.language.language_constant,
+  campaign_criterion.device.type,
+  campaign_criterion.ad_schedule.day_of_week,
+  campaign_criterion.ad_schedule.start_hour,
+  campaign_criterion.ad_schedule.end_hour,
+  campaign_criterion.content_label.type
+FROM campaign_criterion
+WHERE campaign.status = 'ENABLED'
+  AND campaign_criterion.status != 'REMOVED'
+  AND campaign_criterion.type IN ('LOCATION', 'PROXIMITY', 'LANGUAGE', 'DEVICE', 'AD_SCHEDULE', 'CONTENT_LABEL')
+ORDER BY campaign.name, campaign_criterion.type
+```
+
+**What to check:** language set (§1.7), any `AD_SCHEDULE` row (§6.6), any `DEVICE` row carrying a
+`bid_modifier` (§6.7), negative location coverage. Location rows return a geo target constant
+resource name, not a place name; resolve it via `geo_target_constant` if the name is needed.
+
+Note: the geo _target type_ setting lives on `campaign` (§14.1), not on the criteria. The criteria
+say _where_; the setting says _who counts as being there_.
+
+---
+
+### 14.4 Campaign-Level Negative Keywords and Webpage Exclusions
+
+Covers agency-defaults §4.4, §4.5, §5.3, §5.7.
+
+```gaql
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign_criterion.criterion_id,
+  campaign_criterion.type,
+  campaign_criterion.negative,
+  campaign_criterion.status,
+  campaign_criterion.keyword.text,
+  campaign_criterion.keyword.match_type,
+  campaign_criterion.webpage.criterion_name
+FROM campaign_criterion
+WHERE campaign.status = 'ENABLED'
+  AND campaign_criterion.negative = TRUE
+  AND campaign_criterion.status != 'REMOVED'
+  AND campaign_criterion.type IN ('KEYWORD', 'WEBPAGE')
+ORDER BY campaign.name, campaign_criterion.type
+```
+
+**What to check:** brand-term exclusions on a non-brand PMax test (§5.7), and whether any negative
+blocks a term with conversion history (§4.5, cross-reference the search terms report).
+
+---
+
+### 14.5 Shared Negative Lists and Their Attachment
+
+Covers agency-defaults §4.1 to §4.3. Two queries: what exists, and what is attached.
+
+```gaql
+SELECT
+  shared_set.id,
+  shared_set.name,
+  shared_set.type,
+  shared_set.status,
+  shared_set.member_count,
+  shared_set.reference_count
+FROM shared_set
+WHERE shared_set.type = 'NEGATIVE_KEYWORDS'
+  AND shared_set.status != 'REMOVED'
+ORDER BY shared_set.name
+```
+
+```gaql
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  campaign_shared_set.shared_set,
+  campaign_shared_set.status,
+  shared_set.id,
+  shared_set.name,
+  shared_set.member_count
+FROM campaign_shared_set
+WHERE campaign.status = 'ENABLED'
+  AND campaign_shared_set.status != 'REMOVED'
+ORDER BY campaign.name
+```
+
+**What to check:** a list existing at all (§4.1, red flag if none), and every serving campaign
+appearing in the second result set (§4.2). A serving campaign absent from the second query
+references no shared list. `shared_set.reference_count` gives the same information in aggregate but
+does not say _which_ campaigns are missing.
+
+---
+
+### 14.6 Conversion Action Configuration
+
+Covers agency-defaults §3.3 to §3.9. This is the configuration half of PF-1.
+
+```gaql
+SELECT
+  conversion_action.id,
+  conversion_action.name,
+  conversion_action.status,
+  conversion_action.type,
+  conversion_action.category,
+  conversion_action.origin,
+  conversion_action.counting_type,
+  conversion_action.include_in_conversions_metric,
+  conversion_action.primary_for_goal,
+  conversion_action.phone_call_duration_seconds,
+  conversion_action.click_through_lookback_window_days,
+  conversion_action.view_through_lookback_window_days,
+  conversion_action.attribution_model_settings.attribution_model,
+  conversion_action.attribution_model_settings.data_driven_model_status,
+  conversion_action.google_analytics_4_settings.event_name,
+  conversion_action.google_analytics_4_settings.property_name,
+  conversion_action.owner_customer,
+  conversion_action.value_settings.default_value,
+  conversion_action.value_settings.always_use_default_value
+FROM conversion_action
+WHERE conversion_action.status != 'REMOVED'
+ORDER BY conversion_action.category, conversion_action.name
+```
+
+**What to check:** every §3 entry. PRIMARY is `status = ENABLED` **and**
+`include_in_conversions_metric = true`; `primary_for_goal` is a separate field and does not mean
+the same thing, so do not read one for the other. Count primaries by category before reading any
+CPL figure.
+
+Conversion silence (§3.9) needs the metric, which requires a date range:
+
+```gaql
+SELECT
+  conversion_action.id,
+  conversion_action.name,
+  conversion_action.status,
+  conversion_action.include_in_conversions_metric,
+  metrics.all_conversions,
+  metrics.conversion_last_conversion_date
+FROM conversion_action
+WHERE conversion_action.status = 'ENABLED'
+  AND segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'
+ORDER BY metrics.all_conversions DESC
+```
+
+---
+
+### 14.7 Conversion Goal Wiring
+
+Covers agency-defaults §3.1 and §3.2. Four resources, because the goal set is assembled from four
+places and reading any one alone gives the wrong answer.
+
+```gaql
+SELECT
+  campaign.id,
+  campaign.name,
+  conversion_goal_campaign_config.goal_config_level,
+  conversion_goal_campaign_config.custom_conversion_goal
+FROM conversion_goal_campaign_config
+WHERE campaign.status = 'ENABLED'
+ORDER BY campaign.name
+```
+
+```gaql
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign_conversion_goal.category,
+  campaign_conversion_goal.origin,
+  campaign_conversion_goal.biddable
+FROM campaign_conversion_goal
+WHERE campaign.status = 'ENABLED'
+ORDER BY campaign.name, campaign_conversion_goal.category
+```
+
+```gaql
+SELECT
+  customer_conversion_goal.category,
+  customer_conversion_goal.origin,
+  customer_conversion_goal.biddable
+FROM customer_conversion_goal
+ORDER BY customer_conversion_goal.category
+```
+
+```gaql
+SELECT
+  custom_conversion_goal.id,
+  custom_conversion_goal.name,
+  custom_conversion_goal.status,
+  custom_conversion_goal.conversion_actions
+FROM custom_conversion_goal
+```
+
+**How to read the four together:**
+
+1. `conversion_goal_campaign_config.goal_config_level` says whether the campaign uses the account
+   default (`CUSTOMER`) or its own set (`CAMPAIGN`).
+2. `customer_conversion_goal` is the account default map of category and origin to biddable.
+3. `campaign_conversion_goal` is the campaign's effective map. At `CUSTOMER` level it mirrors the
+   customer map; at `CAMPAIGN` level it is the campaign's own.
+4. `custom_conversion_goal` is the named goal set the UI's campaign-specific goal picker offers.
+   An empty result means the picker has nothing in it, which is worth knowing before proposing that
+   someone select one.
+
+The biddable map names _categories_, not actions. Translate it into actions by joining the biddable
+category and origin pairs against the §14.6 result: the actions the campaign can optimise toward
+are the ENABLED, `include_in_conversions_metric = true` actions whose category and origin are
+biddable. That join is the check, and it is where a page-view or content-download category
+quietly widens the goal set (§3.2).
+
+---
+
+### 14.8 Account-Level Settings
+
+Covers agency-defaults §7.2 to §7.7.
+
+```gaql
+SELECT
+  customer.id,
+  customer.descriptive_name,
+  customer.currency_code,
+  customer.time_zone,
+  customer.status,
+  customer.manager,
+  customer.test_account,
+  customer.auto_tagging_enabled,
+  customer.conversion_tracking_setting.conversion_tracking_status,
+  customer.conversion_tracking_setting.conversion_tracking_id,
+  customer.conversion_tracking_setting.cross_account_conversion_tracking_id,
+  customer.conversion_tracking_setting.enhanced_conversions_for_leads_enabled,
+  customer.conversion_tracking_setting.accepted_customer_data_terms,
+  customer.conversion_tracking_setting.google_ads_conversion_customer,
+  customer.call_reporting_setting.call_reporting_enabled,
+  customer.call_reporting_setting.call_conversion_reporting_enabled,
+  customer.call_reporting_setting.call_conversion_action,
+  customer.tracking_url_template,
+  customer.final_url_suffix,
+  customer.contains_eu_political_advertising,
+  customer.optimization_score
+FROM customer
+```
+
+**What to check:** every §7 entry except auto-apply, which is not exposed here (see §14.12).
+`conversion_tracking_id` differing from `google_ads_conversion_customer` means conversions are owned
+by another account in the hierarchy, which changes who can edit them.
+
+---
+
+### 14.9 Campaign-Level Assets
+
+Covers agency-defaults §6.5, and the campaign-level assets on a PMax campaign (§5.4).
+
+```gaql
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign_asset.asset,
+  campaign_asset.field_type,
+  campaign_asset.status,
+  campaign_asset.source,
+  campaign_asset.primary_status,
+  campaign_asset.primary_status_reasons,
+  asset.id,
+  asset.name,
+  asset.type,
+  asset.sitelink_asset.link_text,
+  asset.callout_asset.callout_text,
+  asset.structured_snippet_asset.header,
+  asset.call_asset.phone_number,
+  asset.final_urls
+FROM campaign_asset
+WHERE campaign.status = 'ENABLED'
+  AND campaign_asset.status != 'REMOVED'
+ORDER BY campaign.name, campaign_asset.field_type
+```
+
+**`campaign.id` is required in the SELECT** or the query errors. Asset approval at this level comes
+from `primary_status` and `primary_status_reasons`; there is no `policy_summary` on
+`campaign_asset` in v23.
+
+**What to check:** which asset field types are present per campaign (§6.5), and any asset in a
+non-serving primary status. `ASSET_UNDER_REVIEW` on a newly created asset is expected; a
+disapproved or limited asset that has been in place for a while is not.
+
+---
+
+### 14.10 Performance Max Asset Groups
+
+Covers agency-defaults §5.8 and §5.9.
+
+```gaql
+SELECT
+  campaign.id,
+  campaign.name,
+  asset_group.id,
+  asset_group.name,
+  asset_group.status,
+  asset_group.ad_strength,
+  asset_group.primary_status,
+  asset_group.primary_status_reasons,
+  asset_group.final_urls,
+  asset_group.final_mobile_urls,
+  asset_group.path1,
+  asset_group.path2
+FROM asset_group
+WHERE campaign.status = 'ENABLED'
+  AND asset_group.status != 'REMOVED'
+ORDER BY campaign.name, asset_group.name
+```
+
+```gaql
+SELECT
+  asset_group.id,
+  asset_group.name,
+  asset_group_asset.field_type,
+  asset_group_asset.status,
+  asset_group_asset.primary_status,
+  asset_group_asset.primary_status_reasons,
+  asset_group_asset.policy_summary.approval_status,
+  asset_group_asset.policy_summary.review_status,
+  asset_group_asset.policy_summary.policy_topic_entries,
+  asset.id,
+  asset.type,
+  asset.source,
+  asset.text_asset.text
+FROM asset_group_asset
+WHERE asset_group_asset.status != 'REMOVED'
+ORDER BY asset_group.name, asset_group_asset.field_type
+```
+
+```gaql
+SELECT
+  asset_group.id,
+  asset_group.name,
+  asset_group_signal.audience.audience,
+  asset_group_signal.search_theme.text
+FROM asset_group_signal
+```
+
+**What to check:** field-type coverage per asset group (§5.8), ad strength once review has
+completed, and at least one signal (§5.9). Unlike `campaign_asset`, `asset_group_asset` **does**
+carry `policy_summary`, so asset-group approval is fully readable. `approval_status = UNKNOWN` with
+`review_status = REVIEW_IN_PROGRESS` is the normal state for a campaign under review, not a
+disapproval, and `policy_topic_entries` is null until review finishes.
+
+---
+
+### 14.11 Ad-Level Policy and Match Types
+
+Covers agency-defaults §6.1 and §6.4. Ad policy has its own query at §7.3; this pairing is here so
+the config pull is self-contained.
+
+```gaql
+SELECT
+  campaign.name,
+  ad_group.name,
+  ad_group_ad.ad.id,
+  ad_group_ad.ad.type,
+  ad_group_ad.status,
+  ad_group_ad.ad_strength,
+  ad_group_ad.policy_summary.approval_status,
+  ad_group_ad.policy_summary.review_status
+FROM ad_group_ad
+WHERE ad_group_ad.status = 'ENABLED'
+  AND campaign.status = 'ENABLED'
+ORDER BY campaign.name, ad_group.name
+```
+
+```gaql
+SELECT
+  campaign.name,
+  ad_group.name,
+  ad_group_criterion.keyword.match_type,
+  ad_group_criterion.keyword.text,
+  ad_group_criterion.status,
+  ad_group_criterion.negative
+FROM ad_group_criterion
+WHERE ad_group_criterion.type = 'KEYWORD'
+  AND ad_group_criterion.negative = FALSE
+  AND ad_group_criterion.status = 'ENABLED'
+  AND campaign.status = 'ENABLED'
+ORDER BY campaign.name, ad_group.name
+```
+
+**What to check:** RSA count per ad group (§6.4), any `BROAD` match type outside a named test
+structure (§6.1). The keyword query filters `negative = FALSE` deliberately: the API returns
+positive and negative keywords in the same result set, and counting them together produces a
+confirmed misdiagnosis.
+
+---
+
+### 14.12 Config Drift and Auto-Applied Changes
+
+Covers agency-defaults §7.1 and §2.7. `change_event` is the only way to see who changed a setting
+and when, and the only available signal on the auto-apply setting.
+
+```gaql
+SELECT
+  change_event.change_date_time,
+  change_event.user_email,
+  change_event.client_type,
+  change_event.change_resource_type,
+  change_event.resource_change_operation,
+  change_event.changed_fields,
+  change_event.campaign,
+  change_event.old_resource,
+  change_event.new_resource
+FROM change_event
+WHERE change_event.change_date_time >= 'YYYY-MM-DD 00:00:00'
+  AND change_event.change_date_time <= 'YYYY-MM-DD 23:59:59'
+ORDER BY change_event.change_date_time DESC
+LIMIT 200
+```
+
+**`LIMIT` is mandatory** and must be 10,000 or less. Without it the query fails with
+`changeEventError.LIMIT_NOT_SPECIFIED`. Start at 200 and raise it only if the window truncates.
+
+**What to check:** any row with `client_type` in `('GOOGLE_ADS_AUTOMATED_RULE',
+'GOOGLE_ADS_RECOMMENDATIONS')` is an auto-applied change (§7.1, red flag). Bid strategy or budget
+changes inside a 14-day learning window (§2.7). Any change by a user email that is not ours, which
+is how outside editor access surfaces.
+
+**Coverage limits, and they matter for config verification:**
+
+- `change_event` covers roughly the last 30 days. Older configuration changes are invisible.
+- Timestamps are in the **account's** time zone, not UTC and not yours. A window built from local
+  dates will miss rows at both ends.
+- Not every mutation produces a `change_event` row. Verified on 2026-08-17: an asset group rename
+  and a conversion goal level change were both live in the resources while producing no change
+  event in the same window. **A config setting is verified by reading the resource, never by the
+  absence of a change event.** Change history says what was logged, not what is true.
 
 ---
 

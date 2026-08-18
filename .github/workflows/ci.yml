@@ -21,6 +21,16 @@ on:
     branches: [main, master]
 
 jobs:
+  leak-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Generic PII shape check (customer-ID/phone/email)
+        run: python3 scripts/ci-generic-leak-check.py
+
   detect:
     runs-on: ubuntu-latest
     outputs:

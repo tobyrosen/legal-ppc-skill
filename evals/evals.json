@@ -39,7 +39,7 @@
     },
     {
       "id": 9,
-      "prompt": "The Greenfield Legal Medicaid campaign is barely spending \u2014 maybe $40/month. We have a $50 target CPA and $100/day budget. Should we lower the target CPA to get it to spend more? Account: Greenfield Legal (ID 2222222222), MCC login 0000000000.",
+      "prompt": "The Greenfield Legal elder-planning campaign is barely spending \u2014 maybe $40/month. We have a $50 target CPA and $100/day budget. Should we lower the target CPA to get it to spend more? Account: Greenfield Legal (ID 2222222222), MCC login 0000000000.",
       "expected_output": "Roots the problem in the bid strategy and the account's volume, not the target or the budget. Recognizes ~2 conversions/month is below every smart-bidding threshold (well under 15-20/month for tCPA, and under the ~5/month floor where even Maximize Conversions has enough signal). Rejects both bad fixes: does not lower the target CPA, and does not raise the budget (the campaign spends only ~$40 of a $100/day budget, so budget is not the constraint). Recommends a manual-control strategy appropriate at this volume (eCPC or Manual CPC) and justifies that choice against the volume diagnosis. Reads the account notes first.",
       "files": [],
       "notes": "HARDENED 2026-06-04. Tests the full low-volume bidding reasoning, not just a strategy swap. The account's tiered volume (below both the 15-20/month tCPA threshold and the ~5/month Maximize Conversions floor) means the skill's own doctrine in references/diagnosis-trees.md lands on eCPC/Manual, not Maximize Conversions. A response that lowers the target, raises the budget, stops at Maximize Conversions, or switches strategy without justifying it against the volume diagnosis fails. Requires the account-notes/greenfield-legal.md fixture.",
@@ -68,7 +68,7 @@
     },
     {
       "id": 15,
-      "prompt": "Greenfield Legal Medicaid campaign went from about 8 conversions a month to 1 conversion a month, starting about 11 days ago. We haven't touched the account. Account: Greenfield Legal (ID 2222222222), MCC login 0000000000.",
+      "prompt": "Greenfield Legal elder-planning campaign went from about 8 conversions a month to 1 conversion a month, starting about 11 days ago. We haven't touched the account. Account: Greenfield Legal (ID 2222222222), MCC login 0000000000.",
       "expected_output": "Change history pulled before tag debugging. Recent tracking cleanup identified as primary hypothesis from account notes. Scenario A (count now accurate) vs Scenario B (tag broken) distinguished. No bid changes before tracking verified.",
       "files": [],
       "assertions": [
