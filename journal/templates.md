@@ -52,7 +52,7 @@ Blocks below are pretty-printed for reading and pipe as-is; the appended journal
     "statement": "<observable result expected>",
     "review_by": "YYYY-MM-DD"
   },
-  "source": { "actor": "toby", "ref": "tg-NNNN" },
+  "source": { "actor": "operator", "ref": null },
   "session": "YYYY-MM-DD-<slug>"
 }
 ```
@@ -75,7 +75,7 @@ Blocks below are pretty-printed for reading and pipe as-is; the appended journal
     "statement": "<observable result expected>",
     "review_by": "YYYY-MM-DD"
   },
-  "source": { "actor": "toby", "ref": "tg-NNNN" },
+  "source": { "actor": "operator", "ref": null },
   "session": "YYYY-MM-DD-<slug>"
 }
 ```
@@ -106,7 +106,7 @@ Blocks below are pretty-printed for reading and pipe as-is; the appended journal
   "scope": { "level": "account", "ids": [], "names": [] },
   "tags": ["known-issue"],
   "body": "<standing constraint in direct language>",
-  "source": { "actor": "toby", "ref": "tg-NNNN" },
+  "source": { "actor": "operator", "ref": null },
   "session": "YYYY-MM-DD-<slug>"
 }
 ```
@@ -135,7 +135,7 @@ override to one campaign type or campaign; omit it and the override applies acco
     "applies_to": "<campaign-name>"
   },
   "body": "<why this account runs the non-standard value, and what would end the override>",
-  "source": { "actor": "toby", "ref": "tg-NNNN" },
+  "source": { "actor": "operator", "ref": null },
   "session": "YYYY-MM-DD-<slug>"
 }
 ```
@@ -156,7 +156,7 @@ Worked example, fully fictional:
     "applies_to": "Search - Family Law"
   },
   "body": "Presence-only on this campaign only. Interest traffic was measured across a full quarter and produced clicks with no intake contact. Ends if the firm opens a second office or the campaign geo widens.",
-  "source": { "actor": "toby", "ref": "tg-1234" },
+  "source": { "actor": "operator", "ref": null },
   "session": "2026-07-01-example-family-law"
 }
 ```

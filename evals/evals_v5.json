@@ -1,0 +1,195 @@
+{
+  "skill_name": "google-ads-analysis",
+  "version": "5",
+  "description": "The 2026-09 refresh eval suite. It supersedes the v1 to v4 cases that encoded content removed or corrected by the monthly outcome-mining refresh and the drift correction: the retired PB-15 rebuild, the enhanced-CPC sub-floor fallback, the search-term coverage ceiling and every extrapolation built on it, the historical-CPA target reset, the soft-action demotion branch that caught ebook downloads, and the Display-scoped creative cases. It adds coverage for the two new playbooks (PB-40, PB-41) and the three standing operator rulings that the refresh wrote into the library: PB-16 conversion beats intent, PB-26 the blended CPA is always the reported number, and PB-32 bounded-test cap tracking with override measurement. Scope is Google Ads Search and Performance Max for family, immigration, and elder law only. Each case names the playbook id it exercises where one applies, and the `supersedes` field names the earlier case or source it replaces.",
+  "schema_note": "Cases use the assertion form: a flat `assertions` array, each entry a single pass or fail check. Assertions prefixed [NEGATIVE] must NOT be present in the output; [FALSE-FLAG] marks a known false-flag regression; [VERDICT] checks the data-not-verdicts boundary. Run each prompt with the skill loaded and without it, then score against the assertions. The Westhollow, Apex Law, and Greenfield Legal accounts are fictional fixtures; fixtures live in evals/fixtures/.",
+  "fixtures": "evals/fixtures/ (Westhollow, Apex Law, Greenfield Legal are fictional)",
+  "evals": [
+    {
+      "id": 501,
+      "category": "bidding_sub_floor",
+      "prompt": "Account Greenfield Legal (fictional), campaign 'Westhollow - Elder Planning', already on Maximize Conversions. 30-day conversions = 4, well below the reliability floor for this campaign's volume. Avg CPC = $62 against the campaign's own trailing 30-day median of about $35. Budget-lost impression share = 21%. Tracking verified (PF-1 clean), no bid or budget change in 14 days. What is the standard move?",
+      "expected_output": "Routes to PB-08: Maximize Clicks with a CPC cap, to buy volume and rebuild conversion signal while capping runaway auctions, with a 3 to 4 week revisit and conversion rate watched because Max Clicks optimizes for clicks. Names the reliability floor as volume-dependent judgment rather than a settled number. Does not propose enhanced CPC or manual CPC as the low-volume fallback. Does not derive a target from the account's own historical CPA. Stops short of a go/no-go verdict.",
+      "trap": "Recommends enhanced CPC or manual CPC as the sub-floor fallback (the pre-refresh doctrine, now withdrawn), or lowers a target, or raises budget into a sub-floor campaign, or issues a verdict on the campaign.",
+      "assertions": [
+        "Recommends Maximize Clicks with a CPC cap as the standard move for a sub-floor Maximize Conversions campaign carrying a high avg CPC.",
+        "Names PB-08.",
+        "[NEGATIVE] Does NOT recommend enhanced CPC or manual CPC as the low-volume fallback.",
+        "[NEGATIVE] Does NOT derive a bidding target from the account's own historical CPA.",
+        "States a revisit window and names conversion rate as the metric to watch under Max Clicks.",
+        "Names the reliability floor as volume-dependent judgment for this account rather than a settled house number.",
+        "[VERDICT] Stops short of a go/no-go call on the campaign.",
+        "[NEGATIVE] Does NOT judge the CPC against a published practice-area CPC band; there are none."
+      ],
+      "supersedes": "evals.json case 9; evals_v2.json case 6"
+    },
+    {
+      "id": 502,
+      "category": "search_term_negatives",
+      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Divorce'. A search-term pull returns $1,240 of spend across 180 terms. Clearly-irrelevant spend inside that pull is $244, concentrated in one recurring n-gram with zero conversions over 60 days. Report the search-term findings.",
+      "expected_output": "Reports the $244 as the measured figure it is, next to the campaign's actual CPL. Proposes the n-gram negative from this account's own search terms, checked against the operator's not-waste list and against the term's own conversion record. Places the negative at the narrowest sufficient scope. Names PB-13 and states its thresholds as PROPOSED. Stops short of a verdict.",
+      "trap": "Estimates, extrapolates, or scales any figure to stand for spend the pull did not return; asserts that the Google Ads API under-reports search terms or caps rows; states a coverage ratio; applies a section of the negative-keyword library wholesale; or negates a term the account has converted on.",
+      "assertions": [
+        "Reports the $244 as the measured irrelevant spend, not as an estimate of anything larger.",
+        "[NEGATIVE] Does NOT compute or state a search-term coverage ratio.",
+        "[NEGATIVE] Does NOT estimate, extrapolate, or scale any figure to stand for spend the pull did not return.",
+        "[NEGATIVE] Does NOT claim that the Google Ads API under-reports search terms or caps rows.",
+        "Proposes the negative from this account's own search terms, checked against the not-waste list and the never-negate-a-converter rule.",
+        "Places the proposed negative at the narrowest sufficient scope (account shared list, campaign, or ad group).",
+        "[NEGATIVE] Does NOT apply a section of the negative-keyword library wholesale.",
+        "Names PB-13 and states its 3% and 60-day thresholds as PROPOSED.",
+        "[VERDICT] Stops short of a go/no-go call."
+      ],
+      "supersedes": "evals.json cases 2 and 14"
+    },
+    {
+      "id": 503,
+      "category": "playbook_ruling",
+      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Divorce'. The phrase keyword \"uncontested divorce lawyer\" is enabled in two ad groups of the same campaign, both with impressions in the last 30 days. Ad group A is 'Uncontested Divorce', whose ad copy and landing page match the keyword tightly, and it has produced 0 conversions in 90 days. Ad group B is 'General Divorce', a looser match on copy and page, and it has produced 6 conversions in 90 days. Which instance is kept?",
+      "expected_output": "Keeps the instance in ad group B, the one that converts. States plainly that conversion is the deciding consideration and that intent match breaks ties only, when neither instance has a conversion record or both convert comparably. Names PB-16. Notes that pausing the converting instance would cost smart-bidding signal. Stops short of executing or of a verdict on the account.",
+      "trap": "Keeps ad group A because its copy and landing page match the keyword's intent more tightly (the pre-refresh doctrine, now withdrawn), or treats intent match and conversion as equally weighted.",
+      "assertions": [
+        "Identifies the ad group B instance, the one with 6 conversions, as the one to keep.",
+        "States that conversion is the deciding consideration and intent breaks ties only.",
+        "[NEGATIVE] Does NOT recommend keeping the tighter intent-matched instance over the converting one.",
+        "Names PB-16.",
+        "Notes the smart-bidding signal cost of pausing a converting instance.",
+        "[VERDICT] Ends by returning the decision to the operator."
+      ],
+      "supersedes": "playbooks.md PB-16, rewritten 2026-09"
+    },
+    {
+      "id": 504,
+      "category": "playbook_ruling",
+      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Custody'. Search Partners is enabled with no reason on record. The 30-day blended figures are $4,800 spend, 16 conversions, $300 CPA. The network split has not been pulled yet. The operator asks for this campaign's CPA.",
+      "expected_output": "Reports $300 as the campaign's CPA, plainly and without qualification about validity, because the blended CPA is always the reported CPA. Separately flags that Search Partners is enabled, describing it as atypical and unwanted with no reason on record. Names pulling segments.network as the next step and positions the split as supporting detail underneath the reported figure, not as a substitute for it or a precondition for reporting it. Names PB-26. Notes the signal-loss risk near the reliability floor before any exclusion. Stops short of a go/no-go on excluding Partners.",
+      "trap": "Withholds the CPA pending the network split, describes the blended figure as invalid or unusable, replaces it with a Search-only number, or reports Search Partners as a neutral configuration detail rather than a flag.",
+      "assertions": [
+        "Reports $300 as the campaign's CPA.",
+        "[NEGATIVE] Does NOT withhold, qualify away, or replace the blended CPA pending the network split.",
+        "Flags Search Partners being enabled as atypical and unwanted, with no reason on record.",
+        "Names the segments.network pull as the next step and frames the split as supporting detail.",
+        "Names PB-26.",
+        "Notes the conversion-signal risk of excluding Partners near the reliability floor.",
+        "[VERDICT] Stops short of a go/no-go call on excluding Search Partners."
+      ],
+      "supersedes": "playbooks.md PB-26, rewritten 2026-09; supersedes the reporting half of evals_v3.json cases 16 and 18"
+    },
+    {
+      "id": 505,
+      "category": "playbook_pmax",
+      "prompt": "Account westhollow (fictional). A Performance Max campaign 'Westhollow - PMax Mediation' is live by operator decision at a $40 daily budget with an approved total test cap of $2,000. It is day 3. Cumulative spend is $118. Brand exclusions were deliberately overridden for this test and final-URL expansion was left on, both recorded. One asset group reads policy-limited while its individual assets remain approved. Run the day-3 poll.",
+      "expected_output": "Runs the serving-and-policy poll only, with no performance judgment at day 3. Includes the cap block: cumulative spend to date, recent pace, an estimated cap date derived from that pace, and a named cap-or-kill owner. Records that brand exclusion and final-URL expansion are overridden and states that brand-query share and landing-page distribution will be required at the final test judgment. On the policy-limited asset group, obtains the human-readable policy reason, appeals, records the appeal date, and holds all asset edits until it resolves, reporting serving separately from policy clearance. Confirms PRESENCE_OR_INTEREST is a MATCH and never a flag. Notes that PMax is avoided for law firms by default and that this one is live by operator decision.",
+      "trap": "Issues a performance read or verdict at day 3, rebuilds or edits the policy-limited asset group's assets while the appeal is pending, flags PRESENCE_OR_INTEREST, treats the brand-exclusion override as a defect to be corrected, or omits the cap tracking entirely.",
+      "assertions": [
+        "Reports cumulative spend, recent pace, an estimated cap date, and a named cap-or-kill owner.",
+        "[NEGATIVE] Does NOT issue any performance judgment or verdict at day 3.",
+        "Records the brand-exclusion and final-URL-expansion overrides and states that brand-query share and landing-page distribution are required at the final test judgment.",
+        "On the policy-limited asset group: obtains the policy reason, appeals, records the appeal date, and holds asset edits until resolution.",
+        "Reports serving separately from policy clearance, and does not treat continued spend as evidence the limitation cleared.",
+        "[FALSE-FLAG] Does NOT flag positive_geo_target_type=PRESENCE_OR_INTEREST.",
+        "Notes that PMax is avoided for law firms by default and that this campaign is live by operator decision.",
+        "Names PB-32, and PB-18 for the policy-limitation branch."
+      ],
+      "supersedes": "playbooks.md PB-32, folds added 2026-09"
+    },
+    {
+      "id": 506,
+      "category": "playbook_new",
+      "prompt": "Account westhollow (fictional). The account's top-spend Search campaign 'Westhollow - Divorce' spent $2,140 in the complete week just ended against a trailing four-week weekly mean of $1,300 (+65%). Conversions in that week were 2 against a four-week mean of 5 (-60%). Budget-lost impression share is 4%. Tracking verified (PF-1 clean), no budget or bid-strategy change in 14 days (PF-3 clean). Produce the playbook line.",
+      "expected_output": "Fires PB-40. States the standard move as holding further budget increases and re-reading the complete week, the trailing 30 days, the campaign's portfolio spend share, and intake quality together. Notes that a single sub-floor week is a do-not-move condition and that the pattern needs two complete weeks before capping to the pre-spike band. Does not route to PB-01, because budget-lost is near zero and this is a concentration question, not a budget question. Names the thresholds as PROPOSED. Ends accept/reject and stops short of a verdict.",
+      "trap": "Fires PB-01 and recommends a budget increase, or recommends capping or reallocating on a single week, or presents the PROPOSED thresholds as settled, or issues a go/no-go on the campaign.",
+      "assertions": [
+        "Fires PB-40 and names it.",
+        "States the move as holding further budget increases and re-reading week, 30 days, portfolio share, and intake quality together.",
+        "[NEGATIVE] Does NOT recommend a budget increase or fire PB-01.",
+        "Names the two-complete-week condition before any cap, and the single-sub-floor-week do-not-move condition.",
+        "Identifies the PB-40 thresholds as PROPOSED or unconfirmed.",
+        "[VERDICT] The line ends accept/reject and returns the decision to the operator."
+      ],
+      "supersedes": "playbooks.md PB-40, added 2026-09"
+    },
+    {
+      "id": 507,
+      "category": "playbook_new",
+      "prompt": "Account westhollow (fictional). A new Performance Max campaign launched 5 weeks ago now supplies 61% of the account's clicks at an average CPC of $4.10, against Search at $28.40. The account's blended 30-day CPC is down 44% and the blended CPL is down 18% versus the prior 30 days. The operator asks whether the account has recovered.",
+      "expected_output": "Fires PB-41. Presents blended, Search-only, and PMax-only figures side by side, with the blended figure remaining the reported account number and the two splits underneath it. States that the blended CPC move is substantially a traffic-mix artefact of a cheap-click inventory class, and that the recovery claim is robust only if it survives the Search-only split or the operator explicitly accepts the mix change as what is being measured. Notes PMax is past day 14, so PB-32's inside-14-days do-not-move condition does not apply here. Verifies the premise before answering it. Stops short of declaring the account recovered or not recovered.",
+      "trap": "Answers that the account has recovered on the blended numbers, or discards the blended figure as invalid, or attributes the improvement to Search without splitting, or accepts the operator's recovery premise without verifying it.",
+      "assertions": [
+        "Fires PB-41 and names it.",
+        "Presents blended, Search-only, and PMax-only results side by side.",
+        "[NEGATIVE] Does NOT declare the account recovered on the blended figures alone.",
+        "[NEGATIVE] Does NOT discard or withhold the blended figure.",
+        "Identifies the blended CPC move as substantially a traffic-mix effect of the new PMax inventory.",
+        "Verifies the stated recovery premise rather than accepting it.",
+        "[VERDICT] Returns the recovery call to the operator."
+      ],
+      "supersedes": "playbooks.md PB-41, added 2026-09"
+    },
+    {
+      "id": 508,
+      "category": "conversion_config",
+      "prompt": "Account westhollow (fictional). PF-1 returns these primary conversion actions: 'Divorce Guide Download' (WEBPAGE, 41 conversions/30d), 'Contact Form Lead' (WEBPAGE, 9/30d), 'Calls from Ads' (AD_CALL, 6/30d), and 'All Page Views' (WEBPAGE, 2,400/30d). The campaigns run Maximize Conversions on the account-default goal set. Report the PF-1 findings.",
+      "expected_output": "Flags 'All Page Views' as a generic page-view action wrongly carried as primary. Leaves 'Divorce Guide Download' as PRIMARY and does not flag it, demote it, or discount it, because ebook and guide downloads are primary conversions by standing operator ruling in every account and every campaign. Notes that any demotion of a duplicate lead action would require event-level proof that two primaries fire on the same lead, and that after any non-retroactive demotion PB-06 applies and both sides of every spanning comparison must be rebuilt on a consistent action basis. Stops short of a verdict.",
+      "trap": "Recommends demoting, excluding, or discounting the guide download because its volume dominates the count, or groups it with the page-view action as a soft conversion, or proposes a demotion on volume or decimal-tail similarity without event-level proof.",
+      "assertions": [
+        "Flags 'All Page Views' as a generic page-view action wrongly primary.",
+        "[NEGATIVE] Does NOT recommend demoting, excluding, or discounting 'Divorce Guide Download'.",
+        "States that ebook and guide downloads are primary conversions by standing operator ruling.",
+        "States that demoting a duplicate lead action requires event-level proof that two primaries fire on the same lead.",
+        "Names PB-06 and the requirement to rebuild both sides of any comparison spanning a non-retroactive counting change.",
+        "[VERDICT] Stops short of a go/no-go call on the conversion set."
+      ],
+      "supersedes": "diagnosis-trees.md PF-1 and agency-defaults.md 3.2/3.3, corrected 2026-09"
+    },
+    {
+      "id": 509,
+      "category": "creative_pmax",
+      "prompt": "Account westhollow (fictional). The creative pass finds: PMax campaign 'Westhollow - PMax Probate' has one asset group with a single square image asset and no other aspect ratio; Search campaign 'Westhollow - Divorce' has no image assets at all; and one uploaded image asset in the account is attached to nothing. Report the creative findings.",
+      "expected_output": "Flags the PMax asset group as thin coverage and the unattached asset as a usage gap. Does NOT flag the Search campaign for lacking image assets, because a Search campaign without them is expected. Names PB-21. Marks the source tier on each finding: inventory, usage mapping, and coverage gaps are API-sourceable, while any on-brand or compliance judgment is a manual review. States the thin-coverage threshold as PROPOSED. Stops short of a verdict.",
+      "trap": "Flags the Search campaign for missing image or display creative, or presents a brand or compliance verdict resting only on a vision read, or treats the thin-coverage threshold as settled, or references Display or Demand Gen inventory.",
+      "assertions": [
+        "Flags the PMax asset group as thin image coverage.",
+        "[NEGATIVE] Does NOT flag the Search campaign for lacking image assets.",
+        "Flags the unattached asset as a usage gap.",
+        "[NEGATIVE] Does NOT reference Display or Demand Gen campaigns or inventory.",
+        "Marks the source tier on each finding and reserves the brand and compliance call for manual review.",
+        "Identifies the thin-coverage threshold as PROPOSED or unconfirmed.",
+        "Names PB-21."
+      ],
+      "supersedes": "evals_v4.json case 205 (PB-22 on 'Westhollow - Display Probate'); playbooks.md PB-21/PB-22 rescoped 2026-09"
+    },
+    {
+      "id": 510,
+      "category": "playbook_selection",
+      "prompt": "Account westhollow (fictional), no red flags this check. Four playbook patterns trigger with all gates green: PB-02 on 'Westhollow - Divorce' (rank-lost IS 44%, 2 weeks), PB-20 on 'Westhollow - PMax Probate' (no ad edit in 7 months, CTR down 19% over 3 months), PB-29 on 'Westhollow - Brand' (30d CPL up 24% vs prior 30d, conversions within +/-10%, held for 2 consecutive checks), and PB-41 on the account (a new PMax campaign now supplying 58% of clicks at a fifth of Search CPC). Rank and present them.",
+      "expected_output": "Ranks by evidence tier first, then impact within tier: PB-20 (validated) ahead of PB-29 and PB-41 (partially validated), with PB-02 (validated) placed by impact against PB-20. Names any surplus rather than dropping it silently. Does not reference PB-15, which was retired in 2026-09 and is not reused. Does not characterise the account. Each line ends accept/reject.",
+      "trap": "Fires or references PB-15, or ranks by impact before evidence tier, or drops a triggered playbook without naming it, or characterises the account as good or bad.",
+      "assertions": [
+        "[NEGATIVE] Does NOT reference PB-15 in any form.",
+        "Ranks by evidence tier first and impact second within tier.",
+        "Names any triggered playbook that does not make the card rather than dropping it silently.",
+        "[NEGATIVE] Does NOT characterise the account as good, bad, healthy, or underperforming.",
+        "Every playbook line ends accept/reject."
+      ],
+      "supersedes": "evals_v4.json case 302 (contained a PB-15 case)"
+    },
+    {
+      "id": 511,
+      "category": "target_setting",
+      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Custody' on tCPA with a target of $180 against an actual 30-day cost per conversion of $470 over 19 conversions. The prior 90-day actual CPA is $505. The firm's economics are not recorded anywhere available to you. The operator asks what the target should be set to.",
+      "expected_output": "Declines to back-solve a target from the account's own historical CPA, naming that as the one forbidden move in target setting. Asks for the firm's economics: average signed-case value, lead-to-signed rate, and acceptable cost per signed case. States that with the actual CPA above target, lowering the tCPA is wrong and root causes come first. Where the current target is unusable and no economics number is available, offers removing the target and running Maximize Conversions until it is, rather than setting the historical average. Names PB-05 and PB-04. Stops short of setting a number.",
+      "trap": "Recommends resetting the tCPA to the historical average of roughly $470 to $505 (the pre-refresh diagnosis-tree instruction, now withdrawn), or lowers the target while actual CPA sits above it, or invents a target without the firm's economics.",
+      "assertions": [
+        "[NEGATIVE] Does NOT recommend setting the target to the account's historical average CPA.",
+        "Names back-solving a target from the account's own CPA as the forbidden move.",
+        "Asks for average signed-case value, lead-to-signed rate, and acceptable cost per signed case.",
+        "[NEGATIVE] Does NOT recommend lowering the tCPA while actual cost per conversion is above target.",
+        "Offers removing the target and running Maximize Conversions as the interim, rather than a historical-average target.",
+        "Names PB-05.",
+        "[VERDICT] Does not set a target number itself."
+      ],
+      "supersedes": "diagnosis-trees.md Tree 2 Question 3 and Sub-tree D, corrected 2026-09"
+    }
+  ]
+}

@@ -27,45 +27,49 @@ does not create an override.
 
 ---
 
-## Needs Toby confirmation
+## Needs operator confirmation
 
-Entries marked **PROPOSED** below are the analyst's best reading of what we do, not a ratified
-standard. They are either settings our accounts are inconsistent on, or settings no account has
-exercised yet. Confirm, edit, or reject each one; on confirmation the entry becomes STANDARD and
-this block shrinks.
+Entries marked **PROPOSED** are the analyst's best reading of what we do, not a ratified
+standard. A PROPOSED entry may be reported as a config item at most, never as a red flag, until the
+operator confirms it. Every PROPOSED entry is `unconfirmed` by definition: it is presented as a
+candidate, never as a house tactic, and one tag is enough, so those entries carry no separate marker.
+
+**The 2026-09-02 walk closed this block.** Every entry open on that date was decided.
 
 1. ~~Lead-action counting type~~ (§3.4). CONFIRMED 2026-08-18: `MANY_PER_CLICK` is the standard
-   for lead actions; the open flag is withdrawn.
-2. **Account-wide primary-action hygiene** (§3.2). Proposed: only true lead actions carry
-   `include_in_conversions_metric = true`. The campaign-level version of this is settled for
-   Performance Max (lead categories only, decided 2026-08-17), but the account-wide cleanup is an
-   open item on live accounts, not a ratified rule.
+   for lead actions.
+2. ~~Account-wide primary-action hygiene~~ (§3.2, §3.3). STANDARD 2026-09-02: only true lead
+   actions (forms, calls, ebook and guide downloads) carry `include_in_conversions_metric`.
+   Everything else is secondary.
 3. **Phone-call length threshold** (§3.5). 60 seconds stays as a low-priority default (decision
-   2026-08-18): Google-side call conversions are secondary to call-tracking uploads; not worth tuning time.
-4. **Attribution model** (§3.6). Proposed data-driven where volume supports it, last-click
-   otherwise. Never verified across the set.
-5. **Enhanced conversions for leads** (§7.4). Proposed ON. The pre-flight already treats its
-   absence as a recommendation, but no account has confirmed it enabled.
+   2026-08-18): Google-side call conversions are secondary to call-tracking uploads; not worth
+   tuning time.
+4. ~~Attribution model~~ (§3.6). STANDARD 2026-09-02: data-driven where Google offers it for the
+   action, last-click otherwise. Reported as info only.
+5. ~~Enhanced conversions for leads~~ (§7.4). STANDARD ON, 2026-09-02. Absence is a
+   recommendation, as the pre-flight already treats it.
 6. ~~Performance Max posture~~ (§5.1). CONFIRMED 2026-08-18: posture unchanged (avoid as standing
    inventory); current tests are promotional-credit funded and recorded as tests.
-7. **Shared negative list attachment** (§4.2). Proposed: every serving campaign carries the
-   account-level shared list. Accounts have shared lists that some campaigns do not reference.
-8. **Connected TV as a positive device** on PMax (§5.6). Proposed: leave as delivered. No decision
-   exists either way.
-9. **Ad schedule and device bid adjustments** (§6.6, §6.7). Proposed: none, on smart bidding.
-   No account has set either, which is weak evidence for a rule.
-10. **Dynamic Search Ads posture** (§6.3). Proposed: not used. No account runs DSA, so this is
-    inference from absence.
-11. **Ad asset minimums** (§6.5). Proposed counts for sitelinks, callouts, structured snippets, and
-    call assets. Nothing in the set establishes a number.
-12. **RSA count per ad group** (§6.4). Proposed 2 to 3. Not established.
-13. **Shared negative list naming** (§4.1). Proposed a fixed name for the account-level list so it
-    is greppable across accounts. Current names vary.
-14. **Linked properties** (§7.6). GA4 linkage is standard and evidenced. Business Profile and
-    Search Console linkage are PROPOSED.
-15. **Campaign tracking template and final URL suffix** (§1.9). Proposed: empty at campaign level
-    unless a recorded override. One account has seen third-party tracking parameters appear from an
-    outside editor, which is the case the rule is meant to catch.
+7. ~~Shared negative list attachment~~ (§4.2). STANDARD 2026-09-02: every serving campaign carries
+   the account-level list. A campaign without it is a finding.
+8. ~~Connected TV as a positive device~~ (§5.6). CUT 2026-09-02: "leave as delivered" is not a
+   tactic. The entry is retired.
+9. ~~Ad schedule and device bid adjustments~~ (§6.6, §6.7). DECIDED 2026-09-02: there is no rule.
+   Adjustments are sometimes set on purpose. An adjustment that is present is info to note with its
+   reason, never a finding.
+10. ~~Dynamic Search Ads posture~~ (§6.3). CUT 2026-09-02: "not used" is inference from absence,
+    not a tactic. The entry is retired.
+11. ~~Ad asset minimums~~ (§6.5). STANDARD 2026-09-02, without counts: every serving Search
+    campaign carries sitelinks, callouts, structured snippets and a call asset. The proposed
+    numbers are gone.
+12. ~~RSA count per ad group~~ (§6.4). STANDARD 2026-09-02: at least two responsive search ads per
+    ad group, ideally three, potentially more. Fewer than two is a finding.
+13. ~~Shared negative list naming~~ (§4.1). MOVED to internal 2026-09-02: a naming convention is
+    housekeeping, not a tactic that improves a campaign.
+14. ~~Linked properties~~ (§7.6). STANDARD 2026-09-02: GA4, Business Profile and Search Console all
+    linked. A missing link is info.
+15. ~~Campaign tracking template and final URL suffix~~ (§1.9). STANDARD 2026-09-02: empty at
+    campaign level unless a recorded override. Populated without a record is a config finding.
 
 ---
 
@@ -84,7 +88,7 @@ Override: the case where a different value is legitimate.
 - **info**: recorded, surfaced only on request or during a full audit.
 
 **Status**: entries are STANDARD unless labelled PROPOSED. A PROPOSED entry may be reported as a
-config item at most, never as a red flag, until Toby confirms it.
+config item at most, never as a red flag, until the operator confirms it.
 
 **Readability**: every entry names the GAQL field where the setting is readable. Where a setting
 is not exposed by the API, the entry says so and names the indirect signal or the blind spot.
@@ -122,10 +126,10 @@ budget.
 ### 1.4 Ad rotation
 
 **`campaign.ad_serving_optimization_status`**, standard `ROTATE_INDEFINITELY`, config item if `OPTIMIZE` or `CONVERSION_OPTIMIZE`
-Google's optimize setting picks a winner early and starves everything else, which kills relearning.
-It decides on the first two to twelve weeks and then largely stops re-evaluating. In a low-volume
-legal account it reaches that decision before the data means anything, and new variants never get
-enough impressions to prove themselves.
+`ROTATE_INDEFINITELY` is our practice and was found set correctly on one account. The rationale:
+Google's optimize setting picks a winner early and starves variants in a low-volume account, so new
+variants never get enough impressions to prove themselves. That it does so universally, and the
+two-to-twelve-week decision window, are unconfirmed.
 Override: a campaign with genuinely high volume where rotation is deliberately handed to Google,
 recorded as such.
 
@@ -170,9 +174,9 @@ Override: a genuinely time-boxed campaign, such as a capped test. Record the int
 the override so the check can distinguish "deliberately ends on the 30th" from "will stop and
 nobody knows".
 
-### 1.9 Tracking template and final URL suffix (PROPOSED)
+### 1.9 Tracking template and final URL suffix
 
-**`campaign.tracking_url_template` / `campaign.final_url_suffix`**, proposed standard: empty at campaign level, config item if populated without a record
+**`campaign.tracking_url_template` / `campaign.final_url_suffix`**, standard: empty at campaign level, config item if populated without a record
 Tracking parameters that appear without a change record usually mean an outside editor has account
 access. The parameters themselves may be harmless; the unexplained access is the finding.
 Override: a documented tracking integration, with the parameter set recorded so a later change to
@@ -225,22 +229,27 @@ Override: a deliberately pooled set of campaigns treated as one line item, recor
 
 **`campaign.bidding_strategy_type`**, standard depends on conversion volume, config item if the strategy does not match the tier
 
-- Below roughly 15 to 20 conversions per month: `MAXIMIZE_CONVERSIONS` with **no** target CPA. The
+The tiers below are `unconfirmed`: they turn on the reliability floor, which is volume-dependent
+judgment for the account rather than a fixed number. The one measured rung is the Maximize Clicks
+plus CPC cap case at the bottom.
+
+- Below the account's reliability floor: `MAXIMIZE_CONVERSIONS` with **no** target CPA. The
   algorithm needs conversion volume before a target means anything; a target set on thin data
   restricts the auction entries that would produce the data.
 - At or above that floor with an economics-derived target available: `TARGET_CPA`.
-- Already on `MAXIMIZE_CONVERSIONS`, below the floor, **and** carrying a high average CPC for the
-  practice area: `MAXIMIZE_CLICKS` with a CPC cap, to buy volume and rebuild signal while capping
-  runaway auctions. Watch conversion rate, since Maximize Clicks optimizes for clicks.
-- `TARGET_ROAS` only where case values differ enough between campaigns to justify it.
-- `MANUAL_CPC` only in a genuine crisis.
+- Already on `MAXIMIZE_CONVERSIONS`, below the floor, **and** carrying a high average CPC against
+  the campaign's own trailing median: `MAXIMIZE_CLICKS` with a CPC cap, to buy volume and rebuild
+  signal while capping runaway auctions. Watch conversion rate, since Maximize Clicks optimizes for
+  clicks.
+- `TARGET_ROAS` only where case values differ enough between campaigns to justify it. (unconfirmed)
+- `MANUAL_CPC` only in a genuine crisis. (unconfirmed)
 
 Override: any of the above held deliberately through a transition, recorded with the review date.
 
 ### 2.4 Target CPA presence
 
 **`campaign.maximize_conversions.target_cpa_micros` / `campaign.target_cpa.target_cpa_micros`**, standard: absent below the volume floor, config item if a target is set on a sub-floor campaign
-A target on a campaign that cannot produce 15 to 20 conversions a month is a constraint applied to
+A target on a campaign that cannot clear its own reliability floor is a constraint applied to
 noise.
 Override: a target carried through a temporary volume dip, recorded with the expected recovery.
 
@@ -264,8 +273,9 @@ unset for diagnostic purposes.
 
 **`change_event` on bidding fields**, standard: no bid strategy change inside a 14-day learning
 window, config item if the window was interrupted
-Repeated strategy changes inside the learning period restart the clock and are the most common
-reason a smart-bidding account never stabilises.
+Repeated strategy changes inside the learning period restart the clock. That this is the most
+common reason a smart-bidding account never stabilises is unconfirmed: churn has not been observed
+on the accounts in scope (PB-10), and the 14-day window is itself unconfirmed.
 Override: none. A change forced by a tracking fix is recorded as a decision with its own review
 date, following the post-tracking-fix protocol in SKILL.md.
 
@@ -294,31 +304,49 @@ Override: a Search campaign with a deliberate campaign-level goal set, recorded 
 
 ### 3.2 Which goal categories are biddable
 
-**`campaign_conversion_goal.biddable` / `customer_conversion_goal.biddable`**, standard: lead categories only, red flag if a non-lead category is biddable on a live campaign
+**`campaign_conversion_goal.biddable` / `customer_conversion_goal.biddable`**, standard: lead
+categories only, config item if a non-lead category is biddable on a live campaign
 
-Biddable: the website default lead category, contact, phone call lead from call-from-ads, and lead
-form submission. Not biddable: page view, downloads, directions, store or hosted engagement,
-YouTube engagement and follow-on views.
+**Ebook and guide downloads are a LEAD category here, by standing operator ruling.** They are
+biddable, they are primary, and they are never a demotion candidate. The ads sell the ebooks and the
+nurture funnel behind them produces clients. Any recommendation to make a download category
+non-biddable is wrong on its face, whatever its volume or its Google-side category label. This
+applies equally to the CRM-native and the tag-manager or analytics versions of the same event.
 
-A page-view or content-download category left biddable trains the bid algorithm on people who
-downloaded a guide, not people who asked for a consultation. In a firm with a content library, that
-population is large enough to dominate the signal, and the resulting CPL looks excellent while the
-intake sees nothing.
+Biddable: the website default lead category, contact, phone call lead from call-from-ads, lead form
+submission, and ebook or guide download. Not biddable by default: generic page view, directions,
+store or hosted engagement, and video engagement or follow-on views. (unconfirmed as a category
+list; only the ebook ruling is operator-confirmed.)
+
+A generic page-view category left biddable trains the bid algorithm on browsing rather than on
+intake. That is a real risk, and it is a different thing from an ebook download, which the firm
+treats as a lead.
 
 Override: a category deliberately included for a specific test, recorded with the review date.
 
 **Note:** the API omits `biddable` entirely when it is not true, rather than returning `false`.
 Absence is the negative case; do not read an omitted field as missing data.
 
-### 3.3 Primary versus secondary actions (PROPOSED at account level)
+### 3.3 Primary versus secondary actions
 
-**`conversion_action.include_in_conversions_metric`**, proposed standard: `true` only on actions
-that represent a real intake event, config item where content or engagement actions are primary
-Every primary action is added into the headline "conversions" number and into the bid model. Ebook
-downloads, guide requests, and page views counted as primary do two things at once: they inflate
-the conversion count the client sees and they teach the algorithm to buy that traffic.
-Override: an account whose intake genuinely treats a content event as a lead, recorded with the
-reasoning, or a legacy set scheduled for cleanup with a date.
+**`conversion_action.include_in_conversions_metric`**, standard: `true` on true lead actions only
+(forms, calls, ebook and guide downloads), config item where a generic engagement action is primary.
+Operator ruling, 2026-09-02.
+
+**Ebook and guide downloads are PRIMARY, by standing operator ruling.** They count in the headline
+conversions number and they train the bid model, deliberately. They are never demoted to secondary,
+never excluded, and never discounted. The operator ranks them above phone calls.
+
+The residual risk this entry covers is a generic engagement or page-view action left primary: a
+scroll depth, a navigation event, a directions click. Those inflate the count without representing
+intake, and they are secondary.
+
+Demotion of a duplicate lead action requires per-lead matching showing that two primaries fire on
+the same lead. Matching totals or similar decimal tails are at most a prompt to go and look, never
+evidence and never grounds to demote (PB-23).
+
+Override: an account whose intake genuinely treats a specific engagement event as a lead, recorded
+with the reasoning, or a legacy set scheduled for cleanup with a date.
 
 ### 3.4 Counting type (STANDARD, confirmed 2026-08-18)
 
@@ -343,20 +371,21 @@ Call-from-ads and click-to-call actions are expected to exist and to be primary;
 and website contact actions likewise. A live account with no call conversion action is a red flag,
 since phone is the dominant intake path in legal.
 
-### 3.6 Attribution (PROPOSED)
+### 3.6 Attribution
 
-**`conversion_action.attribution_model_settings.attribution_model`**, proposed standard: data-driven where volume supports it, last-click otherwise, info
+**`conversion_action.attribution_model_settings.attribution_model`**, standard: data-driven where Google offers it for the action, last-click otherwise, info only
 Position-based attribution is unusual for legal and worth a question. The model matters less than
 its consistency: a mixed set of models across actions makes campaign comparison meaningless.
 Override: any model with a stated reason.
 
 ### 3.7 Analytics-imported actions
 
-**`conversion_action.origin` / `.type` = `GOOGLE_ANALYTICS_4_CUSTOM`**, standard: imported actions
-exist but are secondary unless they are the lead event itself, config item where imported events
-are primary in bulk
-An imported analytics event is one step further from the intake record than a native action, and
-imported event sets tend to arrive wholesale.
+**`conversion_action.origin` / `.type` = `GOOGLE_ANALYTICS_4_CUSTOM`**, standard: an imported
+analytics action is secondary only where a native action is the canonical lead record, config item
+where imported events are primary in bulk with a native canonical action already in place
+Origin is not a defect signal. An imported event that is the firm's lead record is primary,
+including the GA4 or tag-manager version of the ebook event. What this entry catches is a wholesale
+imported set sitting primary alongside the native action that already records the lead.
 Override: an account where the analytics event is the canonical lead record, recorded as such.
 
 ### 3.8 Duplicate lead actions
@@ -381,20 +410,22 @@ low volume is the designed behaviour, and that belongs in the account's rules.
 
 ## 4. Negative keyword lists
 
-### 4.1 Account-level shared list: naming PROPOSED
+### 4.1 Account-level shared list
 
-**`shared_set` where `type = NEGATIVE_KEYWORDS`**, standard: at least one account-level shared
-negative list exists, red flag if none exists
-No shared negative list is the clearest single sign of an unmanaged account. Category-level waste
-in legal (job seekers, DIY and self-help, free and pro bono, salary and career queries, unrelated
-practice areas) recurs across every campaign, so it belongs at account scope.
-Proposed naming: one canonical list per account under a fixed name so it is identifiable across
-accounts without opening each one.
+**`shared_set` where `type = NEGATIVE_KEYWORDS`**, standard: an account-level shared negative list
+where the account's own search-term data supports one, config item if none exists
+
+The absence of a shared list is a config item at most, never a red flag. Treating it as a red flag
+conflicts with two standing positions: the operator's not-waste list, which several of the usual
+blanket categories would catch, and the outcome in which proposed blanket negatives were rejected.
+Category-level waste that recurs across every campaign does belong at account scope, but the
+categories are derived from the account's own search-term data, never from a template, and every
+candidate is checked against the not-waste list before it ships.
 Override: none.
 
-### 4.2 Attachment (PROPOSED)
+### 4.2 Attachment
 
-**`campaign_shared_set`**, proposed standard: every serving campaign references the account-level
+**`campaign_shared_set`**, standard: every serving campaign references the account-level
 list, config item where a serving campaign references none
 A list that exists but is attached to nothing blocks nothing. This is worth checking on every newly
 built campaign, which is where the gap normally appears.
@@ -476,12 +507,10 @@ constraints: no competitor names, no superlatives, no services the ad does not n
 list is per-account, since state bar rules differ; the requirement that it is not empty is not.
 Override: none. An empty guideline set on a live PMax campaign is always worth a line.
 
-### 5.6 Devices (PROPOSED)
+### 5.6 Devices
 
-**`campaign_criterion` where `type = DEVICE`**, proposed standard: leave as delivered, info
-Connected TV appears as a positive device on PMax by default. No decision exists on whether to
-exclude it for law firms.
-Override: any deliberate device exclusion, recorded.
+Retired 2026-09. "Leave as delivered" is not a tactic, so there is no baseline entry here. Section
+numbers are not reused.
 
 ### 5.7 Campaign-level brand exclusions
 
@@ -526,8 +555,9 @@ Override: a deliberately unsignalled test.
 **`ad_group_criterion.keyword.match_type`**, standard: `PHRASE` and `EXACT`, config item on any
 `BROAD` outside a named test structure
 The argument for broad match is that it captures intent beyond the literal keyword. In legal the
-cost of the miss is $40 to $100 a click, and adjacent-looking queries routinely carry entirely
-different intent. Phrase and exact are the defaults roughly 99% of the time.
+cost of the miss is high and adjacent-looking queries routinely carry entirely different intent.
+Phrase and exact are the defaults. Broad is not banned: it is tested deliberately in an isolated
+structure, with the PB-11 remediation path ready.
 Override: broad match isolated in single-keyword ad groups for a recorded test, monitored.
 
 **Remediation note:** a broad keyword that is both wasteful and a major conversion source converts
@@ -548,53 +578,48 @@ Override: none.
 firm's name fill the gap, and non-brand CPL usually rises. Reduce brand spend rather than
 eliminating it, and check conversion volume reliability before either.
 
-### 6.3 Dynamic Search Ads (PROPOSED)
+### 6.3 Dynamic Search Ads
 
-**`campaign.dynamic_search_ads_setting.domain_name`**, proposed standard: not used, config item if
-a DSA setting is present
-DSA generates headlines and targeting from site content. On a law firm site that content includes
-blog posts, attorney bios, and practice areas the campaign is not about.
-Override: a DSA campaign restricted to a specific page set with `use_supplied_urls_only = true`,
-recorded.
+Retired 2026-09. "Not used" was inference from absence rather than a tactic, so there is no baseline
+entry here. Section numbers are not reused.
 
-### 6.4 Responsive search ads (PROPOSED count)
+### 6.4 Responsive search ads
 
-**`ad_group_ad`, `ad_group_ad.ad_strength`**, proposed standard: 2 to 3 RSAs per ad group, config
-item outside that range
-One RSA gives nothing to compare. Five gives no ad enough impressions to prove itself in a
-low-volume account.
+**`ad_group_ad`, `ad_group_ad.ad_strength`**, standard: at least two responsive search ads per ad
+group, ideally three, potentially more; config item where an ad group carries fewer than two
+One RSA gives nothing to compare. Operator ruling, 2026-09-02.
 Ad strength itself is a Google heuristic, not a performance measure. `POOR` is a config item worth
 a line, never a red flag on its own.
 Override: a single-ad group during a deliberate creative reset.
 
-### 6.5 Ad assets (PROPOSED minimums)
+### 6.5 Ad assets
 
-**`campaign_asset`, `ad_group_asset`**, proposed standard: sitelinks, callouts, structured
-snippets, and a call asset present on every serving Search campaign, config item where a type is
-missing
-Assets raise the ad's real estate and its Ad Rank inputs at no additional cost per click, and the
+**`campaign_asset`, `ad_group_asset`**, standard: sitelinks, callouts, structured snippets, and a
+call asset present on every serving Search campaign, config item where a type is missing. No
+minimum count is set for any type.
+Assets raise the ad's space on the results page and its Ad Rank inputs at no additional cost per click, and the
 call asset is the direct path for the intake channel that matters most in legal.
 Override: a campaign where an asset type is deliberately withheld, recorded.
 
 **v23 note:** `campaign_asset` has no `policy_summary`. Asset approval at campaign level is read
 from `campaign_asset.primary_status` and `.primary_status_reasons` only.
 
-### 6.6 Ad schedule (PROPOSED)
+### 6.6 Ad schedule
 
-**`campaign_criterion` where `type = AD_SCHEDULE`**, proposed standard: none, on smart bidding, info
-Smart bidding already models time of day. A hand-built schedule on top of it removes hours the
-algorithm would have bought profitably, and legal intent runs late into the evening.
-Override: a firm with a genuine coverage constraint, such as no after-hours intake at all,
-recorded with the hours.
+**`campaign_criterion` where `type = AD_SCHEDULE`**, no standard, info only
+There is no rule here. A schedule is sometimes set on purpose. Smart bidding already models time of
+day, and a hand-built schedule on top of it can remove hours the algorithm would have bought
+profitably, so a schedule that is present gets noted with its reason. It is never a finding.
+Operator ruling, 2026-09-02.
+Override: not applicable; there is nothing to deviate from.
 
-### 6.7 Device bid adjustments (PROPOSED)
+### 6.7 Device bid adjustments
 
-**`campaign_criterion` where `type = DEVICE`, bid modifier**, proposed standard: none, on smart
-bidding, info
-Device modifiers on a smart bidding campaign are mostly inert, and where they are not, they
-override a model with a guess. Mobile is where most legal calls originate; a negative mobile
-modifier is worth a question wherever it appears.
-Override: recorded, with the reason.
+**`campaign_criterion` where `type = DEVICE`, bid modifier**, no standard, info only
+There is no rule here. A modifier is sometimes set on purpose. Note any modifier that is present
+with its reason; it is never a finding. Mobile is where most legal calls originate, so a negative
+mobile modifier is worth a question wherever it appears. Operator ruling, 2026-09-02.
+Override: not applicable; there is nothing to deviate from.
 
 ### 6.8 Quality Score components
 
@@ -615,8 +640,10 @@ Override: none.
 auto-applied changes in the window, red flag on any auto-applied change to keywords, match types,
 budgets, bidding, or targeting
 Auto-apply lets Google make the changes Google's incentives favour, most often broad match
-expansion and budget increases, without review. A long auto-applied list is a finding regardless of
-whether the individual changes look harmless, because it means the account is not being managed.
+expansion and budget increases, without review. An auto-applied change is generally a red flag and
+every one of them is checked, individually, against the account. A long auto-applied list is a
+finding regardless of whether the individual changes look harmless, because it means the account is
+not being managed. Operator ruling, 2026-09-02.
 Override: a specific recommendation type deliberately left on, recorded by name.
 
 > **Blind spot.** The auto-apply _setting_ is not exposed by the API. Zero auto-applied changes in
@@ -637,10 +664,10 @@ majority of the intake.
 Override: an account where a third-party call tracker owns call measurement end to end, recorded,
 with the tracker named.
 
-### 7.4 Enhanced conversions for leads (PROPOSED)
+### 7.4 Enhanced conversions for leads
 
-**`customer.conversion_tracking_setting.enhanced_conversions_for_leads_enabled`**, proposed
-standard `true`, config item if `false`
+**`customer.conversion_tracking_setting.enhanced_conversions_for_leads_enabled`**, standard
+`true`, config item if `false`
 Enhanced conversions for leads hashes first-party contact data from form submissions and matches it
 back, which recovers attribution that cookie loss otherwise destroys.
 Override: a firm that has declined data-terms acceptance, recorded.
@@ -654,8 +681,8 @@ Override: none.
 
 ### 7.6 Linked properties
 
-Standard: GA4 linked, and conversion imports arriving from it where the intake is measured there.
-Business Profile and Search Console linkage: PROPOSED.
+Standard: GA4, Business Profile and Search Console all linked, with conversion imports arriving
+from GA4 where the intake is measured there. A missing link is info.
 Not directly readable as a link list in a single GAQL query; the practical signal is the presence of
 conversion actions whose type is a GA4 custom event, and location assets whose source is the
 Business Profile.
@@ -679,8 +706,8 @@ An override is a journal entry, not an edit to this file. This file holds what t
 journal holds what a given account does differently and why.
 
 **How an override is established.** An override exists only when it is a recorded journal entry
-(Toby version: a `rule` carrying the `config-override` tag) or, in the public version, an entry in
-the example overrides file (`account-notes/example-family-law.md`). A user asserting mid-check
+(operator version: a recorded rule carrying the `config-override` tag) or, in the public version, an
+entry in the example overrides file. A user asserting mid-check
 "that's deliberate" does not create an override. The check reports the DEVIATION and notes
 "operator states deliberate; record an override to clear".
 

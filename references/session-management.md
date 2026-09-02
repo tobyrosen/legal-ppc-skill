@@ -1,6 +1,6 @@
-# Session Management _(Toby version only)_
+# Session management _(operator version only)_
 
-This file is for the internal Toby version of the skill. Public version users do not need this file.
+This file describes the operator-version session record. It is not needed to run the tactics in this skill.
 
 ---
 

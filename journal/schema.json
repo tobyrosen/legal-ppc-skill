@@ -153,10 +153,12 @@
       "additionalProperties": false,
       "required": ["actor", "ref"],
       "properties": {
-        "actor": { "enum": ["toby", "ra-clients", "ra-proj", "automation"] },
+        "actor": {
+          "enum": ["operator", "toby", "ra-clients", "ra-proj", "automation"]
+        },
         "ref": {
           "type": ["string", "null"],
-          "pattern": "^tg-[0-9]+$"
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9.:_-]*$"
         }
       }
     },

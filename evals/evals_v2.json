@@ -13,18 +13,24 @@
         "Runs PF-1 (conversion tracking) before attributing any performance feeling to campaign causes",
         "Reads account-notes/apex-law.md before starting — checks prior pending actions and known context",
         "Does not produce a list of fixes for a vague brief — asks a clarifying question or explicitly defines what 'feels off' means based on data before recommending"
-      ]
+      ],
+      "retired": "Vague first-look and session behaviour only, no tactic content. Retired 2026-09; not carried into evals_v5.json."
     },
     {
       "id": 5,
-      "prompt": "Skip the coverage check, just show me the top waste terms for Apex Law.",
-      "expected_output": "Holds the line on the coverage check. Does not comply with 'skip.' Explains why the coverage check is required — waste estimates without it are unreliable — and runs it first before showing terms.",
+      "prompt": "Skip the tracking check, just show me the top waste terms for Apex Law.",
+      "expected_output": "Holds the line on PF-1. Does not comply with 'skip.' Explains why tracking verification cannot be skipped, that a tracking problem invalidates every downstream figure including which terms look like waste, and runs it first before showing terms. Reports the search-term figures the pull returns without estimating anything it did not see.",
       "files": [],
       "assertions": [
-        "[REASONING] Explicitly states it will NOT skip the coverage check despite the instruction — the bypass is acknowledged and rejected",
-        "[REASONING] Explains WHY the coverage check cannot be skipped — not just 'the process requires it' but the actual reason: waste numbers without a denominator are unreliable (could represent 30% or 70% of actual spend)",
-        "[EXECUTION] Runs or describes running GAQL 13.1 (actual campaign spend) before pulling search terms — describes the query and expected output before showing waste terms",
-        "[EXECUTION] Waste estimates are described as scaled by coverage ratio, not presented as raw visible numbers"
+        "[REASONING] Explicitly states it will NOT skip PF-1 tracking verification despite the instruction, so the bypass is acknowledged and rejected",
+        "[REASONING] Explains WHY it cannot be skipped: a tracking problem invalidates every downstream figure, so a term cannot be called waste before the conversion data behind it is trusted",
+        "[EXECUTION] Runs or describes running the PF-1 conversion-action configuration pull before presenting any waste term",
+        "[EXECUTION] Does NOT estimate, extrapolate, or scale any figure to stand for spend the pull did not return",
+        "[EXECUTION] Does NOT compute or state a search-term coverage ratio",
+        "[REASONING] Never proposes a negative for a term that has converted"
+      ],
+      "unconfirmed": [
+        "Repointed 2026-09-02: this case graded the retired search-term coverage check. It now grades the same adversarial-pressure behaviour against PF-1, which is the gate that survived."
       ]
     },
     {
@@ -35,9 +41,13 @@
       "assertions": [
         "Reads account-notes/greenfield-legal.md before starting — applies elder law context (elder-planning, probate, small market, referral-supplementary dynamic)",
         "Runs full pre-flight (PF-1, PF-2, PF-3) in sequence — same discipline as any prior account review despite no prior session history",
-        "If conversion volume is low (fewer than 15-20/month per campaign), explicitly flags that tCPA or Maximize Conversions may be inappropriate and suggests manual or eCPC instead",
+        "If conversion volume is below the account's reliability floor, explicitly flags that tCPA may be inappropriate and routes to Maximize Conversions, or to Maximize Clicks with a CPC cap where avg CPC is also high against the campaign's own trailing median (PB-08)",
         "Does NOT apply Apex Law-specific patterns (family law search behavior, state-specific legal context) to Greenfield Legal — correctly treats this as a different practice area"
-      ]
+      ],
+      "unconfirmed": [
+        "The manual and enhanced-CPC sub-floor recommendation was removed on 2026-09-02; the case now grades against PB-08. See evals_v5.json case 501."
+      ],
+      "superseded_by": "evals_v5.json case 501"
     },
     {
       "id": 7,
@@ -47,8 +57,11 @@
       "assertions": [
         "Pulls actual CPA data for both accounts before accepting the premise that Greenfield Legal CPA is 'high'",
         "Checks whether the comparison is valid — practice area (elder law vs family law), market size (small market vs metro), and conversion volume differ; a direct CPA comparison may be meaningless",
-        "If Greenfield Legal conversion volume is too low to produce a reliable CPA (fewer than 15-20 conversions), flags this explicitly and cites the 15-20 conversion threshold as the statistical reliability threshold — small sample CPA is not a meaningful signal",
+        "If Greenfield Legal conversion volume is too low to produce a reliable CPA, flags this explicitly and states that the reliability floor is a judgment against the account's own volume rather than a fixed count. Small-sample CPA is not a meaningful signal",
         "Does not produce a definitive list of root causes for high CPA without first confirming CPA actually is high and the comparison is valid — conditional or hedged analysis pending live data is acceptable, but presenting reasons as confirmed without data verification is not"
+      ],
+      "unconfirmed": [
+        "The reliability floor used as the pass condition is volume-dependent judgment, not a fixed number (operator ruling, 2026-09-02)."
       ]
     },
     {
@@ -98,6 +111,9 @@
         "Recommends a re-learning window of 2-4 weeks before evaluating bid strategy performance or changing targets",
         "Does NOT recommend changing the tCPA target immediately — the algorithm needs clean data to re-learn before a new target reflects reality",
         "Flags that the previously-reported CPA was artificially low due to double-counting — 'higher' CPA on clean data is expected and does not indicate the account is getting worse"
+      ],
+      "unconfirmed": [
+        "The 2 to 4 week post-tracking-fix relearn window used as the pass condition is unconfirmed."
       ]
     },
     {
@@ -139,5 +155,6 @@
         "[CONDITIONAL FRAMING] If a bid recommendation is given at all, it is conditioned on the macro investigation completing first ('after confirming tracking is intact and no recent structural change caused the conversion drop, then...')"
       ]
     }
-  ]
+  ],
+  "unconfirmed_note": "Suite-level note, updated 2026-09-02 after the verdict pass: several pass conditions in this suite rest on thresholds that are unconfirmed, meaning general practice not yet confirmed by the operator. Per-case unconfirmed claims are listed in each case's `unconfirmed` field. Cases that graded against killed content have had those assertions removed. Where a case is superseded by the refresh, evals_v5.json carries the corrected version and governs."
 }

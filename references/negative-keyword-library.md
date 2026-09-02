@@ -1,12 +1,19 @@
-# Negative Keyword Library — Legal PPC
+# Negative keyword library: legal PPC
 
-Master reference for negative keywords in law firm Google Ads accounts. Organized by category and scope.
+Candidate negative-keyword patterns for family, immigration, and elder law Google Ads accounts, organized by category and scope.
+
+**Nothing in this file is a blanket list.** Every section below is `unconfirmed`: it is general practice, not a house tactic confirmed by the operator. Two rules override every category here, in every account:
+
+1. **The operator's not-waste list wins.** The terms named in SKILL.md "Search terms that are NOT waste" are never negated, whatever category in this file would catch them. That list includes free-consultation variants, cheap divorce, uncontested divorce online, child support calculator, divorce mediator, how long does a divorce take, how to file for divorce without a lawyer, family law attorney jobs, divorce therapist, child support office, pay child support online, medicaid office phone number, and nursing homes near me.
+2. **Never negate a term that has converted.** Check the term's own conversion data before excluding it. A converting term is a client, not waste.
+
+**This library seeds new campaigns. It is never applied to a live account.** On a live account, every negative comes from that account's own search terms, checked against the not-waste list above and against the term's own conversion record. Add at the narrowest sufficient scope. Do not paste a section wholesale onto anything.
 
 ## How to Use This Library
 
-**Account-level shared list:** Apply universal categories (sections 1–4) to every account via a shared negative keyword list. These block traffic that is irrelevant regardless of practice area or market.
+**Account-level shared list.** Sections 1 to 4 are candidate categories. Whether an account needs a shared list at all, and which categories belong in it, is decided against that account's own search-term data. The absence of a shared list is not a red flag on its own.
 
-**Campaign-level negatives:** Apply practice area cross-exclusions (section 5) at the campaign level. A family law campaign excludes personal injury terms; a criminal defense campaign excludes family law terms. These are not universal — they depend on what the firm does.
+**Campaign-level negatives.** Apply the practice-area cross-exclusions in section 5 at the campaign level, and only for practice areas the firm demonstrably does not handle. Never cross-exclude family, immigration, or elder work from one another without confirming the firm does not take those matters: a firm running all three would be blocking its own clients.
 
 **Ad group-level negatives:** Narrow exclusions specific to one ad group's keyword theme. Not covered here — these are account-specific and determined through search term review.
 
@@ -16,13 +23,17 @@ Master reference for negative keywords in law firm Google Ads accounts. Organize
 
 ## Section 1 — Price & Affordability Signals
 
-These block users signaling they cannot afford legal services or are explicitly seeking free/reduced-cost options. These users rarely convert to paying clients.
+Price and affordability signals split two ways, and the split is ruled, not inferred.
+
+**Confirmed waste:** free divorce lawyer, pro bono divorce lawyer, legal aid divorce, free divorce papers, divorce lawyer salary, free elder law attorney, free will template, elder law attorney salary.
+
+**Money terms, never negated:** free consultation variants, cheap divorce, uncontested divorce online, child support calculator, divorce mediator, how long does a divorce take.
+
+That price and affordability searchers rarely convert to paying clients is a general claim, not a measured result on these accounts. Check every candidate against the ruling above and against the term's own conversion data before negating it.
 
 ### Broad Match (use cautiously — review for collateral blocking)
 
 ```text
-free
-cheap
 quick
 legal aid
 pro bono
@@ -30,33 +41,31 @@ assistance
 easy
 fast
 diy
-fees
-cost
-afford
 aid
 loan
 low cost
 ```
 
+`free`, `cheap`, `cost`, `fees` and `afford` are deliberately absent: as broad negatives they catch
+free consultation and cheap divorce, which are ruled money terms.
+
 ### Phrase Match
 
 ```text
-"afford"
 "aid"
 "assistance"
-"cheap"
-"cost"
 "diy"
 "easy"
 "fast"
-"fees"
-"free"
 "legal aid"
 "loan"
 "low cost"
 "pro bono"
 "quick"
 ```
+
+Same reason: `"afford"`, `"cheap"`, `"cost"`, `"fees"` and `"free"` are not on the phrase list.
+The named confirmed-waste strings above are negated as written, not as bare words.
 
 ### Exact Match
 
@@ -84,13 +93,11 @@ low cost
 
 ## Section 2 — Employment & Career Signals
 
-These block job seekers, law students, and people researching legal careers — not legal services clients.
+Candidates for blocking job seekers, law students, and people researching legal careers. Not wholesale: the operator has ruled `family law attorney jobs` explicitly NOT waste, so an attorney-jobs query is not automatically a job seeker. `attorney jobs` and `lawyer jobs` are therefore absent from both lists below. Retain only the job-seeker patterns proven in the account's own search-term data.
 
 ### Phrase Match
 
 ```text
-"attorney jobs"
-"lawyer jobs"
 "legal jobs"
 "paralegal jobs"
 "law clerk"
@@ -120,8 +127,6 @@ These block job seekers, law students, and people researching legal careers — 
 [bar exam]
 [paralegal]
 [law clerk]
-[attorney jobs]
-[lawyer jobs]
 [law degree]
 ```
 
@@ -129,12 +134,13 @@ These block job seekers, law students, and people researching legal careers — 
 
 ## Section 3 — Self-Help & DIY Legal Resources
 
-These block people seeking to represent themselves or find forms — they are not looking to hire an attorney.
+Candidates for blocking people seeking forms or self-representation. Procedural family, immigration, and elder queries are frequently real prospects in these practice areas.
+
+Four strings are deliberately absent from the list below. `how to file` and `without a lawyer` both block `how to file for divorce without a lawyer`, which is a ruled not-waste term. `free consultation` and `free case review` are money terms and belong as keywords, not negatives. Do not apply this section wholesale.
 
 ### Phrase Match
 
 ```text
-"how to file"
 "how to represent"
 "self represent"
 "pro se"
@@ -146,7 +152,6 @@ These block people seeking to represent themselves or find forms — they are no
 "legal documents"
 "do it yourself"
 "represent myself"
-"without a lawyer"
 "without an attorney"
 "without hiring"
 "legal advice"
@@ -154,19 +159,15 @@ These block people seeking to represent themselves or find forms — they are no
 "online legal"
 "legal aid society"
 "free legal"
-"free consultation"
-"free case review"
 "free attorney"
 "free lawyer"
 ```
-
-**Note on "free consultation" and "free case review":** These are double-edged — some firms lead with free consultations as a CTA, and blocking these terms may reduce qualified traffic. Evaluate per account. If the firm offers a free consult, remove these from the negative list and use them as keywords instead.
 
 ---
 
 ## Section 4 — Research & Informational Intent
 
-These block early-stage research queries that are unlikely to convert. Use phrase match only — exact match is too narrow, and broad match risks catching too much.
+Candidates only. Blanket informational negatives conflict with the long-consideration reality of these practice areas: informational queries can be genuine top-of-funnel here and have been observed converting. `how long does` is absent from the list below because it blocks `how long does a divorce take`, a ruled money term. Check whether every remaining pattern converts in this account before negating it. Use phrase match; exact is too narrow and broad risks catching too much.
 
 ### Phrase Match
 
@@ -176,7 +177,6 @@ These block early-stage research queries that are unlikely to convert. Use phras
 "what does"
 "what are"
 "how does"
-"how long does"
 "how much does"
 "what happens"
 "can i"
@@ -203,90 +203,58 @@ These block early-stage research queries that are unlikely to convert. Use phras
 
 ---
 
-## Section 5 — Practice Area Cross-Exclusions
+## Section 5: practice-area cross-exclusions
 
-Apply at the campaign level, not account-level. These prevent a family law campaign from triggering on criminal defense queries and vice versa.
+Apply at campaign level, never account level, and only for practice areas the firm demonstrably does not handle. Confirm the firm's actual practice list before applying any of it. The default is no cross-exclusion unless the firm has declined the work, and that default is operator-confirmed.
 
-### For Family Law Campaigns — Exclude These Practice Areas
+**Family, immigration, and elder work are never cross-excluded from one another by default.** All three are in scope for this skill, and a firm may run any combination of them. Excluding immigration terms from a family campaign, or estate and probate terms from an elder campaign, blocks the firm's own clients unless the firm has confirmed it does not take that work. Estate planning, wills, trusts, and probate overlap elder law and stay in scope.
+
+### For a family law campaign, where the firm does not handle these areas
 
 ```text
-"criminal"
-"criminal defense"
-"criminal lawyer"
-"criminal attorney"
-"DUI"
-"DWI"
-"drug charge"
-"personal injury"
-"car accident"
-"slip and fall"
-"workers comp"
-"workers compensation"
-"immigration"
-"visa"
-"green card"
-"bankruptcy"
-"chapter 7"
-"chapter 13"
 "estate planning"
 "will"
 "trust"
 "probate"
-"real estate"
-"business law"
-"employment law"
-"wrongful termination"
 ```
 
-### For Criminal Defense Campaigns — Exclude These Practice Areas
+Apply only where the firm has confirmed it does not take estate or probate matters. If it runs an elder practice, these belong as keywords in that campaign, not as negatives here.
+
+### For an elder law campaign, where the firm does not handle these areas
 
 ```text
 "divorce"
 "custody"
 "child support"
 "alimony"
-"family law"
-"personal injury"
-"car accident"
-"immigration"
-"bankruptcy"
-"estate"
-"probate"
 ```
 
-### For Personal Injury Campaigns — Exclude These Practice Areas
+Same condition: apply only where the firm has confirmed it does not take family matters.
 
-```text
-"divorce"
-"custody"
-"criminal"
-"DUI"
-"immigration"
-"bankruptcy"
-"employment"
-```
+### For an immigration campaign
 
-**Note:** These cross-exclusion lists should be customized based on what the firm actually handles. A firm that does both family law and criminal defense should NOT cross-exclude those from each other. Review against the firm's actual practice areas before applying.
+No cross-exclusion set is recorded. Immigration has no vertical-specific tactics encoded yet, so build this from the account's own search-term data rather than from a template.
+
+**Rule.** A cross-exclusion list is derived from what the firm declines, not from a template. Verify the firm declines a category before negating it, and never negate a term the account has converted on.
 
 ---
 
-## Section 6 — Geography Exclusions
+## Section 6: geography exclusions
 
-Managed at the campaign targeting settings level, not as keyword negatives — but listed here for reference. For accounts where geographic keywords appear in search terms from outside the target market, add location modifiers as negatives at the campaign level.
+Managed at the campaign targeting level first. Where out-of-area queries persist in search terms, add the geo token as a campaign negative.
 
-Examples (apply as phrase match, customized to account):
+**Negate the geo token only, never the service term.** Decompose the query first: for a city-mismatched query shaped `[core service term] [wrong city]`, negate the wrong city, so the campaign keeps serving the service term in its real geography. Negating whole city-plus-service phrases blocks the core service phrase and is the failure mode this rule exists to prevent.
 
 ```text
-"[competing city] attorney"
-"[out-of-state] lawyer"
-"[wrong jurisdiction] divorce"
+"[wrong city]"
+"[out-of-state locality]"
 ```
 
-These are account-specific and cannot be standardized here. Identify via the geographic performance report and search term analysis.
+These are account-specific and cannot be standardized here. Identify them from the geographic performance report and search-term analysis.
 
 ---
 
-## Maintenance Notes
+## Maintenance
 
 - **Review search terms monthly** (or at each optimization session) and add new negatives discovered in search term reports. The library above is a starting point, not a complete list.
 - **Date-stamp significant additions.** When adding a batch of negatives after a search term review, note the date in account records so future managers know when the list was last reviewed.

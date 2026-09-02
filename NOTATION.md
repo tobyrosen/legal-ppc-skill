@@ -5,8 +5,8 @@ every meaningful event is one small machine-readable entry; every decision carri
 expectation and a review date; outcomes are scored against expectations later. Human-readable
 notes are RENDERED from the journal, never hand-written.
 
-Decided with Toby 2026-08-10 (tg-15576..15580). Owner: ra-proj (methodology).
-Daily writer: ra-clients (during PPC checks, per the locked legal-ppc-skill flow).
+Notation standard for the journal. Owned by the methodology maintainer; written during each
+recurring check.
 
 ---
 
@@ -58,7 +58,10 @@ One JSON object per line. Required: `id`, `ts`, `account`, `platform`, `type`, `
 - `re` — array of entry ids this entry refers to (outcome → its decision; superseding entry → superseded).
 - `verdict` — on outcome: `met | not_met | mixed | unclear`.
 - `config_override` — on a `rule` only: `{setting, account_value, agency_default, applies_to?}`. Records a deliberate departure from `references/agency-defaults.md`. See §8.
-- `source` — `{actor: toby | ra-clients | ra-proj | automation, ref}` (`ref` = tg-NNNN or null). Decisions are Toby's unless recorded otherwise.
+- `source`: `{actor, ref}`. `actor` is the party the entry came from, and the schema accepts exactly five
+  values: `operator`, `toby`, `ra-clients`, `ra-proj`, `automation`. `ref` is an optional external reference
+  id, or null. A ref is a generic identifier: letters, digits, dot, colon, underscore and hyphen, starting
+  with a letter or digit. Decisions belong to the operator unless recorded otherwise.
 - `session` — check id, `YYYY-MM-DD-<slug>` (matches the rendered session-log filename).
 - `migrated` — `true` only on backfilled entries parsed from the legacy md ledgers.
 
@@ -68,7 +71,7 @@ Every `decision`/`change` names what we expect and when to look. `journal.py due
 lists open entries with `review_by <= today` — a mandatory step at the top of every PPC
 check. The check then appends `outcome` entries with honest verdicts. Over time
 `journal.py` can answer: budget raises at budget-lost >50% — how often did CPL hold?
-That is the tuning database Toby asked for.
+That is the tuning database this standard exists to build.
 
 ## 5. Check workflow (ra-clients, every check)
 
@@ -76,12 +79,12 @@ That is the tuning database Toby asked for.
 2. Run the check per SKILL.md (unchanged).
 3. Append entries as events happen (`obs`/`flag`/`decision`/`change`/`outcome`).
 4. `journal.py render <slug>` — regenerate notes + session log. `journal.py validate` must pass.
-5. Off-runbook surprises still escalate to ra-proj/Toby per the ra-clients charter.
+5. Off-runbook surprises still escalate to the operator.
 
 ## 6. Source of truth / copy sync (closes the two-copy problem)
 
 - **Data lives in exactly one place:** `$PPC_JOURNAL_ROOT/` (journal + rendered views). Skill copies carry NO account data.
-- **Canonical method copy:** `RA-Projects/legal-ai-ecosystem/legal-ppc-skill/`. Verified 2026-08-10: `~/.claude/skills/google-ads-analysis` is a SYMLINK to the canonical dir — there is exactly one physical copy; edits to canonical are live immediately. If the symlink is ever replaced by a real copy, restore the symlink rather than maintaining two files. (`$PPC_JOURNAL_ROOT/google-ads-analysis{,.plugin}` are historical Mar/Apr research artifacts, not live copies.)
+- **Canonical method copy:** one physical copy of this skill, with the runtime skill directory a symlink to it. If the symlink is ever replaced by a real copy, restore the symlink rather than maintaining two files.
 - `vocab.json` exists in two places by design: the runtime copy at `$PPC_JOURNAL_ROOT/journal/vocab.json` is what `journal.py` validates against (bundled skill copy is the fallback). When editing the vocabulary, edit the bundled canonical copy and sync to the runtime copy — keep them byte-identical.
 - Legacy `account-notes/` + `session-logs/` under the skill copies are frozen after backfill: contents migrated into the journals, each dir left with a `POINTER.md` naming the new locations. Legacy files are kept (history), never updated again.
 
