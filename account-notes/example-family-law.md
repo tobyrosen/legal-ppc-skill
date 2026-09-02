@@ -1,4 +1,4 @@
-# Account Notes — example-family-law (SYNTHETIC EXAMPLE)
+# Account Notes: example-family-law (SYNTHETIC EXAMPLE)
 
 This file is a fully synthetic template example for the Accounts table in SKILL.md. No real firm, account ID, or performance data appears here. Copy this structure for each real account.
 
@@ -29,6 +29,6 @@ deviation._
 
 ## Context
 
-- Firm economics (source for targets — see "Target Setting" in SKILL.md): average signed-case value, lead-to-signed rate, acceptable cost per signed case.
+- Firm economics (source for targets, see "Target Setting" in SKILL.md): average signed-case value, lead-to-signed rate, acceptable cost per signed case.
 - Tracking setup notes: which conversion actions are primary, any lead-quality filtering between the CRM/call tracking and Google Ads.
 - Market priors: practice area, geography, consideration-window notes.

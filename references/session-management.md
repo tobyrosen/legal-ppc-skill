@@ -9,7 +9,7 @@ This file describes the operator-version session record. It is not needed to run
 Copy this template and fill it out at the end of every session. Save to `session-logs/YYYY-MM-DD-[account-name].md`.
 
 ```markdown
-# Session Log — [YYYY-MM-DD] — [Account Name]
+# Session Log: [YYYY-MM-DD], [Account Name]
 
 ## Brief
 
@@ -27,11 +27,11 @@ Copy this template and fill it out at the end of every session. Save to `session
 - [ ] Search term review
 - [ ] Other: \_\_\_
 
-- PF-1 conversion tracking config: [verified — primary conversion actions listed by name with a config-state verdict, e.g. "tracking clean (N primaries: <action names>)"; volume counts alone do NOT satisfy this line]
+- PF-1 conversion tracking config: [verified, primary conversion actions listed by name with a config-state verdict, e.g. "tracking clean (N primaries: <action names>)"; volume counts alone do NOT satisfy this line]
 
 ## Diagnostic Path
 
-[Ordered account of what was checked and why — not a polished narrative, just what actually happened]
+[Ordered account of what was checked and why, not a polished narrative, just what actually happened]
 
 1. [What was pulled] → [What it showed] → [What that led to]
 2. ...
@@ -60,7 +60,7 @@ Copy this template and fill it out at the end of every session. Save to `session
 
 ## Open Questions
 
-[What couldn't be resolved and why — for follow-up in next session]
+[What couldn't be resolved and why, for follow-up in next session]
 
 ## Session Observations
 
@@ -77,6 +77,6 @@ Session logs accumulate in `session-logs/`. After approximately 4–8 sessions w
 2. Identify patterns that appear in 2+ sessions and aren't already in the diagnosis trees
 3. Propose additions or revisions to the relevant skill files
 4. Review and approve before any file is updated
-5. Add validated patterns to `references/learnings.md` with the date and source session log(s)
+5. Record validated patterns in a learnings file of your own, kept outside the tracked tree, with the date and source session log(s). This step is optional and the file is yours; the skill does not ship one.
 
-This is the mechanism by which the skill improves. The model doesn't learn — the files learn.
+This is the mechanism by which the skill improves. The model doesn't learn. The files learn.

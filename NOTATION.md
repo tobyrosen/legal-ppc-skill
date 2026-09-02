@@ -1,4 +1,4 @@
-# Google Ads Notes & Notation Standard (v1.0 — 2026-08-10)
+# Google Ads Notes & Notation Standard (v1.0, 2026-08-10)
 
 The managed-account memory system for RA client ad accounts. Trading-journal model:
 every meaningful event is one small machine-readable entry; every decision carries an
@@ -12,7 +12,7 @@ recurring check.
 
 ## 1. The one rule that matters
 
-**The journal is the only write surface.** `$PPC_JOURNAL_ROOT/journal/<slug>.jsonl` —
+**The journal is the only write surface.** `$PPC_JOURNAL_ROOT/journal/<slug>.jsonl`:
 append-only JSONL, one entry per line. Account-notes and session-log markdown files are
 generated views. Nobody hand-edits a rendered file; a hand edit is drift and will be
 overwritten by the next render.
@@ -37,59 +37,59 @@ retained historical data. Which accounts those are is part of the private roster
 
 One JSON object per line. Required: `id`, `ts`, `account`, `platform`, `type`, `status`, `source`, `session`.
 
-- `id` — `<slug>-<YYYYMMDD>-<NN>` (per-account, per-day sequence). Unique per file.
-- `ts` — ISO 8601 with offset (`2026-08-10T09:15:00+07:00`).
-- `account` — account slug.
+- `id`: `<slug>-<YYYYMMDD>-<NN>` (per-account, per-day sequence). Unique per file.
+- `ts`: ISO 8601 with offset (`2026-08-10T09:15:00+07:00`).
+- `account`: account slug.
 - `platform`: `google | call-tracking | analytics | crm | site | admin | other`.
-- `type` — the event kind:
-  - `obs` — data point / observation, no action implied
-  - `flag` — anomaly raised for a decision
-  - `decision` — a call made (incl. "let it run"); **requires `expect`**
-  - `change` — a change actually applied in an account; **requires `expect`**
-  - `outcome` — scoring of an earlier decision/change; **requires `re` + `verdict`**
-  - `rule` — standing constraint ("do not re-flag this as a tracking break", "do not re-mention outages"); also carries **config overrides**, see §8
-  - `context` — background prose (vendor situations, tracker backstories)
-- `status` — `open | closed | superseded`. `rule` stays `open` until superseded. `obs`/`context` default `closed`. A `decision`/`change` stays `open` until its `outcome` entry closes it.
-- `scope` — optional `{level, ids[], names[]}`; `level` ∈ `account | campaign | ad_group | keyword | ad | budget | tracking | conversion | landing_page | audience`.
-- `tags` — array, each MUST exist in `vocab.json` (validator-enforced). Growing the vocabulary = edit vocab.json deliberately, not inline.
-- `body` — free text. One-liner for obs; as long as needed for context. Prose is welcome HERE, not in new fields.
-- `metrics` — optional `{window: {from, to}, provisional: bool, kv: {spend, conv, cpl, is_budget_lost, is_rank_lost, ...}}`. Native account currency, numbers only.
-- `expect` — on decision/change: `{statement, review_by}` (date). "Let it sit" still gets a review_by (the next check).
-- `re` — array of entry ids this entry refers to (outcome → its decision; superseding entry → superseded).
-- `verdict` — on outcome: `met | not_met | mixed | unclear`.
-- `config_override` — on a `rule` only: `{setting, account_value, agency_default, applies_to?}`. Records a deliberate departure from `references/agency-defaults.md`. See §8.
+- `type`: the event kind:
+  - `obs`: data point / observation, no action implied
+  - `flag`: anomaly raised for a decision
+  - `decision`: a call made (incl. "let it run"); **requires `expect`**
+  - `change`: a change actually applied in an account; **requires `expect`**
+  - `outcome`: scoring of an earlier decision/change; **requires `re` + `verdict`**
+  - `rule`: standing constraint ("do not re-flag this as a tracking break", "do not re-mention outages"); also carries **config overrides**, see §8
+  - `context`: background prose (vendor situations, tracker backstories)
+- `status`: `open | closed | superseded`. `rule` stays `open` until superseded. `obs`/`context` default `closed`. A `decision`/`change` stays `open` until its `outcome` entry closes it.
+- `scope`: optional `{level, ids[], names[]}`; `level` ∈ `account | campaign | ad_group | keyword | ad | budget | tracking | conversion | landing_page | audience`.
+- `tags`: array, each MUST exist in `vocab.json` (validator-enforced). Growing the vocabulary = edit vocab.json deliberately, not inline.
+- `body`: free text. One-liner for obs; as long as needed for context. Prose is welcome HERE, not in new fields.
+- `metrics`: optional `{window: {from, to}, provisional: bool, kv: {spend, conv, cpl, is_budget_lost, is_rank_lost, ...}}`. Native account currency, numbers only.
+- `expect`: on decision/change: `{statement, review_by}` (date). "Let it sit" still gets a review_by (the next check).
+- `re`: array of entry ids this entry refers to (outcome → its decision; superseding entry → superseded).
+- `verdict`: on outcome: `met | not_met | mixed | unclear`.
+- `config_override`: on a `rule` only: `{setting, account_value, agency_default, applies_to?}`. Records a deliberate departure from `references/agency-defaults.md`. See §8.
 - `source`: `{actor, ref}`. `actor` is the party the entry came from, recorded as a free-form non-empty
   string rather than a fixed list. Recommended values, offered as examples and not as an enum:
   `operator`, `agent`, `automation`. `ref` is an optional external reference id, or null. A ref is a
   generic identifier: letters, digits, dot, colon, underscore and hyphen, starting with a letter or
   digit. Decisions belong to the operator unless recorded otherwise.
-- `session` — check id, `YYYY-MM-DD-<slug>` (matches the rendered session-log filename).
-- `migrated` — `true` only on backfilled entries parsed from the legacy md ledgers.
+- `session`: check id, `YYYY-MM-DD-<slug>` (matches the rendered session-log filename).
+- `migrated`: `true` only on backfilled entries parsed from the legacy md ledgers.
 
 ## 4. The outcome loop (why this beats prose notes)
 
 Every `decision`/`change` names what we expect and when to look. `journal.py due <slug>`
-lists open entries with `review_by <= today` — a mandatory step at the top of every PPC
+lists open entries with `review_by <= today`, a mandatory step at the top of every PPC
 check. The check then appends `outcome` entries with honest verdicts. Over time
-`journal.py` can answer: budget raises at budget-lost >50% — how often did CPL hold?
+`journal.py` can answer: budget raises at budget-lost >50%, how often did CPL hold?
 That is the tuning database this standard exists to build.
 
 ## 5. Check workflow (operator, every check)
 
-1. `journal.py due <slug>` — reviews due today; carry into the check agenda.
+1. `journal.py due <slug>`: reviews due today; carry into the check agenda.
 2. Run the check per SKILL.md (unchanged).
 3. Append entries as events happen (`obs`/`flag`/`decision`/`change`/`outcome`).
-4. `journal.py render <slug>` — regenerate notes + session log. `journal.py validate` must pass.
+4. `journal.py render <slug>`: regenerate notes + session log. `journal.py validate` must pass.
 5. Off-runbook surprises still escalate to the operator.
 
 ## 6. Source of truth / copy sync (closes the two-copy problem)
 
 - **Data lives in exactly one place:** `$PPC_JOURNAL_ROOT/` (journal + rendered views). Skill copies carry NO account data.
 - **Canonical method copy:** one physical copy of this skill, with the runtime skill directory a symlink to it. If the symlink is ever replaced by a real copy, restore the symlink rather than maintaining two files.
-- `vocab.json` exists in two places by design: the runtime copy at `$PPC_JOURNAL_ROOT/journal/vocab.json` is what `journal.py` validates against (bundled skill copy is the fallback). When editing the vocabulary, edit the bundled canonical copy and sync to the runtime copy — keep them byte-identical.
+- `vocab.json` exists in two places by design: the runtime copy at `$PPC_JOURNAL_ROOT/journal/vocab.json` is what `journal.py` validates against (bundled skill copy is the fallback). When editing the vocabulary, edit the bundled canonical copy and sync to the runtime copy. Keep them byte-identical.
 - Legacy `account-notes/` + `session-logs/` under the skill copies are frozen after backfill: contents migrated into the journals, each dir left with a `POINTER.md` naming the new locations. Legacy files are kept (history), never updated again.
 
-## 7. Tag vocabulary (v1 seed — grows via vocab.json)
+## 7. Tag vocabulary (v1 seed, grows via vocab.json)
 
 `watch`, `monitor`, `carried`, `known-issue`, `budget`, `negatives`, `impression-share`,
 `cpl-direction`, `tracking`, `conversion-config`, `lead-quality`, `outage`, `vendor`,

@@ -509,9 +509,9 @@ def _single_line(value: str) -> str:
 
 
 def _entry_markdown(entry: dict[str, Any], include_verdict: bool = False) -> list[str]:
-    heading = f"### `{entry['id']}` — {entry['type']}"
+    heading = f"### `{entry['id']}`: {entry['type']}"
     if include_verdict:
-        heading += f" — {entry['verdict']}"
+        heading += f", {entry['verdict']}"
     lines = [heading, "", f"Scope: {_scope_one_liner(entry)}"]
     if entry.get("tags"):
         lines.append(f"Tags: {', '.join(entry['tags'])}")
@@ -591,9 +591,9 @@ def _note_markdown(slug: str, entries: list[dict[str, Any]]) -> str:
     )
 
     lines = [
-        f"<!-- GENERATED FILE — DO NOT HAND-EDIT. Source: {source} -->",
+        f"<!-- GENERATED FILE: DO NOT HAND-EDIT. Source: {source} -->",
         "",
-        f"# Account Notes — {slug}",
+        f"# Account Notes: {slug}",
         "",
         "## Config overrides",
         "",
@@ -663,9 +663,9 @@ def _session_markdown(
 ) -> str:
     ordered = sorted(entries, key=lambda item: (item["ts"], item["id"]))
     lines = [
-        f"<!-- GENERATED FILE — DO NOT HAND-EDIT. Source: {journal_source} -->",
+        f"<!-- GENERATED FILE: DO NOT HAND-EDIT. Source: {journal_source} -->",
         "",
-        f"# Session Log — {session}",
+        f"# Session Log: {session}",
         "",
     ]
     for entry_type in TYPE_ORDER:

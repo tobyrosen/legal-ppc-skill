@@ -142,7 +142,7 @@ The gates are enforced as written. Where a window or a number below is still a p
 Ordered by evidence within each theme: validated entries first, then partially validated, then textbook. `V` = validated in practice, `P` = partially validated, `T` = textbook only. This index carries the reading order. In the body each entry sits in its theme section and keeps its own number, so cross-references stay stable and new entries append rather than renumber (which is why PB-38 and PB-39 sit inside the keyword and budget sections rather than at the end).
 
 **Budget and impression share:** PB-01 `V`, PB-39 `V`, PB-02 `V`, PB-40 `P`, PB-03 `T`
-**Bidding:** PB-08 `V`, PB-09 `V`, PB-04 `T`, PB-05 `T`, PB-06 `T`, PB-07 `T`, PB-10 `T`
+**Bidding:** PB-08 `V`, PB-09 `V`, PB-06 `P`, PB-04 `T`, PB-05 `T`, PB-07 `T`, PB-10 `T`
 **Keywords and search terms:** PB-14 `V`, PB-38 `V`, PB-11 `P`, PB-13 `P`, PB-12 `T`, PB-16 `T`, PB-17 `T`
 **Ads and creative:** PB-20 `V`, PB-18 `P`, PB-19 `T`, PB-21 `T`, PB-22 `T`
 **Tracking and measurement:** PB-24 `V`, PB-25 `P`, PB-23 `P`

@@ -107,7 +107,7 @@ If a keyword query lacks `ad_group_criterion.negative = FALSE`, stop and re-run 
 
 1. **Always include `ad_group.status = 'ENABLED'`** in the WHERE clause.
 2. **Always SELECT `search_term_view.status`.** If the field is missing, the query is incomplete. Do not flag any term without it.
-3. **Never flag a term with `status = NONE` as an active finding.** `NONE` means the term matched historically but is no longer served by any keyword, often from a broad keyword since tightened or paused. Confirmed misdiagnosis: a fictional "quiet title action westhollow" term was flagged as active waste when it was status NONE from a paused broad keyword.
+3. **Never flag a term with `status = NONE` as an active finding.** `NONE` means the term matched historically but is no longer served by any keyword, often from a broad keyword since tightened or paused. Confirmed misdiagnosis: a fictional "uncontested divorce westhollow" term was flagged as active waste when it was status NONE from a paused broad keyword.
 4. **Check which ad group a term came from.** A term from a paused or removed ad group is historical, not an active waste source.
 
 Root cause: the API scopes data by account and date, not by serving status.

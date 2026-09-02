@@ -1,4 +1,4 @@
-# Internal files — not included in public release
+# Internal files, not included in public release
 account-notes/
 # ...except the synthetic template example referenced by SKILL.md's Accounts table
 !account-notes/example-family-law.md
@@ -14,5 +14,5 @@ skills/
 __pycache__/
 *.pyc
 
-# Internal operations overlay - runbook, other-platform drafts. Never released.
+# Private local files. Never released.
 internal/

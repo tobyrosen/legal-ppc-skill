@@ -16,7 +16,7 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, dev]
   pull_request:
     branches: [main, master]
 
@@ -93,7 +93,7 @@ jobs:
           if [ -d tests ] || [ -d test ]; then
             pytest --cov --cov-report=xml || echo "No tests collected"
           else
-            echo "No tests directory — skipping pytest"
+            echo "No tests directory, skipping pytest"
           fi
       - name: Run bandit (Python security scan)
         run: bandit -r . -x ./tests,./test,./.venv,./venv,./node_modules -ll || true

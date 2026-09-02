@@ -212,7 +212,7 @@
       "trap": "Concludes there is no policy issue because the campaign serving_status is SERVING, or jumps straight to requesting a screenshot of the Policy Manager / ad status column to find out whether ads are approved, instead of pulling ad_group_ad.policy_summary.approval_status and review_status via GAQL.",
       "assertions": [
         "[EXECUTION] Pulls ad-level policy status via GAQL (GAQL 7.3, or ad_group_ad.policy_summary.approval_status and ad_group_ad.policy_summary.review_status FROM ad_group_ad) before requesting any screenshot",
-        "[REASONING] States that a campaign serving_status = SERVING does NOT confirm individual ads are approved — ad-level policy must be checked separately",
+        "[REASONING] States that a campaign serving_status = SERVING does NOT confirm individual ads are approved, ad-level policy must be checked separately",
         "[JUDGMENT] Flags ads with approval_status DISAPPROVED or APPROVED_LIMITED, or review_status UNDER_REVIEW / REVIEW_IN_PROGRESS, as the primary hypothesis for the soft spend / single-ad serving symptom",
         "[OUTPUT DISCIPLINE] Does NOT treat ad approval status as a screenshot-only blind spot; any screenshot request is scoped only to the human-readable disapproval reason, not to obtain the approval status itself",
         "[OUTPUT DISCIPLINE] Does NOT conclude 'no policy issues' from the normal campaign serving_status alone"

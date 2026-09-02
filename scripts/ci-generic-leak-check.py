@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""ci-generic-leak-check.py — public-safe, generic pre-publish PII check.
+"""ci-generic-leak-check.py: public-safe, generic pre-publish PII check.
 
 Runs in CI on every push/PR to this public repo. It knows nothing about
-any specific client, firm, or account — it only looks for SHAPES that
+any specific client, firm, or account, it only looks for SHAPES that
 real account data tends to take:
 
   1. 10-digit numbers shaped like a Google Ads customer ID
@@ -11,7 +11,7 @@ real account data tends to take:
 
 A small ALLOWLIST below covers this repo's own documented placeholders
 (see SKILL.md's ID table and evals/fixtures/). Nothing in this file or
-its allowlist is client-specific — that pairing lives outside this repo
+its allowlist is client-specific, that pairing lives outside this repo
 in a private denylist run separately before any release
 (public-repo-leak-gate.py; see the internal wiki's Shared Capabilities
 page). This script is a coarse net, not the release gate.
@@ -37,7 +37,7 @@ PHONE_RE = re.compile(r"\b\(?\d{3}\)?[-.\s]\d{3}[-.\s]\d{4}\b")
 TEN_DIGIT_RE = re.compile(r"\b\d{10}\b")
 EMAIL_RE = re.compile(r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b")
 
-# Documented, generic placeholders — see SKILL.md's account-ID table and
+# Documented, generic placeholders, see SKILL.md's account-ID table and
 # evals/fixtures/README.md. All-repeated-digit IDs (1111111111 ... ) are
 # the house convention for synthetic fixture IDs.
 ALLOWLISTED_10DIGIT = {str(d) * 10 for d in range(10)} | {"1234567890"}
@@ -106,7 +106,7 @@ def main() -> int:
     print(
         "\nIf this is a documented placeholder, add it to the allowlist in "
         "scripts/ci-generic-leak-check.py with a comment explaining why. "
-        "If this is real account data, remove it before merging — do not "
+        "If this is real account data, remove it before merging, do not "
         "widen the allowlist to make it pass."
     )
     return 1

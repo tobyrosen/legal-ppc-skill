@@ -1,20 +1,20 @@
-# Diagnosis Trees — Google Ads for Law Firms
+# Diagnosis Trees: Google Ads for Law Firms
 
 ## How to Use This Document
 
-These are diagnostic frameworks, not flowcharts. They guide judgment — they don't replace it. Work through the guiding questions in order, but be prepared to branch based on what you find. The trees cross-reference each other because real problems rarely have single causes.
+These are diagnostic frameworks, not flowcharts. They guide judgment. They don't replace it. Work through the guiding questions in order, but be prepared to branch based on what you find. The trees cross-reference each other because real problems rarely have single causes.
 
 **GAQL references** point to sections in `gaql-query-library.md` (e.g., "GAQL 2.1" = Section 2, Query 1).
 
 **Blind spot callouts** appear wherever the API cannot provide what's needed. The screenshot protocol is:
 
-> ⚠️ **BLIND SPOT — [what cannot be seen]**
+> ⚠️ **BLIND SPOT: [what cannot be seen]**
 > → Please share a screenshot of [exact location, with applicable filters/date range].
 
 **Version note:** This skill has two operational modes:
 
 - **Operator version:** reads the account's recorded context at session start, so it carries account history. The operating steps for that live outside this skill.
-- **Public version** — reads skill reference files only. No historical context. No session logging.
+- **Public version**: reads skill reference files only. No historical context. No session logging.
 
 Sections marked _[operator version]_ describe behaviour that applies only where recorded account context exists.
 
@@ -24,7 +24,7 @@ Sections marked _[operator version]_ describe behaviour that applies only where 
 
 **Run before any diagnostic tree. These take priority over everything else.**
 
-Pre-flight findings are not symptoms to diagnose — they are foundational problems that corrupt the meaning of everything else. A high CPA finding means nothing if conversion tracking is counting page views as leads. Fix the foundation first.
+Pre-flight findings are not symptoms to diagnose: they are foundational problems that corrupt the meaning of everything else. A high CPA finding means nothing if conversion tracking is counting page views as leads. Fix the foundation first.
 
 ### PF-1: Conversion Tracking Verification
 
@@ -40,7 +40,7 @@ Evaluate the `type` and `name` fields together. The types that represent real le
 
 - `WEBPAGE` actions with names suggesting form completion, contact submission, or appointment booking
 - `AD_CALL` or `PHONE_CALL` actions (auto-tracked call extensions)
-- `UPLOAD_CLICKS` (offline import — only meaningful if the firm is actually importing intake data)
+- `UPLOAD_CLICKS` (offline import, only meaningful if the firm is actually importing intake data)
 
 - `WEBPAGE` actions recording an ebook or guide download. **These are PRIMARY by standing operator
   ruling**, in every account and every campaign. They are never a demotion candidate and never a
@@ -62,7 +62,7 @@ never evidence and never grounds to demote (PB-23).
 **Is conversion volume plausible given clicks?**
 If there are 500 clicks in 30 days but 0 conversions, tracking is the leading hypothesis: even low-converting legal accounts convert at some rate with that much traffic. (`PROPOSED` click count.) Check the sibling primaries before calling it a break, and note that a call tracker forwarding only qualified leads can produce a legitimate zero.
 
-> ⚠️ **BLIND SPOT — Tag firing cannot be verified via API**
+> ⚠️ **BLIND SPOT: Tag firing cannot be verified via API**
 > The API shows conversion action configuration. It cannot confirm whether the tag is actually firing on the correct page events.
 > → If conversions are zero despite meaningful click volume, please share a screenshot of the Google Tag Manager container (or GA4 debug view) showing whether the conversion tag fires on a form submission or call event.
 
@@ -73,7 +73,7 @@ Look for multiple actions of the same type with similar names and `include_in_co
 Data-driven attribution is fine for accounts with volume. Last-click is acceptable. Time-decay is acceptable. Position-based is unusual for legal. Flag any attribution model that seems inconsistent with how the firm's intake process actually works.
 
 **Is Enhanced Conversions for Leads configured?**
-Enhanced Conversions for Leads hashes and matches first-party contact data (email, phone) submitted in forms, enabling more accurate and durable cross-device attribution. It is Google's current recommended tracking upgrade for form submissions in legal. Check whether it is enabled in the Google Ads conversion settings. An account without it is missing an increasingly standard signal quality improvement — flag as a P2 recommendation on first review.
+Enhanced Conversions for Leads hashes and matches first-party contact data (email, phone) submitted in forms, enabling more accurate and durable cross-device attribution. It is Google's current recommended tracking upgrade for form submissions in legal. Check whether it is enabled in the Google Ads conversion settings. An account without it is missing an increasingly standard signal quality improvement. Flag as a P2 recommendation on first review.
 
 ---
 
@@ -81,14 +81,14 @@ Enhanced Conversions for Leads hashes and matches first-party contact data (emai
 
 Pull: GAQL 1.1 (all campaigns), GAQL 1.3 (ad rotation settings), GAQL 7.3 (ad policy / approval status)
 
-Evaluate against the good-account checklist from the knowledge base. These are binary flags — either present or not:
+Evaluate against the good-account checklist from the knowledge base. These are binary flags, either present or not:
 
-- **Ad policy / approval status?** Pull GAQL 7.3. Ad-level policy is API-accessible — check it here, do not default to a screenshot. Flag any ad where `ad_group_ad.policy_summary.approval_status` is `DISAPPROVED` or `APPROVED_LIMITED`, or where `ad_group_ad.policy_summary.review_status` is `UNDER_REVIEW` or `REVIEW_IN_PROGRESS`. A campaign reading `serving_status = SERVING` does NOT clear ad-level policy issues. A screenshot is the fallback only for the human-readable disapproval reason, not for the approval status itself.
+- **Ad policy / approval status?** Pull GAQL 7.3. Ad-level policy is API-accessible. Check it here, do not default to a screenshot. Flag any ad where `ad_group_ad.policy_summary.approval_status` is `DISAPPROVED` or `APPROVED_LIMITED`, or where `ad_group_ad.policy_summary.review_status` is `UNDER_REVIEW` or `REVIEW_IN_PROGRESS`. A campaign reading `serving_status = SERVING` does NOT clear ad-level policy issues. A screenshot is the fallback only for the human-readable disapproval reason, not for the approval status itself.
 - **Performance Max campaign present?** Flag. PMax is almost universally wrong for law firms without overwhelming conversion history. Note which campaigns are PMax type.
 - **Display/content network enabled on any search campaign?** Check `network_settings.target_content_network`. Flag if `TRUE` without a deliberate reason on record.
-- **Search partners enabled?** Check `network_settings.target_partner_search_network`. Flag if `TRUE` — usually degrades lead quality in legal.
+- **Search partners enabled?** Check `network_settings.target_partner_search_network`. Flag if `TRUE`. Usually degrades lead quality in legal.
 - **Ad rotation set to OPTIMIZE?** Check `ad_serving_optimization_status`. Flag if `OPTIMIZE` or `CONVERSION_OPTIMIZE`. Correct setting is `ROTATE_INDEFINITELY`.
-- **Brand campaign isolated?** Review campaign names for evidence of brand/non-brand separation. There is no API flag for this — use naming convention as the signal. Flag if any campaign name suggests it may contain both.
+- **Brand campaign isolated?** Review campaign names for evidence of brand/non-brand separation. There is no API flag for this. Use naming convention as the signal. Flag if any campaign name suggests it may contain both.
 - **Broad match keywords present?** Pull GAQL 3.2 (match type distribution). Flag any `BROAD` type keywords outside of explicitly named test campaigns.
 
 _[operator version]: Cross-reference structural flags against the account's recorded overrides. Deliberate exceptions to the standard structure are inputs to the check, not findings: do not re-flag what has already been settled._
@@ -105,7 +105,7 @@ This is a narrative read, not a metric check. You are asking: what kind of accou
 
 **Signs of Google mismanagement:** Long list of `client_type = GOOGLE_ADS_AUTOMATED_RULE` or `GOOGLE_ADS_RECOMMENDATIONS` changes. Auto-applied broad match expansions, auto-applied audience targeting, auto-applied budget changes. Each of these should be reviewed against knowledge base principles.
 
-**Signs of learning phase disruption:** Multiple bid strategy changes within 14-day windows. This pattern — change, bad performance, change again, bad performance, change again — is the most common cause of smart bidding accounts that never stabilize. Note the dates and the sequence.
+**Signs of learning phase disruption:** Multiple bid strategy changes within 14-day windows. This pattern (change, bad performance, change again, bad performance, change again) is the most common cause of smart bidding accounts that never stabilize. Note the dates and the sequence.
 
 **Signs of recent structural changes that may explain current symptoms:** Budget increases/decreases, campaign pauses/enables, targeting changes. If these occurred within the last 30 days and the brief is about performance decline, they're the first hypothesis.
 
@@ -155,11 +155,11 @@ Cross-reference the timing with change history (PF-3).
 - **Drop coincides with a smart bidding strategy change or budget change within 14 days**: likely a learning phase disruption. See Sub-tree D (Smart Bidding Instability).
 - **Drop is gradual over 2–4 months with no structural changes**: creative staleness is the most likely cause. Check when ads were last updated (GAQL 8.1 change history + GAQL 7.2 ad performance). CTR decline preceding conversion rate decline is the pattern.
 
-> ⚠️ **BLIND SPOT — Landing page changes cannot be detected via API**
+> ⚠️ **BLIND SPOT: Landing page changes cannot be detected via API**
 > A common cause of sudden conversion rate drops is a website or landing page update that changed the form, CTA, or page structure.
 > → Please share a screenshot of the current landing page for the affected campaigns, and confirm whether any website changes were made around the time of the drop.
 >
-> ⚠️ **BLIND SPOT — Competitor ad changes are not visible via API**
+> ⚠️ **BLIND SPOT: Competitor ad changes are not visible via API**
 > New competitors entering the market or existing competitors improving their copy and offers can depress CVR without any change in your account.
 > → Please share a screenshot of the Auction Insights tab for the affected campaigns (last 30 days), and optionally a manual search for your top keywords to see what competitor ads currently look like.
 
@@ -167,11 +167,11 @@ Cross-reference the timing with change history (PF-3).
 
 **Step 4: Is this a landing page / offer problem?**
 
-If CVR has never been strong, the account is driving traffic to something that doesn't convert. This is not an ads problem — it's a conversion infrastructure problem.
+If CVR has never been strong, the account is driving traffic to something that doesn't convert. This is not an ads problem. It's a conversion infrastructure problem.
 
 Indicators: high click volume, meaningful spend, consistent zero or near-zero conversions over the life of the account. QS `post_click_quality_score` BELOW_AVERAGE (GAQL 3.1) supports this hypothesis.
 
-> ⚠️ **BLIND SPOT — Landing page quality cannot be assessed via API**
+> ⚠️ **BLIND SPOT: Landing page quality cannot be assessed via API**
 > → Please share a screenshot of the landing page(s) receiving ad traffic. Assess: Is there a clear, prominent CTA? Is the messaging aligned with what the ads promise? Is there a phone number visible above the fold? Is the mobile experience functional?
 
 _[operator version]: Check the account's recorded context for prior landing-page findings, and note a recurrence rather than reporting it as new. A standing structural flag has a shelf life: re-pull before re-asserting it._
@@ -194,16 +194,16 @@ If one campaign is driving high CPA while others are acceptable, drill into that
 
 ---
 
-**Step 2: What is driving the high CPA — high CPC, low CVR, or both?**
+**Step 2: What is driving the high CPA, high CPC, low CVR, or both?**
 
 CPA = cost per click ÷ conversion rate. These require different fixes.
 
 Pull: GAQL 3.3 or 3.4 (keyword performance) for the affected campaigns. Look at average CPC and conversion rate at the keyword level.
 
-- **CPC is disproportionately high for the market**: Is impression share rank loss elevated? Pull GAQL 5.1. High rank loss IS means the account is losing auctions on quality/bid grounds — throwing more money at bids may not fix this.
+- **CPC is disproportionately high for the market**: Is impression share rank loss elevated? Pull GAQL 5.1. High rank loss IS means the account is losing auctions on quality/bid grounds. Throwing more money at bids may not fix this.
   - Move to Sub-tree B (Quality Score Diagnosis) before adjusting bids.
 
-> ⚠️ **BLIND SPOT — Competitor CPC dynamics are not visible via API**
+> ⚠️ **BLIND SPOT: Competitor CPC dynamics are not visible via API**
 > Rising CPCs without account changes usually indicate increased auction competition. The API cannot show you who is bidding more aggressively or what their bids are.
 > → Please share a screenshot of Auction Insights for the campaigns with elevated CPC (last 30 days vs. prior 30 days if available). This will show whether new competitors have entered or existing ones have increased their presence.
 
@@ -227,27 +227,27 @@ Pull: GAQL 1.1 (bid strategy by campaign), GAQL 2.3 (conversion volume by campai
 
 **Entry:** Campaigns are ending the day with budget remaining; actual daily spend is consistently below the daily budget limit.
 
-Note: this symptom is counterintuitive. Budget not spending is not a sign that the account is healthy and efficient — it usually means the account can't win auctions at its current quality or bid level.
+Note: this symptom is counterintuitive. Budget not spending is not a sign that the account is healthy and efficient. It usually means the account can't win auctions at its current quality or bid level.
 
 ---
 
-**Step 1: Is the campaign actually eligible to serve — and are its ads approved?**
+**Step 1: Is the campaign actually eligible to serve, and are its ads approved?**
 
 Pull: GAQL 1.1. Check `campaign.status` and `campaign.serving_status`.
 
 Expected: `status = ENABLED`, `serving_status = SERVING`.
 
-Then pull GAQL 7.3 (ad policy / approval status) for the campaign. Ad-level policy is API-accessible — check it here before requesting any screenshot. Flag any ad where `ad_group_ad.policy_summary.approval_status` is `DISAPPROVED` or `APPROVED_LIMITED`, or where `ad_group_ad.policy_summary.review_status` is `UNDER_REVIEW` or `REVIEW_IN_PROGRESS`. A campaign can read `serving_status = SERVING` at the campaign level while its ads are disapproved or limited at the ad level — that is exactly the case where budget underspends because the eligible creative is being throttled by policy. Do not conclude "no policy issues" from a normal campaign serving_status; confirm it against the ad-level policy summary.
+Then pull GAQL 7.3 (ad policy / approval status) for the campaign. Ad-level policy is API-accessible. Check it here before requesting any screenshot. Flag any ad where `ad_group_ad.policy_summary.approval_status` is `DISAPPROVED` or `APPROVED_LIMITED`, or where `ad_group_ad.policy_summary.review_status` is `UNDER_REVIEW` or `REVIEW_IN_PROGRESS`. A campaign can read `serving_status = SERVING` at the campaign level while its ads are disapproved or limited at the ad level. That is exactly the case where budget underspends because the eligible creative is being throttled by policy. Do not conclude "no policy issues" from a normal campaign serving_status; confirm it against the ad-level policy summary.
 
 If serving_status shows anything other than SERVING, the API returns a serving status code but not the full explanation for why a campaign isn't serving:
 
-> ⚠️ **BLIND SPOT — Campaign serving-status explanation is not fully accessible via API**
+> ⚠️ **BLIND SPOT: Campaign serving-status explanation is not fully accessible via API**
 > The API returns a serving status code but not the full explanation for why a campaign isn't serving.
 > → Please share a screenshot of the campaign status column in the Google Ads UI.
 
-If GAQL 7.3 surfaces disapproved or limited ads, that is the finding — the disapproval reason text is the only screenshot fallback:
+If GAQL 7.3 surfaces disapproved or limited ads, that is the finding. The disapproval reason text is the only screenshot fallback:
 
-> ⚠️ **BLIND SPOT — Human-readable disapproval reason is not fully expanded via API**
+> ⚠️ **BLIND SPOT: Human-readable disapproval reason is not fully expanded via API**
 > GAQL 7.3 returns the approval and review status codes (`DISAPPROVED`, `APPROVED_LIMITED`, `UNDER_REVIEW` / `REVIEW_IN_PROGRESS`), but the Policy Manager's detailed explanation of _why_ an ad was disapproved is not fully expanded in the API policy summary.
 > → For any ad flagged DISAPPROVED or APPROVED_LIMITED by GAQL 7.3, please share a screenshot of the Policy Manager entry for that ad so the specific policy reason can be addressed.
 
@@ -257,9 +257,9 @@ If GAQL 7.3 surfaces disapproved or limited ads, that is the finding — the dis
 
 Pull: GAQL 5.1 (impression share breakdown), GAQL 11.1 (budget utilization)
 
-The key insight: if the budget isn't being spent, `search_budget_lost_impression_share` should be near zero — there's no budget constraint if money isn't being used. Focus on total impression share and `search_rank_lost_impression_share`.
+The key insight: if the budget isn't being spent, `search_budget_lost_impression_share` should be near zero. There's no budget constraint if money isn't being used. Focus on total impression share and `search_rank_lost_impression_share`.
 
-- **Total IS is low AND rank lost IS is high**: the account is losing auctions on quality and bid grounds. It doesn't need more budget — it needs better QS or higher bids. Move to Sub-tree B (Quality Score Diagnosis).
+- **Total IS is low AND rank lost IS is high**: the account is losing auctions on quality and bid grounds. It doesn't need more budget. It needs better QS or higher bids. Move to Sub-tree B (Quality Score Diagnosis).
 - **Total IS is low AND both rank and budget IS are low**: unusual. Suggests the account isn't entering the auction much at all. Check keyword volume (next step).
 
 ---
@@ -272,7 +272,7 @@ Look at how many keywords have `impressions > 0`.
 
 - **Most keywords have zero impressions**: keywords may have extremely low search volume, or match types are so restrictive that no queries are triggering them. Exact match on hyper-specific long-tail terms in small geographic markets can produce genuine zero-traffic situations.
 
-> ⚠️ **BLIND SPOT — Keyword search volume estimates and first-page bid estimates are not in the API**
+> ⚠️ **BLIND SPOT: Keyword search volume estimates and first-page bid estimates are not in the API**
 > → Please share a screenshot of the Keywords tab in the UI with the Status column visible. Google shows "Low search volume" status and bid estimates directly in this view. This will confirm whether the issue is volume-based or bid-based.
 
 - **Keywords have some impressions but far fewer than budget would allow**: bids are below the competitive threshold for these keywords. This is a bid/QS problem, not a budget problem. Increasing the budget does nothing. Move to Sub-tree B (Quality Score Diagnosis) to determine whether QS improvements will help before raising bids.
@@ -283,16 +283,16 @@ Look at how many keywords have `impressions > 0`.
 
 Pull: GAQL 10.3 (device performance), GAQL 10.4 (daypart performance)
 
-In some accounts, ad scheduling restrictions are too aggressive — campaigns are only enabled for a narrow window and can't spend their full budget in that time. Check whether ad schedules are set and whether they are appropriate.
+In some accounts, ad scheduling restrictions are too aggressive. Campaigns are only enabled for a narrow window and can't spend their full budget in that time. Check whether ad schedules are set and whether they are appropriate.
 
-> ⚠️ **BLIND SPOT — Ad schedule settings are not easily surfaced via the GAQL API in a readable format**
+> ⚠️ **BLIND SPOT: Ad schedule settings are not easily surfaced via the GAQL API in a readable format**
 > → Please share a screenshot of the Ad Schedule settings for the affected campaigns.
 
 ---
 
-### Tree 4: Performance Dropped — Something Changed
+### Tree 4: Performance Dropped, Something Changed
 
-**Entry:** The brief is "something is wrong" — performance was acceptable and now isn't. The most common brief. The most variable tree.
+**Entry:** The brief is "something is wrong". Performance was acceptable and now isn't. The most common brief. The most variable tree.
 
 **Pre-flight ordering exception:** If the drop is sudden or large in magnitude (40%+ decline within a one to two week window, the magnitude being a threshold and the reordering being evidenced), run PF-3 (change history) before PF-1 and PF-2. The standard pre-flight order prioritizes tracking integrity, but when a drop is abrupt, a bid strategy change, budget change, or auto-applied update is far more likely to be the cause than a tag failure. Running PF-3 first answers the "did something change?" question before spending time on tag debugging. If nothing changed, proceed to PF-1 normally. If a structural change is found, that discovery shapes every downstream step.
 
@@ -329,7 +329,7 @@ _[operator version]: Check the account's recorded context for seasonal patterns 
 
 Pull: GAQL 6.3 (weekly segmented performance) for the affected campaigns
 
-Run this for both 90-day (to establish the baseline trend) and focus on the period of decline. Identify which metric moved first — this is the diagnostic entry point.
+Run this for both 90-day (to establish the baseline trend) and focus on the period of decline. Identify which metric moved first. This is the diagnostic entry point.
 
 - **Impressions dropped while CTR held steady**: reach problem. The account stopped entering as many auctions. IS data (GAQL 5.1) will tell you whether this is budget or rank. See Sub-tree A.
 - **CTR dropped while impressions held**: ad quality or competitive landscape change. See Sub-tree C (CTR Decline).
@@ -349,11 +349,11 @@ Cross-reference with change history timing (PF-3). Key question: did any change 
 - **New keywords were added with broad or phrase match**: check GAQL 4.1 (search terms). Are new irrelevant queries now generating clicks that don't convert?
 - **No account changes**: external cause. The two most common are landing page changes and seasonal audience shifts.
 
-> ⚠️ **BLIND SPOT — Landing page changes are not visible via API**
+> ⚠️ **BLIND SPOT: Landing page changes are not visible via API**
 > → Has the website or landing page changed recently? If uncertain, please share a screenshot of the current landing page for the affected campaigns.
 >
-> ⚠️ **BLIND SPOT — Seasonal patterns in legal search behavior are not visible within the account data alone**
-> → Compare this period to the same period in the prior year if data is available. Family law search volume, for example, typically rises after the holidays and dips in summer — patterns that look like performance drops are sometimes normal seasonality.
+> ⚠️ **BLIND SPOT: Seasonal patterns in legal search behavior are not visible within the account data alone**
+> → Compare this period to the same period in the prior year if data is available. Family law search volume, for example, typically rises after the holidays and dips in summer. Patterns that look like performance drops are sometimes normal seasonality.
 
 ---
 
@@ -363,9 +363,9 @@ When: average CPC has risen significantly vs. prior period without a correspondi
 
 Pull: GAQL 5.1 (IS breakdown). Is `search_rank_lost_impression_share` increasing alongside the CPC rise?
 
-- **Rank loss IS is increasing with CPC**: competition is intensifying. Other advertisers are bidding more, which raises the auction floor. This is market-driven — the solution is not automatically to raise bids, which compounds cost. Evaluate whether the account's current CPA is still acceptable at the new CPC level before responding.
+- **Rank loss IS is increasing with CPC**: competition is intensifying. Other advertisers are bidding more, which raises the auction floor. This is market-driven. The solution is not automatically to raise bids, which compounds cost. Evaluate whether the account's current CPA is still acceptable at the new CPC level before responding.
 
-> ⚠️ **BLIND SPOT — Competitor bid changes are not visible via API**
+> ⚠️ **BLIND SPOT: Competitor bid changes are not visible via API**
 > → Please share a screenshot of Auction Insights for the affected campaigns. Look specifically for new entrants or a significant increase in impression share for existing competitors.
 
 - **Rank loss IS is stable but CPC is rising**: bid strategy may be bidding more aggressively without a clear reason. Check whether target CPA was recently lowered (making the algorithm bid higher to hit the target) or whether a learning phase caused overspending. See Sub-tree D.
@@ -376,7 +376,7 @@ Pull: GAQL 5.1 (IS breakdown). Is `search_rank_lost_impression_share` increasing
 
 **Entry:** New account, no prior analysis context. Goal is to understand the account's state comprehensively before identifying what to do.
 
-This is the structural audit entry point. Don't look for one thing — look for everything and flag it.
+This is the structural audit entry point. Don't look for one thing. Look for everything and flag it.
 
 ---
 
@@ -402,7 +402,7 @@ Build a mental map: how many campaigns, how are they organized, what are they tr
 
 Pull: GAQL 6.2 (90-day campaign performance)
 
-This is your baseline. You need to understand what "normal" looks like for this account before you can identify what's wrong. Note: in an inherited account with a history of mismanagement, the baseline may itself be a problem — you're not trying to restore performance to a broken prior state.
+This is your baseline. You need to understand what "normal" looks like for this account before you can identify what's wrong. Note: in an inherited account with a history of mismanagement, the baseline may itself be a problem. You're not trying to restore performance to a broken prior state.
 
 ---
 
@@ -428,7 +428,7 @@ Pull: GAQL 7.1 (RSA performance), GAQL 7.2 (ad freshness)
 
 Cross-reference ad creation/modification dates from change history (GAQL 8.1). How old is the creative? When were ads last meaningfully updated?
 
-> ⚠️ **BLIND SPOT — Ad rendering in the SERP is not visible via API**
+> ⚠️ **BLIND SPOT: Ad rendering in the SERP is not visible via API**
 > The API returns asset lists (headlines, descriptions) but not which combinations are actually serving or how the ad appears to users.
 > → Please share a screenshot of the Ad Preview tool (in the Google Ads UI) for the most important ad groups, or run a manual search for core keywords to see how ads appear in practice.
 
@@ -446,7 +446,7 @@ _[operator version]: Record the session even when no action was taken. A first r
 
 ### Tree 6: Search Term Waste / Negative Keyword Gaps
 
-**Entry:** The brief is specifically about search term quality — mining for negatives, reviewing match type behavior, or investigating wasted spend on irrelevant queries.
+**Entry:** The brief is specifically about search term quality: mining for negatives, reviewing match type behavior, or investigating wasted spend on irrelevant queries.
 
 ---
 
@@ -475,7 +475,7 @@ For each term, the classification is: relevant, irrelevant, or ambiguous.
 
 **Relevant**: query that a prospective client of this firm would plausibly use. Keep or add as keyword.
 **Irrelevant**: clearly outside the firm's practice area, geography, or client type. Add as negative at the appropriate level.
-**Ambiguous**: could be a prospect but intent is unclear. Flag for review — don't add as negative without further consideration.
+**Ambiguous**: could be a prospect but intent is unclear. Flag for review. Don't add as negative without further consideration.
 
 Before applying any negative library categories, check account notes for market-specific funnel exceptions. Some accounts have practice areas or markets where standard informational intent negatives would block real prospects (e.g., NC family law long-consideration-window, immigration procedural queries in Arizona, elder abuse informational queries). The negative library is a starting point, not a universal rule.
 
@@ -484,7 +484,7 @@ Cross-reference against the negative keyword library categories:
 - Price/affordability signals (Section 1)
 - Employment/career signals (Section 2)
 - Self-help/DIY intent (Section 3)
-- Research/informational intent (Section 4) — _check account notes for market exceptions before applying_
+- Research/informational intent (Section 4): _check account notes for market exceptions before applying_
 - Practice area cross-contamination (Section 5)
 
 ---
@@ -493,7 +493,7 @@ Cross-reference against the negative keyword library categories:
 
 Pull: GAQL 9.1 (shared negative lists), GAQL 9.2 (contents of shared lists), GAQL 9.3 (campaign negatives), GAQL 9.4 (ad group negatives)
 
-Don't recommend negatives that are already in place. Identify structural gaps — categories from the negative keyword library that are entirely absent from the account's existing negative structure.
+Don't recommend negatives that are already in place. Identify structural gaps: categories from the negative keyword library that are entirely absent from the account's existing negative structure.
 
 ---
 
@@ -519,11 +519,11 @@ Produce in the upload format from the negative keyword library (phrase match by 
 
 ### Tree 7: Conversion Tracking Failure / Sudden Drop
 
-**Entry:** Conversions dropped suddenly — especially to near-zero or zero — within a defined recent window, without an obvious account change. The brief is typically "tracking looks broken" or "conversions dropped 10 days ago."
+**Entry:** Conversions dropped suddenly (especially to near-zero or zero) within a defined recent window, without an obvious account change. The brief is typically "tracking looks broken" or "conversions dropped 10 days ago."
 
-This is not the same as "conversions are generally low" (Tree 1) — that is a performance problem. This is a measurement problem. Until it is confirmed or ruled out, no other analysis is meaningful.
+This is not the same as "conversions are generally low" (Tree 1). That is a performance problem. This is a measurement problem. Until it is confirmed or ruled out, no other analysis is meaningful.
 
-**Pre-flight ordering exception:** For Tree 7, run PF-3 (change history) before PF-1 and PF-2. The standard pre-flight order exists because tracking integrity is the foundation of all other analysis — but here, the presenting symptom IS a tracking failure, so tag debugging (PF-1) is not a foundation check, it is the diagnosis itself. Change history answers the prior question: did something actually change? If nothing changed, then PF-1's tag checks are the right next step. If something did change, that discovery shapes everything that follows. Run PF-3 first, then PF-1.
+**Pre-flight ordering exception:** For Tree 7, run PF-3 (change history) before PF-1 and PF-2. The standard pre-flight order exists because tracking integrity is the foundation of all other analysis, but here, the presenting symptom IS a tracking failure, so tag debugging (PF-1) is not a foundation check, it is the diagnosis itself. Change history answers the prior question: did something actually change? If nothing changed, then PF-1's tag checks are the right next step. If something did change, that discovery shapes everything that follows. Run PF-3 first, then PF-1.
 
 ---
 
@@ -533,9 +533,9 @@ Pull: GAQL 8.1 (changes, last 30 days), GAQL 8.2 (auto-applied changes, last 30 
 
 Establish exactly when the drop started. Cross-reference that date with any account changes.
 
-- **A bid strategy or budget change occurred around the drop date**: don't assume it's a tracking failure — a learning phase disruption can cause a real conversion drop, not just a measurement problem. See Sub-tree D. But also continue this tree, as tracking failure and learning phase disruption can co-occur.
+- **A bid strategy or budget change occurred around the drop date**: don't assume it's a tracking failure. A learning phase disruption can cause a real conversion drop, not just a measurement problem. See Sub-tree D. But also continue this tree, as tracking failure and learning phase disruption can co-occur.
 - **No account changes around the drop date**: external cause. Continue.
-- **Drop is abrupt (one day to next) rather than gradual**: stronger signal of a tracking change — tag break, integration disconnect, or website change.
+- **Drop is abrupt (one day to next) rather than gradual**: stronger signal of a tracking change: tag break, integration disconnect, or website change.
 
 ---
 
@@ -544,19 +544,19 @@ Establish exactly when the drop started. Cross-reference that date with any acco
 Pull: GAQL 2.2 (recent conversion volume), segmented so each action's volume is visible individually. Compare the 30 days before the drop against the 30 days after.
 
 **All primary actions dropped simultaneously:**
-Suggests a shared root cause — an account-level change, a website change affecting all tags, or a change to how Google is attributing conversions. Continue to Step 3.
+Suggests a shared root cause: an account-level change, a website change affecting all tags, or a change to how Google is attributing conversions. Continue to Step 3.
 
 **One action dropped while others held:**
 The broken action is isolated. Skip to Step 4 for that action type directly.
 
 **All actions appear to be working but reported volume is lower:**
-Consider whether conversion action settings changed (counting method, attribution window). Also consider Smart Bidding relearning: if tracking was recently fixed or changed, the algorithm may have had a disrupted signal before the fix — the reported "drop" is the period before the fix, not a new failure.
+Consider whether conversion action settings changed (counting method, attribution window). Also consider Smart Bidding relearning: if tracking was recently fixed or changed, the algorithm may have had a disrupted signal before the fix. The reported "drop" is the period before the fix, not a new failure.
 
 ---
 
 **Step 3: Check for never-fired primary actions**
 
-Look at all-time conversion history for each primary action. A primary action with zero all-time conversions has never worked — it is not a new failure, it never functioned. This is distinct from an action that was working and then stopped.
+Look at all-time conversion history for each primary action. A primary action with zero all-time conversions has never worked. It is not a new failure, it never functioned. This is distinct from an action that was working and then stopped.
 
 Never-fired primaries are a standing configuration error, not a recent event. Note them separately from the acute drop investigation.
 
@@ -571,7 +571,7 @@ These fire when a user reaches a specific page URL (typically a thank-you or con
 - Is the thank-you page URL still the same as when the tag was configured?
 - Does the current checkout/form flow actually reach the tagged URL on submission?
 
-> ⚠️ **BLIND SPOT — Tag firing cannot be confirmed via API**
+> ⚠️ **BLIND SPOT: Tag firing cannot be confirmed via API**
 > → Request a screenshot of the current thank-you page URL and confirm it matches the conversion action's URL rule. If the URL changed, this is the root cause.
 
 **AD_CALL (Google forwarding number):**
@@ -590,21 +590,21 @@ ORDER BY call_view.start_call_date_time DESC
 
 The date window must be set at run time. If call_view returns records, call tracking is capturing calls. If it returns zero records over a normal-volume window, investigate the forwarding and tracking configuration.
 
-**UPLOAD_CLICKS (third-party call tracking platform — CallRail, CTM, etc.):**
+**UPLOAD_CLICKS (third-party call tracking platform: CallRail, CTM, etc.):**
 These platforms upload call data to Google Ads via the offline conversions API. Two common silent failure modes:
 
 1. **No Lead Rule configured**: the integration is connected but has no criteria for what constitutes a conversion. It silently uploads nothing. Fix: add a qualifying filter (e.g., call duration > 60 seconds) in the platform's Google Ads integration settings.
-2. **GCLID not being captured**: if the landing page doesn't capture and store the GCLID parameter from the ad click, the platform cannot attribute the call back to Google Ads. Enhanced Conversions (matching by phone number) is the fallback — check whether it is enabled in both Google Ads and the call tracking platform.
+2. **GCLID not being captured**: if the landing page doesn't capture and store the GCLID parameter from the ad click, the platform cannot attribute the call back to Google Ads. Enhanced Conversions (matching by phone number) is the fallback. Check whether it is enabled in both Google Ads and the call tracking platform.
 
 ---
 
-**Step 5: After the fix — Smart Bidding relearning**
+**Step 5: After the fix, Smart Bidding relearning**
 
 If the tracking failure affected a campaign running Maximize Conversions or tCPA:
 
 The algorithm has been operating on incomplete or absent conversion signals. After the tracking fix, the algorithm must relearn. This takes 2–4 weeks. During this window:
 
-- Hold bid strategy and targets constant — do not adjust in response to apparently poor performance
+- Hold bid strategy and targets constant: do not adjust in response to apparently poor performance
 - The apparent CPA may worsen temporarily as the algorithm recalibrates
 - A "conversion drop" that coincides with a tracking fix being deployed is the algorithm catching up, not a new failure
 
@@ -634,11 +634,11 @@ Rank is the constraint. Rank = Quality Score × bid. Spending more money on bids
 Fix QS first (free improvement), then evaluate whether budget increase is warranted after rank improves. Addressing budget before rank just throws money at an auction you're losing on merit.
 
 **Neither is elevated, but IS is low:**
-This means the campaign is entering auctions but isn't getting many of them — unusual. Two hypotheses: targeting is more restrictive than intended, or the keyword pool is extremely narrow.
+This means the campaign is entering auctions but isn't getting many of them. Unusual. Two hypotheses: targeting is more restrictive than intended, or the keyword pool is extremely narrow.
 
-Pull: GAQL 3.4 (keyword-level impressions). If most or all keywords have near-zero impressions, the keyword pool is the constraint — flag for keyword expansion or match type review (exact match on hyper-specific terms in small markets can produce genuine near-zero traffic). If keywords have impressions but campaign IS is still low, check geographic and audience targeting settings.
+Pull: GAQL 3.4 (keyword-level impressions). If most or all keywords have near-zero impressions, the keyword pool is the constraint. Flag for keyword expansion or match type review (exact match on hyper-specific terms in small markets can produce genuine near-zero traffic). If keywords have impressions but campaign IS is still low, check geographic and audience targeting settings.
 
-> ⚠️ **BLIND SPOT — Geographic targeting inclusions/exclusions and audience lists are not easily readable via GAQL**
+> ⚠️ **BLIND SPOT: Geographic targeting inclusions/exclusions and audience lists are not easily readable via GAQL**
 > → Please share a screenshot of the campaign's Locations settings and Audiences tab to confirm whether targeting is inadvertently too narrow.
 
 ---
@@ -657,12 +657,12 @@ Pull: GAQL 3.1 (keywords with QS components)
 Expected CTR is calculated by Google based on historical ad performance for this keyword relative to similar advertisers. Low expected CTR means the ads aren't compelling or relevant enough for the query, by Google's assessment. Action: rewrite headlines for this keyword's specific intent. Ensure the keyword or a close variant appears in at least one headline.
 
 `creative_quality_score` (ad relevance) is BELOW_AVERAGE:
-The keyword and the ad don't match well. This is usually a structural problem — the keyword is in an ad group where the ad copy is written for a different theme. Action: tighten the ad group so all keywords share the same intent, or create a new ad group with ad copy that matches this keyword's intent directly.
+The keyword and the ad don't match well. This is usually a structural problem. The keyword is in an ad group where the ad copy is written for a different theme. Action: tighten the ad group so all keywords share the same intent, or create a new ad group with ad copy that matches this keyword's intent directly.
 
 `post_click_quality_score` (landing page experience) is BELOW_AVERAGE:
 Google has assessed that the landing page doesn't deliver what the ad promises, loads slowly, or provides a poor mobile experience.
 
-> ⚠️ **BLIND SPOT — Landing page quality cannot be assessed via API**
+> ⚠️ **BLIND SPOT: Landing page quality cannot be assessed via API**
 > → Please share a screenshot of the landing page receiving traffic from this campaign. Assess: Does the page content match what the ad says? Is there a visible CTA? Does the keyword theme appear in the page headline? Is the page functional on mobile?
 
 _[operator version]: Check the account's recorded context. If landing-page quality was flagged BELOW_AVERAGE in a prior session and remains unresolved, escalate it. Note explicitly: bid strategy adjustments, keyword changes, and QS optimization have limited leverage while landing page quality is the binding constraint. The account can improve most other things and still underperform if the LP is not addressed._
@@ -691,7 +691,7 @@ Pull: GAQL 6.3 (weekly trend), GAQL 7.1 (RSA performance), GAQL 8.1 (change hist
 
 - **Abrupt drop over one to two weeks**: route to the change log first (PF-3, PB-37). The one abrupt drop we measured was internal, an outside actor pausing every campaign. Only once no change is found does external competition become the leading hypothesis: new competitors, competitor creative improvement, or SERP layout change.
 
-> ⚠️ **BLIND SPOT — Competitor ad copy and SERP layout changes are not visible via API**
+> ⚠️ **BLIND SPOT: Competitor ad copy and SERP layout changes are not visible via API**
 > → Please share a screenshot of the Google SERP for 2–3 of the most important keywords in the affected campaigns. Look at how many ads appear, whether competitor ads have improved, and whether any new high-visibility features (Local Service Ads, featured snippets, etc.) are pushing paid ads down the page.
 
 **Is ad rotation masking the decline?**
@@ -709,7 +709,7 @@ Pull: GAQL 3.1. If `search_predicted_ctr` has moved to BELOW_AVERAGE on previous
 
 **Called from:** Tree 2 (Step 3), Tree 4 (Steps 2, 3)
 
-**When:** Campaign performance is erratic — large swings in CPC, impressions, and conversions week to week. Or bid strategy is marked as "learning" for an extended period. Or performance degraded immediately after a bid strategy change and hasn't recovered.
+**When:** Campaign performance is erratic. Large swings in CPC, impressions, and conversions week to week. Or bid strategy is marked as "learning" for an extended period. Or performance degraded immediately after a bid strategy change and hasn't recovered.
 
 Pull: GAQL 2.3 (30-day conversion volume by campaign), GAQL 8.1 (change history), GAQL 6.3 (weekly trend)
 
@@ -748,12 +748,12 @@ Action: move the live target toward the economics target in steps of no more tha
 
 If change history shows repeated bid strategy changes at one to two week intervals, often with manual bid adjustments in between, the account has likely never completed a learning phase. (`PROPOSED`: churn has not been observed on the accounts in scope, per PB-10.)
 
-Breaking the cycle requires patience — and a hard rule: **do not change the tCPA target at the start of the freeze window.** Setting a "better" number still resets the learning clock. The freeze must start from the current live value, whatever it is.
+Breaking the cycle requires patience, and a hard rule: **do not change the tCPA target at the start of the freeze window.** Setting a "better" number still resets the learning clock. The freeze must start from the current live value, whatever it is.
 
 Two valid approaches:
 
 1. **Hold the current tCPA target.** Commit to no changes for a minimum of 4 full weeks (28 days), not 21 days. The learning phase requires at least 14 days of clean data and 28 days provides a buffer above that floor. (`PROPOSED`: both windows are carried over, not measured here.) Do not lower the target, do not raise it, do not pause the campaign. Hold.
 
-2. **Switch to Maximize Conversions (no target).** If the current tCPA is far from any achievable baseline — as often happens after a staircase of raises — removing the target entirely allows the algorithm to optimize direction rather than hit an arbitrary number. This is often the correct call when the tCPA has been raised multiple times without completing a learning cycle, because no single "current" value reflects real performance data.
+2. **Switch to Maximize Conversions (no target).** If the current tCPA is far from any achievable baseline (as often happens after a staircase of raises), removing the target entirely allows the algorithm to optimize direction rather than hit an arbitrary number. This is often the correct call when the tCPA has been raised multiple times without completing a learning cycle, because no single "current" value reflects real performance data.
 
-Either approach is valid. What is NOT valid: making any additional bid strategy changes, target changes, or budget changes during the stabilization window. This is often difficult to explain to clients — budget spending erratically during learning phases looks bad in the short term even when the long-term outcome will be better.
+Either approach is valid. What is NOT valid: making any additional bid strategy changes, target changes, or budget changes during the stabilization window. This is often difficult to explain to clients. Budget spending erratically during learning phases looks bad in the short term even when the long-term outcome will be better.

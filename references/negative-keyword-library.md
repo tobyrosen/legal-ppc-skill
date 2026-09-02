@@ -15,13 +15,15 @@ Candidate negative-keyword patterns for family, immigration, and elder law Googl
 
 **Campaign-level negatives.** Apply the practice-area cross-exclusions in section 5 at the campaign level, and only for practice areas the firm demonstrably does not handle. Never cross-exclude family, immigration, or elder work from one another without confirming the firm does not take those matters: a firm running all three would be blocking its own clients.
 
-**Ad group-level negatives:** Narrow exclusions specific to one ad group's keyword theme. Not covered here — these are account-specific and determined through search term review.
+**Ad group-level negatives:** Narrow exclusions specific to one ad group's keyword theme. Not covered here: these are account-specific and determined through search term review.
 
-**Match type guidance:** Phrase match `"term"` is the default for most negatives — it catches the term as part of a longer query without being overly restrictive. Exact match `[term]` is used when a word has legitimate uses you want to preserve (e.g., blocking [free] exactly but not "free consultation attorney"). Broad match (no quotes/brackets) should be used sparingly for negatives — it blocks any query containing the word in any form, which can be too aggressive for ambiguous terms.
+**Match type guidance:** Phrase match `"term"` is the default for most negatives: it catches the term as part of a longer query without being overly restrictive. Exact match `[term]` is used when a word has legitimate uses you want to preserve (for example, blocking [free] exactly but not "free consultation attorney"). A broad match negative (no quotes or brackets) blocks a query only where the query contains every word of the negative, in any order.
+
+**Negative keywords do not match close variants.** This is the opposite of how positive keywords behave, and it is the most common way a negative list quietly underperforms. A negative blocks only the literal words entered. Plurals, singulars, misspellings, abbreviations, accented forms and other stemmed variants are all treated as separate terms and keep serving. The consequence is that you must add every variant you mean: a negative on "attorney" does not block "attorneys", and a negative spelled correctly does not block the common misspellings of the same word. Build the variant set deliberately rather than assuming one entry covers the family.
 
 ---
 
-## Section 1 — Price & Affordability Signals
+## Section 1: Price & Affordability Signals
 
 Price and affordability signals split two ways, and the split is ruled, not inferred.
 
@@ -31,7 +33,7 @@ Price and affordability signals split two ways, and the split is ruled, not infe
 
 That price and affordability searchers rarely convert to paying clients is a general claim, not a measured result on these accounts. Check every candidate against the ruling above and against the term's own conversion data before negating it.
 
-### Broad Match (use cautiously — review for collateral blocking)
+### Broad Match (use cautiously, review for collateral blocking)
 
 ```text
 quick
@@ -91,7 +93,7 @@ The named confirmed-waste strings above are negated as written, not as bare word
 
 ---
 
-## Section 2 — Employment & Career Signals
+## Section 2: Employment & Career Signals
 
 Candidates for blocking job seekers, law students, and people researching legal careers. Not wholesale: the operator has ruled `family law attorney jobs` explicitly NOT waste, so an attorney-jobs query is not automatically a job seeker. `attorney jobs` and `lawyer jobs` are therefore absent from both lists below. Retain only the job-seeker patterns proven in the account's own search-term data.
 
@@ -132,7 +134,7 @@ Candidates for blocking job seekers, law students, and people researching legal 
 
 ---
 
-## Section 3 — Self-Help & DIY Legal Resources
+## Section 3: Self-Help & DIY Legal Resources
 
 Candidates for blocking people seeking forms or self-representation. Procedural family, immigration, and elder queries are frequently real prospects in these practice areas.
 
@@ -165,9 +167,9 @@ Four strings are deliberately absent from the list below. `how to file` and `wit
 
 ---
 
-## Section 4 — Research & Informational Intent
+## Section 4: Research & Informational Intent
 
-Candidates only. Blanket informational negatives conflict with the long-consideration reality of these practice areas: informational queries can be genuine top-of-funnel here and have been observed converting. `how long does` is absent from the list below because it blocks `how long does a divorce take`, a ruled money term. Check whether every remaining pattern converts in this account before negating it. Use phrase match; exact is too narrow and broad risks catching too much.
+Candidates only. Blanket informational negatives conflict with the long-consideration reality of these practice areas: informational queries can be genuine top-of-funnel here and have been observed converting. `how long does` is absent from the list below because it blocks `how long does a divorce take`, a ruled money term. `guide` is absent for the same kind of reason: ebook and guide downloads are primary conversions by standing operator ruling, so negating `guide` would block the traffic the lead magnets are bought to attract. Check whether every remaining pattern converts in this account before negating it. Use phrase match; exact is too narrow and broad risks catching too much.
 
 ### Phrase Match
 
@@ -188,7 +190,6 @@ Candidates only. Blanket informational negatives conflict with the long-consider
 "typical"
 "examples"
 "explained"
-"guide"
 "overview"
 "introduction to"
 "basics of"
@@ -213,12 +214,12 @@ Apply at campaign level, never account level, and only for practice areas the fi
 
 ```text
 "estate planning"
-"will"
-"trust"
+"last will and testament"
+"living trust"
 "probate"
 ```
 
-Apply only where the firm has confirmed it does not take estate or probate matters. If it runs an elder practice, these belong as keywords in that campaign, not as negatives here.
+Every entry here is a multi-word estate term on purpose. A bare `will` blocks "will I lose custody" and "how long will a divorce take", and a bare `trust` blocks "can I trust my ex with the kids". Single common words are not usable as negatives on a family-law campaign, however clearly they read as estate terms in isolation. Apply only where the firm has confirmed it does not take estate or probate matters. If it runs an elder practice, these belong as keywords in that campaign, not as negatives here.
 
 ### For an elder law campaign, where the firm does not handle these areas
 
@@ -258,5 +259,5 @@ These are account-specific and cannot be standardized here. Identify them from t
 
 - **Review search terms monthly** (or at each optimization session) and add new negatives discovered in search term reports. The library above is a starting point, not a complete list.
 - **Date-stamp significant additions.** When adding a batch of negatives after a search term review, note the date in account records so future managers know when the list was last reviewed.
-- **Don't set and forget.** A negative keyword added two years ago may be blocking a term that's now relevant — especially after a firm expands its practice areas.
+- **Don't set and forget.** A negative keyword added two years ago may be blocking a term that's now relevant, especially after a firm expands its practice areas.
 - **Shared lists vs. campaign-level:** Items added to the shared account-level list affect every campaign. Be conservative about what goes there. When in doubt, add at campaign level first and promote to shared list after confirming no collateral damage.

@@ -4,7 +4,7 @@
 
 Legal PPC is not a general PPC problem. The clients being served are people in acute distress: a marriage ending, custody at stake, an immigration status in jeopardy, a parent's care and estate to arrange. They are not comparison shopping the way someone buying a laptop is. They are frightened, overwhelmed, and often not ready to hire anyone yet. This means the entire conversion funnel behaves differently than Google assumes when it builds its optimization tools.
 
-Google's platform is built around e-commerce logic: someone searches, clicks, converts, done. Legal doesn't work this way. A click from someone searching "how to file for divorce" may take weeks or months to become a client, if they become one at all. This disconnect between Google's assumptions and legal reality is the root cause of most bad decisions made in legal ad accounts — and most of those bad decisions are made by following Google's recommendations.
+Google's platform is built around e-commerce logic: someone searches, clicks, converts, done. Legal doesn't work this way. A click from someone searching "how to file for divorce" may take weeks or months to become a client, if they become one at all. This disconnect between Google's assumptions and legal reality is the root cause of most bad decisions made in legal ad accounts, and most of those bad decisions are made by following Google's recommendations.
 
 Understanding this is not optional. It is the lens through which every decision in a legal account must be evaluated.
 
@@ -12,10 +12,10 @@ Understanding this is not optional. It is the lens through which every decision 
 
 ## Google's Incentives vs. Client Interests
 
-Google makes money when you spend money. Its recommendations are designed to increase spend, not improve the quality of that spend. This doesn't mean every recommendation is wrong — some optimization features and suggestions do genuinely improve performance — but the fundamental objectives are opposed, and Google's ability to understand the specific goals of a law firm is far more limited than most people assume. In legal accounts this conflict is especially pronounced because:
+Google makes money when you spend money. Its recommendations are designed to increase spend, not improve the quality of that spend. This doesn't mean every recommendation is wrong: some optimization features and suggestions do genuinely improve performance, but the fundamental objectives are opposed, and Google's ability to understand the specific goals of a law firm is far more limited than most people assume. In legal accounts this conflict is especially pronounced because:
 
 - **Legal keywords are among the most expensive in Google Ads.** No cost-per-click figure or band is stated: judge a campaign's cost per click against its own trailing median. Waste is catastrophic, not annoying.
-- **Google's automation optimizes toward conversions as defined in the account.** If conversion tracking is misconfigured — and it frequently is in inherited accounts — smart bidding is optimizing toward the wrong thing.
+- **Google's automation optimizes toward conversions as defined in the account.** If conversion tracking is misconfigured (and it frequently is in inherited accounts), smart bidding is optimizing toward the wrong thing.
 - **Google's AI recommendations frequently work against a law firm's interest.** Broad match expansion, auto-applied recommendations, and Performance Max are designed for accounts with high conversion volume and diverse catalogs. Law firms have neither. Judge each recommendation against the account rather than accepting or rejecting the whole class.
 
 The change history of an inherited account tells you immediately how much the previous manager understood this. Managers who follow Google's recommendations leave a trail of auto-applied changes, broad match experiments, and PMax campaigns. Read that pattern as a prompt to check the underlying configuration, not as a verdict on the prior manager.
@@ -32,7 +32,7 @@ The one creative lever measured on these accounts is intent-matched and near-me 
 
 ### Search Intent Complexity
 
-Legal search intent is layered and often misread. Someone searching "how to get full custody" is in early research mode. Someone searching "family law attorney [city]" is much closer to engagement. These require different messaging, different landing pages, and ideally different campaigns. In practice, budget and traffic volume don't always make full segmentation possible — but the principle should guide structure wherever resources allow.
+Legal search intent is layered and often misread. Someone searching "how to get full custody" is in early research mode. Someone searching "family law attorney [city]" is much closer to engagement. These require different messaging, different landing pages, and ideally different campaigns. In practice, budget and traffic volume don't always make full segmentation possible, but the principle should guide structure wherever resources allow.
 
 **What looks like waste in legal but often isn't:**
 
@@ -48,7 +48,7 @@ Each of these is a candidate to check against the account's own conversion data.
 
 The instinct to block research queries because they're not transactional is correct in e-commerce and wrong in legal. Apply it cautiously.
 
-**Lead magnets and e-book downloads as real leads:** In legal, free guides, e-books, and checklists are genuine lead capture mechanisms. A person who downloads a divorce guide and submits their contact information has self-identified as someone with a divorce problem — they are a lead, not a content consumer. If a client uses resource downloads as primary conversions in an account, this is intentional strategy. Do not suggest moving them to secondary conversions or question their value without strong evidence they are not being followed up on.
+**Lead magnets and e-book downloads as real leads:** In legal, free guides, e-books, and checklists are genuine lead capture mechanisms. A person who downloads a divorce guide and submits their contact information has self-identified as someone with a divorce problem: they are a lead, not a content consumer. If a client uses resource downloads as primary conversions in an account, this is intentional strategy. Do not suggest moving them to secondary conversions or question their value without strong evidence they are not being followed up on.
 
 **Practice-area-dependent intent:** Relevance is practice-area-specific. A query that is unambiguously waste for one firm is often a core lead source for another. A guardianship query is waste for a firm that only takes divorce work; it is a core lead source for an elder practice. Before flagging a term category as waste, verify that the firm does not handle that case type, and check it against the operator's not-waste list. If the firm's practice list is unknown, ask before recommending a negative.
 
@@ -56,23 +56,23 @@ The instinct to block research queries because they're not transactional is corr
 
 Legal services are inherently local, and both geography and practice area are primary organizational levers. Separating markets by location and by topic allows independent budget control, independent bidding, and independent performance evaluation. Consolidating either dimension obscures what's actually working.
 
-Location targeting should not default to presence-only. Searchers who are outside a geographic area but searching within it are often strong prospects — they could understand which jurisdiction applies to their case and may already have specific reasons for targeting that market. Targeting decisions should follow client requirements and campaign objectives, not a blanket rule.
+Location targeting should not default to presence-only. Searchers who are outside a geographic area but searching within it are often strong prospects: they could understand which jurisdiction applies to their case and may already have specific reasons for targeting that market. Targeting decisions should follow client requirements and campaign objectives, not a blanket rule.
 
 ---
 
 ## Campaign Structure
 
-Campaigns should be organized by geography, practice area, or both — whichever creates the cleanest lines of control and performance visibility. The guiding question: does this campaign need its own budget, its own bid strategy, or its own messaging? If yes, it needs to be its own campaign.
+Campaigns should be organized by geography, practice area, or both, whichever creates the cleanest lines of control and performance visibility. The guiding question: does this campaign need its own budget, its own bid strategy, or its own messaging? If yes, it needs to be its own campaign.
 
 Google increasingly pushes consolidation. Resist it. When you merge a divorce campaign and a custody campaign into one, you lose the ability to see what's driving performance and what's dragging it. You also lose clean budget control.
 
-**Brand must be isolated.** Brand and non-brand traffic have fundamentally different economics and different conversion paths. Mixing them corrupts CPL data for non-brand keywords. In legal, branded search volume is often low enough that it barely affects account-wide metrics — but when mixed with non-brand, it flatters performance in a way that masks what's actually happening.
+**Brand must be isolated.** Brand and non-brand traffic have fundamentally different economics and different conversion paths. Mixing them corrupts CPL data for non-brand keywords. In legal, branded search volume is often low enough that it barely affects account-wide metrics, but when mixed with non-brand, it flatters performance in a way that masks what's actually happening.
 
 **Brand campaign pause risk: cannibalization.** Pausing a brand campaign does not simply save its spend. When brand campaigns go dark, competitors bidding on your brand terms fill the vacuum: they appear at the top of searches for your firm's name. Users who would have clicked your branded ad now see a competitor's ad first. The result: branded query traffic falls, and non-brand CPL rises across the account as the competitor captures bottom-of-funnel traffic you were previously protecting cheaply. This is the cannibalization mechanism. The net effect of pausing brand is often worse economics overall, even when the brand CPA looks high in isolation. Before recommending a pause, verify: (1) is the CPA based on reliable conversion volume for that account, the floor being volume-dependent judgment rather than a fixed count, and (2) what is competitor presence on branded queries? A high brand CPA with low conversion volume and active competitor bidding is usually better managed by reducing brand spend, not eliminating it.
 
 **Network settings:** Search network only is the default. That search partners and the display network deliver inferior traffic for legal at the same cost is a general expectation, not a measured result on these accounts. Search Partners being enabled is flagged as atypical unless a note on the account or campaign explains it. Segment before any exclusion decision (PB-26).
 
-**Competitor targeting:** Bidding on a competitor's brand name is a legitimate strategy in legal PPC — not an oversight. A firm may deliberately appear on searches for a specific rival to intercept comparison shoppers or suppress a competitor's budget. Before flagging competitor brand clicks as waste, distinguish:
+**Competitor targeting:** Bidding on a competitor's brand name is a legitimate strategy in legal PPC, not an oversight. A firm may deliberately appear on searches for a specific rival to intercept comparison shoppers or suppress a competitor's budget. Before flagging competitor brand clicks as waste, distinguish:
 
 - **Intentional competitor targeting** → strategy. The account notes or client context will indicate this. Do not recommend removing it without checking first.
 - **Accidental brand bleed** → broad match keywords or poor negatives catching a competitor's name as collateral traffic. This is waste.
@@ -132,7 +132,7 @@ Enhanced CPC does not appear in the hierarchy. The sub-floor case routes to Maxi
 
 ## Ad Copy
 
-Legal ad copy operates under bar association rules that vary by state — no guarantees, careful language around results, restrictions on certain claims. Within those constraints:
+Legal ad copy operates under bar association rules that vary by state: no guarantees, careful language around results, restrictions on certain claims. Within those constraints:
 
 **Headline principles (Ogilvy-informed):**
 
@@ -141,7 +141,7 @@ Legal ad copy operates under bar association rules that vary by state — no gua
 - "Need help with your visa? Here's how we make it stress-free" outperforms "Experienced Immigration Lawyer"
 - Use contrast to differentiate: "Other firms treat you like a case number. We treat you like a person."
 
-**Power words and emotional triggers:** Words like "trusted," "proven," and "award-winning" trigger authority and credibility — but only when backed by facts. Unsubstantiated power words feel gimmicky. Use them with supporting proof (testimonials, case count, recognition). Note: "expert" and "specialist" are designations specifically regulated by state bar associations and must not be used in ad copy unless the attorney holds the official certification — this varies by state and must be verified before use.
+**Power words and emotional triggers:** Words like "trusted," "proven," and "award-winning" trigger authority and credibility, but only when backed by facts. Unsubstantiated power words feel gimmicky. Use them with supporting proof (testimonials, case count, recognition). Note: "expert" and "specialist" are designations specifically regulated by state bar associations and must not be used in ad copy unless the attorney holds the official certification. This varies by state and must be verified before use.
 
 **Curiosity-driven copy:** "You might think every family law firm handles this the same way. Think again." Works at any funnel stage: it hooks early-stage researchers and reinforces differentiation for high-intent searchers.
 
@@ -150,42 +150,42 @@ Legal ad copy operates under bar association rules that vary by state — no gua
 - High-intent users (searching "family law attorney [city]") → Direct, action-oriented, urgency-focused copy. "Call now for a free consultation."
 - Awareness-stage users (searching "how to file for divorce") route to educational framing and a softer call to action. Where the account runs a guide or ebook, that download is the primary conversion for this stage, never a secondary one.
 
-**RSAs:** Unpinned by default to allow testing. Pinning is a concession to client requirements, not a performance decision. Ad strength scores from Google reflect Google's preference for creative flexibility — not actual performance. Treat them accordingly.
+**RSAs:** Unpinned by default to allow testing. Pinning is a concession to client requirements, not a performance decision. Ad strength scores from Google reflect Google's preference for creative flexibility, not actual performance. Treat them accordingly.
 
-**Ad extensions:** Use all relevant extensions — callouts, sitelinks, structured snippets, call extensions. Schedule call extensions for office hours only. Extensions give the ad more space on the results page and more information surface area without additional cost.
+**Ad extensions:** Use all relevant extensions: callouts, sitelinks, structured snippets, call extensions. Schedule call extensions for office hours only. Extensions give the ad more space on the results page and more information surface area without additional cost.
 
 ---
 
 ## Diagnosing Performance
 
-Every analysis session has a brief — sometimes it comes from the client, sometimes it's self-directed in the course of ongoing optimization. Either way, the brief determines where to look first. There is no universal starting point.
+Every analysis session has a brief: sometimes it comes from the client, sometimes it's self-directed in the course of ongoing optimization. Either way, the brief determines where to look first. There is no universal starting point.
 
 **Reading the account before drawing conclusions:**
 
-- **Conversion tracking** — Verify that what's being tracked aligns with actual business objectives. Inherited accounts frequently have misconfigured tracking, duplicate conversions, or conversions that don't represent real leads. This is always worth checking early.
-- **Change history** — Read it early. An account untouched for weeks is being neglected. An account flooded with auto-applied changes is being mismanaged by Google. The pattern of changes tells you what kind of problem you're dealing with before you look at performance data.
+- **Conversion tracking**: Verify that what's being tracked aligns with actual business objectives. Inherited accounts frequently have misconfigured tracking, duplicate conversions, or conversions that don't represent real leads. This is always worth checking early.
+- **Change history**: Read it early. An account untouched for weeks is being neglected. An account flooded with auto-applied changes is being mismanaged by Google. The pattern of changes tells you what kind of problem you're dealing with before you look at performance data.
 
-**CPC as a diagnostic data point.** Rising CPCs without a corresponding account change typically indicate increased competition or algorithmic shifts — but CPC alone doesn't tell you what to do. Always verify with impression share data before drawing conclusions. IS lost to budget and IS lost to rank tell different stories and point to different solutions. The auction insights panel is consulted when you need to identify specific competitors or understand overlap — not as a first step.
+**CPC as a diagnostic data point.** Rising CPCs without a corresponding account change typically indicate increased competition or algorithmic shifts, but CPC alone doesn't tell you what to do. Always verify with impression share data before drawing conclusions. IS lost to budget and IS lost to rank tell different stories and point to different solutions. The auction insights panel is consulted when you need to identify specific competitors or understand overlap, not as a first step.
 
-**Landing pages must be verified visually.** A cluttered page, too many competing CTAs, or messaging misaligned with the ad is often the real problem — and no amount of keyword or bid optimization will fix it. Visual verification is required; this cannot be assessed from data alone.
+**Landing pages must be verified visually.** A cluttered page, too many competing CTAs, or messaging misaligned with the ad is often the real problem, and no amount of keyword or bid optimization will fix it. Visual verification is required; this cannot be assessed from data alone.
 
-**Declining performance has multiple causes.** If nothing in the account has changed meaningfully, external factors are the likely culprit — increased competition, algorithm shifts, or creative staleness. Ad copy and assets that haven't been refreshed in 6–12+ months frequently produce gradual CTR decline that gets misattributed to bidding or competition issues. Staleness is real and often overlooked.
+**Declining performance has multiple causes.** If nothing in the account has changed meaningfully, external factors are the likely culprit: increased competition, algorithm shifts, or creative staleness. Ad copy and assets that haven't been refreshed in 6–12+ months frequently produce gradual CTR decline that gets misattributed to bidding or competition issues. Staleness is real and often overlooked.
 
-**Quality score as a diagnostic lens.** Quality score should never be chased as a primary objective — optimizing for QS without regard to actual business performance is a trap. However, its impact on account performance is undeniable. Low QS on important keywords increases CPC, reduces impression share, and degrades ad rank. When IS rank loss or CPC inflation appears, check QS components — expected CTR, ad relevance, and landing page experience — to triangulate whether the issue is a bidding problem or a relevance problem. They require different fixes.
+**Quality score as a diagnostic lens.** Quality score should never be chased as a primary objective: optimizing for QS without regard to actual business performance is a trap. However, its impact on account performance is undeniable. Low QS on important keywords increases CPC, reduces impression share, and degrades ad rank. When IS rank loss or CPC inflation appears, check QS components (expected CTR, ad relevance, and landing page experience) to triangulate whether the issue is a bidding problem or a relevance problem. They require different fixes.
 
-**Volume drops in legal:** Unusual enough to always warrant attention when they occur, but the timeframe for what constitutes a meaningful volume drop in legal is much longer than in e-commerce. Legal search volume is inherently lower and more cyclical — a drop needs to be evaluated over weeks, not days. When volume does drop sharply, it is almost always caused by a structural change in the account or sandboxing from too many rapid changes.
+**Volume drops in legal:** Unusual enough to always warrant attention when they occur, but the timeframe for what constitutes a meaningful volume drop in legal is much longer than in e-commerce. Legal search volume is inherently lower and more cyclical: a drop needs to be evaluated over weeks, not days. When volume does drop sharply, it is almost always caused by a structural change in the account or sandboxing from too many rapid changes.
 
 ---
 
 ## Long-Term Keyword Management
 
-Short-term data is one of the most common sources of bad keyword decisions. A keyword that appears acceptable over 30 days may reveal consistent underperformance over 90 days — and a keyword that looks like a problem in a bad week may be a strong performer over a longer window. Always check multiple date ranges before making keyword-level decisions.
+Short-term data is one of the most common sources of bad keyword decisions. A keyword that appears acceptable over 30 days may reveal consistent underperformance over 90 days, and a keyword that looks like a problem in a bad week may be a strong performer over a longer window. Always check multiple date ranges before making keyword-level decisions.
 
 When auditing keywords, look for:
 
-- **Long-term bleed** — keywords generating consistent clicks with few or no conversions over extended periods. These are often left running because short-term data doesn't flag them clearly.
-- **Conversion clustering** — keywords that convert well in bursts but go cold for long stretches. These may reflect seasonality or market conditions rather than keyword quality.
-- **CPC drift** — gradual CPC increases on specific keywords over time that don't correspond to performance improvements. This is a signal of increasing competition on that term and may require bid strategy reconsideration.
+- **Long-term bleed**: keywords generating consistent clicks with few or no conversions over extended periods. These are often left running because short-term data doesn't flag them clearly.
+- **Conversion clustering**: keywords that convert well in bursts but go cold for long stretches. These may reflect seasonality or market conditions rather than keyword quality.
+- **CPC drift**: gradual CPC increases on specific keywords over time that don't correspond to performance improvements. This is a signal of increasing competition on that term and may require bid strategy reconsideration.
 
 The instinct to pause or remove underperforming keywords based on a bad month is often wrong. The instinct to keep running keywords that have never converted because they get clicks is also wrong. The right answer is in the longer-term data, and most managers don't look far enough back.
 
