@@ -18,17 +18,19 @@
     },
     {
       "id": 5,
-      "prompt": "Skip the coverage check, just show me the top waste terms for Apex Law.",
-      "expected_output": "Holds the line on the coverage check. Does not comply with 'skip.' Explains why the coverage check is required — waste estimates without it are unreliable — and runs it first before showing terms.",
+      "prompt": "Skip the tracking check, just show me the top waste terms for Apex Law.",
+      "expected_output": "Holds the line on PF-1. Does not comply with 'skip.' Explains why tracking verification cannot be skipped, that a tracking problem invalidates every downstream figure including which terms look like waste, and runs it first before showing terms. Reports the search-term figures the pull returns without estimating anything it did not see.",
       "files": [],
       "assertions": [
-        "[REASONING] Explicitly states it will NOT skip the coverage check despite the instruction — the bypass is acknowledged and rejected",
-        "[REASONING] Explains WHY the coverage check cannot be skipped — not just 'the process requires it' but the actual reason: waste numbers without a denominator are unreliable (could represent 30% or 70% of actual spend)",
-        "[EXECUTION] Runs or describes running GAQL 13.1 (actual campaign spend) before pulling search terms — describes the query and expected output before showing waste terms",
-        "[EXECUTION] Does NOT estimate, extrapolate, or scale any figure to stand for spend the pull did not return"
+        "[REASONING] Explicitly states it will NOT skip PF-1 tracking verification despite the instruction, so the bypass is acknowledged and rejected",
+        "[REASONING] Explains WHY it cannot be skipped: a tracking problem invalidates every downstream figure, so a term cannot be called waste before the conversion data behind it is trusted",
+        "[EXECUTION] Runs or describes running the PF-1 conversion-action configuration pull before presenting any waste term",
+        "[EXECUTION] Does NOT estimate, extrapolate, or scale any figure to stand for spend the pull did not return",
+        "[EXECUTION] Does NOT compute or state a search-term coverage ratio",
+        "[REASONING] Never proposes a negative for a term that has converted"
       ],
       "unconfirmed": [
-        "The coverage-ratio framing was withdrawn on 2026-09-02. See evals_v5.json case 502."
+        "Repointed 2026-09-02: this case graded the retired search-term coverage check. It now grades the same adversarial-pressure behaviour against PF-1, which is the gate that survived."
       ]
     },
     {

@@ -103,25 +103,28 @@
     {
       "id": 203,
       "category": "playbook_optimization",
-      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Probate'. Coverage computed and stated: visible search-term spend $1,880 of $3,410 actual (55%). The n-gram 'estate paperwork help' appears across 9 terms, $190 visible spend (10% of visible), and 1 conversion at $186. Query filters correct: search_term_view.status selected, ad_group.status = 'ENABLED', no status = NONE rows. Produce the walk card.",
+      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Probate'. A search-term pull returns $1,880 of spend across the campaign's terms. The n-gram 'estate paperwork help' appears across 9 terms, $190 of that spend, and 1 conversion at $186. Query filters correct: search_term_view.status selected, ad_group.status = 'ENABLED', no status = NONE rows. Produce the walk card.",
       "expected_behaviors": [
-        "Reports the coverage statement (55%, $1,880 of $3,410) as data, using the campaign spend as the denominator, not an account total",
+        "Reports the $1,880 and the n-gram's $190 as the measured figures they are, with no estimate of spend the pull did not return",
         "Reports the n-gram and its conversion as data, with no PB-nn move line and no accept/reject proposal (a 'playbooks: none fired' line is the empty form and is allowed; naming PB-13 as a gated candidate without a move is not a card line)",
         "States that n=1 conversion is below the reliability floor for this campaign's volume, so the term's $186 figure is not a CPA judgment"
       ],
       "must_not": [
         "Does NOT add a PB-13 move line (pattern + standard move + accept/reject) or any negative-keyword proposal for 'estate paperwork help', because the n-gram has converted (the PB-13 do-not-move condition: negatives never block a term with conversion history)",
-        "Does NOT round the 1 conversion down to zero or otherwise imply the term is a clean waste case"
+        "Does NOT round the 1 conversion down to zero or otherwise imply the term is a clean waste case",
+        "Does NOT compute or state a search-term coverage ratio",
+        "Does NOT claim that the Google Ads API under-reports search terms or caps rows",
+        "Does NOT extrapolate or scale any figure to stand for spend the pull did not return"
       ],
-      "trap": "Proposes a negative for a converting n-gram, or emits a PB-nn move line / accept-reject proposal for it.",
-      "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-03 (gated case: the converting n-gram must NOT be proposed as a negative). Pair with case 204 for the contrasting fire case."
+      "trap": "Proposes a negative for a converting n-gram, emits a PB-nn move line or accept-reject proposal for it, or computes a coverage ratio and reports waste as a share of visible spend (the pre-refresh instruction, now withdrawn).",
+      "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-03 (gated case: the converting n-gram must NOT be proposed as a negative). Pair with case 204 for the contrasting fire case. Coverage-ratio reporting removed 2026-09-02: the skill reports what the pull returns and never estimates unseen spend."
     },
     {
       "id": 204,
       "category": "playbook_optimization",
-      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Probate'. Coverage computed and stated: visible search-term spend $1,880 of $3,410 actual (55%). The n-gram 'estate paperwork help' appears across 9 terms, $190 visible spend (10% of visible), and 0 conversions over 74 days. Query filters correct: search_term_view.status selected, ad_group.status = 'ENABLED', no status = NONE rows. Produce the walk card.",
+      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Probate'. A search-term pull returns $1,880 of spend across the campaign's terms. The n-gram 'estate paperwork help' appears across 9 terms, $190 of that spend, and 0 conversions over 74 days. Query filters correct: search_term_view.status selected, ad_group.status = 'ENABLED', no status = NONE rows. Produce the walk card.",
       "expected_behaviors": [
-        "Reports the coverage statement as data",
+        "Reports the $190 as the measured figure it is, with no estimate of spend the pull did not return",
         "Names PB-13 and uses the card-line grammar (playbook PB-13 (<scope>): standard move for ... is .... accept/reject)",
         "Ends the playbook line with accept/reject",
         "States the caveat 'existing negatives not checked' (or equivalent) because the existing-negatives pull was not supplied, and the standard move starts with that pull",
@@ -129,10 +132,12 @@
       ],
       "must_not": [
         "Does NOT propose a negative from a library category rather than from the account's own search terms",
-        "Does NOT phrase the line as a verdict on the campaign or the keyword ('this term is junk')"
+        "Does NOT phrase the line as a verdict on the campaign or the keyword ('this term is junk')",
+        "Does NOT compute or state a search-term coverage ratio",
+        "Does NOT extrapolate or scale any figure to stand for spend the pull did not return"
       ],
-      "trap": "Phrases the line as a verdict on the campaign or the keyword ('this term is junk'), proposes a negative from a library category rather than from the account's own search terms, or omits PB-13 entirely.",
-      "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-03 second variant (the fire case, contrasting with 203's gated case)."
+      "trap": "Phrases the line as a verdict on the campaign or the keyword ('this term is junk'), proposes a negative from a library category rather than from the account's own search terms, computes a coverage ratio, or omits PB-13 entirely.",
+      "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-03 second variant (the fire case, contrasting with 203's gated case). Coverage-ratio reporting removed 2026-09-02: the skill reports what the pull returns and never estimates unseen spend."
     },
     {
       "id": 205,
@@ -154,16 +159,17 @@
     {
       "id": 206,
       "category": "playbook_optimization",
-      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Divorce', location setting PRESENCE_OR_INTEREST. Search terms show 'divorce lawyer northbridge' and four other out-of-area city terms, together $240 of $2,100 visible campaign search-term spend (11%), zero conversions across all five. Coverage stated. User-location data confirms out-of-area clicks. Produce the walk card.",
+      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Divorce', location setting PRESENCE_OR_INTEREST. Search terms show 'divorce lawyer northbridge' and four other out-of-area city terms, together $240 of the campaign's $2,100 search-term spend (11%), zero conversions across all five. User-location data confirms out-of-area clicks. Produce the walk card.",
       "expected_behaviors": [
-        "Adds one playbook line: 'playbook PB-28 (Westhollow - Divorce): standard move for out-of-area terms at 10%+ of visible search spend is geo-token negatives plus location exclusions, targeting setting unchanged. accept/reject'",
+        "Adds one playbook line: 'playbook PB-28 (Westhollow - Divorce): standard move for out-of-area terms at 10%+ of the campaign's search-term spend is geo-token negatives plus location exclusions, targeting setting unchanged. accept/reject'",
         "Names the geo tokens (city names) as the negative-candidate scope, not the service keyword",
-        "Names that out-of-area spend is 11% of visible campaign search-term spend (above the 10% PROPOSED trigger) and that zero conversions cleared the do-not-move gate",
+        "Names that out-of-area spend is 11% of the campaign's search-term spend (above the 10% PROPOSED trigger) and that zero conversions cleared the do-not-move gate",
         "Treats PRESENCE_OR_INTEREST as a config MATCH, never as a conditionally-available lever"
       ],
       "must_not": [
         "Does NOT propose changing positive_geo_target_type away from PRESENCE_OR_INTEREST",
-        "Does NOT propose negating the service token ('divorce lawyer') instead of the geo token"
+        "Does NOT propose negating the service token ('divorce lawyer') instead of the geo token",
+        "Does NOT compute or state a search-term coverage ratio"
       ],
       "trap": "Proposes flipping PRESENCE_OR_INTEREST to presence-only, treats the setting as a lever, or negates the service token instead of the geo token.",
       "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-05. Directly reinforces the fixture-1 false-flag rule (agency-defaults.md Sec 1.5) inside a playbook-triggering scenario: the standard move for geo leakage is negatives, never a targeting-setting change."

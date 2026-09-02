@@ -132,13 +132,13 @@ Look at clicks. If clicks are also low relative to impression share expectations
 - **Clicks are low / impressions are low** → Traffic volume is the issue, not conversion rate. Move to Sub-tree A (Impression Share Diagnosis).
 - **Clicks are present in reasonable volume** → Conversion rate is the issue. Continue below.
 
-What is "reasonable volume"? There is no universal threshold — evaluate relative to the account's own history (pull GAQL 6.2 for 90-day baseline and compare periods).
+What is "reasonable volume"? There is no universal threshold: evaluate relative to the account's own history on aligned complete windows, the last 30 days against the prior 30 (GAQL 6.2). The 90-day series is context only.
 
 ---
 
 **Step 2: Is this a new problem or has CVR always been low?**
 
-Compare current CVR (conversions ÷ clicks) against 90-day baseline (GAQL 6.2).
+Compare current CVR (conversions ÷ clicks) on aligned complete windows, the last 30 days against the prior 30 (GAQL 6.2). The 90-day series is context only, never the comparison basis.
 
 - **CVR has dropped from prior period** → Something changed. When? Cross-reference with change history (PF-3). Continue to Step 3.
 - **CVR has never been good** → This is a structural or offer problem, not a recent change problem. The account may be driving traffic to an ineffective landing page. Continue to Step 4.

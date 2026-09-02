@@ -55,7 +55,7 @@ Precedence, highest first: a live GAQL pull, then the operator's recorded ruling
 
 ## Account macro context: a reasoning gate, not a report section
 
-Before any item-level work, establish the account's direction: spend, conversion volume, lead volume, and CPL against the prior 90-day baseline, plus year-over-year where the data spans long enough. This is pulled every session without exception.
+Before any item-level work, establish the account's direction on aligned complete windows: spend, conversion volume, lead volume, and CPL for the last 30 days against the prior 30, plus year-over-year where the data spans long enough. The 90-day series is context for the shape of the trend, never the comparison basis. This is pulled every session without exception.
 
 It is a gate on the recommendation, not an output section. Surface it only when it changes the reading:
 

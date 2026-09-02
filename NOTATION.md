@@ -58,7 +58,10 @@ One JSON object per line. Required: `id`, `ts`, `account`, `platform`, `type`, `
 - `re` — array of entry ids this entry refers to (outcome → its decision; superseding entry → superseded).
 - `verdict` — on outcome: `met | not_met | mixed | unclear`.
 - `config_override` — on a `rule` only: `{setting, account_value, agency_default, applies_to?}`. Records a deliberate departure from `references/agency-defaults.md`. See §8.
-- `source`: `{actor, ref}`. `actor` is the party the entry came from; `ref` is an optional external reference id, or null. Decisions belong to the operator unless recorded otherwise.
+- `source`: `{actor, ref}`. `actor` is the party the entry came from, and the schema accepts exactly five
+  values: `operator`, `toby`, `ra-clients`, `ra-proj`, `automation`. `ref` is an optional external reference
+  id, or null. A ref is a generic identifier: letters, digits, dot, colon, underscore and hyphen, starting
+  with a letter or digit. Decisions belong to the operator unless recorded otherwise.
 - `session` — check id, `YYYY-MM-DD-<slug>` (matches the rendered session-log filename).
 - `migrated` — `true` only on backfilled entries parsed from the legacy md ledgers.
 
