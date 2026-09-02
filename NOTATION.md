@@ -82,9 +82,10 @@ before writing, and it does nothing at all to a journal that has no legacy value
 
 Because append, render and validate all read the whole file, one v1 record would otherwise block
 every operation on that account. So `journal.py validate` does not fail with a bare enum error on
-the four known values: it reports `legacy platform values found: run journal.py migrate` with a
-count per value, and the fix is one command. That hint is never offered for a value migrate
-cannot handle, which fails on the enum like any other bad field.
+the four known values: it reports `legacy platform values found: run journal.py migrate <slug>`
+with a count per value, naming the journal's own slug so the hint is a command you can paste as
+written. That hint is never offered for a value migrate cannot handle, which fails on the enum like
+any other bad field.
 
 ## 4. The outcome loop (why this beats prose notes)
 

@@ -277,8 +277,9 @@ def validate_records(
 
     `unsaved_lines` names the line numbers of records that are not on disk yet,
     such as the candidate an append is about to write. Those never get the
-    'run journal.py migrate' hint, because migrate rewrites files and cannot
-    help an entry that has not been written. They get the ordinary enum error.
+    'run journal.py migrate <slug>' hint, because migrate rewrites files and
+    cannot help an entry that has not been written. They get the ordinary enum
+    error.
     """
     errors: list[str] = []
     pending = unsaved_lines or set()
@@ -373,7 +374,8 @@ def validate_records(
             f"{name}={count}" for name, count in sorted(legacy_platforms.items())
         )
         errors.append(
-            f"{path}: legacy platform values found: run journal.py migrate. {detail}"
+            f"{path}: legacy platform values found: "
+            f"run journal.py migrate {slug}. {detail}"
         )
     return errors
 

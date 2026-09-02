@@ -206,7 +206,12 @@ class JournalTests(unittest.TestCase):
         records, parse_errors = journal.read_journal(path)
         self.assertEqual(parse_errors, [])
         errors = journal.validate_records(path, records)
-        self.assertTrue(any("run journal.py migrate" in error for error in errors))
+        self.assertTrue(
+            any(
+                "run journal.py migrate example-family-law" in error for error in errors
+            ),
+            "the hint names the slug, so it can be run as written",
+        )
         self.assertTrue(any("callrail=1" in error for error in errors))
         self.assertTrue(any("hubspot=1" in error for error in errors))
         self.assertFalse(
@@ -254,7 +259,7 @@ class JournalTests(unittest.TestCase):
         with self.assertRaises(journal.JournalError) as caught:
             journal.append_entry("example-family-law", candidate)
         message = str(caught.exception)
-        self.assertIn("run journal.py migrate", message)
+        self.assertIn("run journal.py migrate example-family-law", message)
         self.assertIn("callrail=1", message)
 
     def test_unknown_platform_stays_a_plain_validation_error(self):
@@ -278,6 +283,7 @@ class JournalTests(unittest.TestCase):
         )
         hints = [error for error in errors if "run journal.py migrate" in error]
         self.assertEqual(len(hints), 1)
+        self.assertIn("run journal.py migrate example-family-law", hints[0])
         self.assertIn("callrail=1", hints[0])
         self.assertNotIn("sms", hints[0])
 
