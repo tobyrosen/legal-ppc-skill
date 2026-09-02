@@ -191,7 +191,7 @@ WHERE ad_group_criterion.type = 'KEYWORD'
 ORDER BY campaign.name, ad_group.name
 ```
 
-**What to look for:** Quality scores below 5 on important keywords — check which QS component is below average (`BELOW_AVERAGE`): `search_predicted_ctr` = ad copy problem; `creative_quality_score` = ad relevance problem; `post_click_quality_score` = landing page problem.
+**What to look for:** the quality-score trend on the spending keywords rather than any cutoff. A falling quality score with impressions collapsing while ad rank and bid hold is the throttling shape and is a finding. Where the score is falling, check which QS component is below average (`BELOW_AVERAGE`): `search_predicted_ctr` = ad copy problem; `creative_quality_score` = ad relevance problem; `post_click_quality_score` = landing page problem.
 
 **Required filter:** `ad_group_criterion.negative = FALSE` is mandatory. `ad_group_criterion` returns both positive and negative keywords — omitting this filter causes ad-group-level negatives to appear as positive keywords, producing false BROAD match flags and misidentified waste (P6).
 

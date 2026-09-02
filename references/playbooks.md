@@ -116,7 +116,7 @@ The line names a pattern and the standard move for that pattern. It never charac
 PLAYBOOKS: 4 triggered, 3 carded
 playbook PB-02 (Northbridge - Estate Litigation): standard move for rank-lost IS 58% on a converting campaign with page ownership confirmed is a landing-page relevance pass before any bid change. accept/reject
 playbook PB-24 (account): standard move for call conversions down 61% vs the trailing 4-week average is a call-tracking route check before any bidding read. accept/reject
-playbook PB-11 (Northbridge - Trust Disputes): standard move for a BROAD keyword carrying 44% of spend at zero conversions over 30 days is pausing it and adding the phrase-match equivalent. accept/reject
+playbook PB-11 (Northbridge - Trust Disputes): standard move for a BROAD keyword carrying 44% of spend at zero conversions over 30 days is converting it to phrase match and monitoring search terms for 2 to 4 weeks. accept/reject
 surplus journaled: PB-21
 ```
 

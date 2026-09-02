@@ -410,7 +410,7 @@ This is your baseline. You need to understand what "normal" looks like for this 
 
 Pull: GAQL 3.1 (keywords with QS), GAQL 3.2 (match type distribution), GAQL 3.3 (90-day keyword performance)
 
-Flag: broad match keywords, keywords with QS < 5 that are spending significantly, and keywords with 90-day cost and zero conversions (long-term bleed). Don't make keyword decisions yet — flag for further evaluation.
+Flag: broad match keywords, keywords with 90-day cost and zero conversions (long-term bleed), and the quality-score trend on the spending keywords. No quality-score cutoff is asserted: a falling quality score with impressions collapsing while ad rank and bid hold is the throttling shape and is a finding. Don't make keyword decisions yet, flag for further evaluation.
 
 ---
 
@@ -418,7 +418,7 @@ Flag: broad match keywords, keywords with QS < 5 that are spending significantly
 
 Pull: GAQL 9.1 (shared negative lists), GAQL 9.3 (campaign-level negatives), GAQL 9.4 (ad group negatives)
 
-No shared negative list at all = immediate flag. Compare contents of any existing lists against the negative keyword library. Identify obvious gaps.
+The absence of a shared negative list is a config item at most, never a red flag on its own (agency-defaults 4.1, negative-keyword-library "How to Use This Library"). Record it as info. Whether the account needs one, and which categories belong in it, is decided against the account's own search-term data. Compare contents of any existing lists against the negative keyword library. Identify obvious gaps.
 
 ---
 
@@ -647,7 +647,7 @@ Pull: GAQL 3.4 (keyword-level impressions). If most or all keywords have near-ze
 
 **Called from:** Tree 2 (Step 2), Tree 3 (Step 3), Sub-tree A
 
-**When:** IS rank loss is elevated, CPC inflation is present without external explanation, or specific keywords show QS < 6 with meaningful spend.
+**When:** IS rank loss is elevated, CPC inflation is present without external explanation, or the quality score on meaningfully spending keywords is falling while impressions collapse and ad rank and bid hold. Quality score is watched as a trend; no cutoff separates a quality problem from competition.
 
 Pull: GAQL 3.1 (keywords with QS components)
 
@@ -671,7 +671,7 @@ _[operator version]: Check the account's recorded context. If landing-page quali
 Address in order: landing page first (highest impact, foundational), then ad relevance (structural fix), then CTR (copy optimization). Don't optimize ad copy on a broken landing page.
 
 **Quality score is healthy across the spending keywords but CPC is still inflating:**
-Quality score is not the primary cause. This is competitive pressure: other advertisers are bidding more for these keywords. Refer to Tree 2 Step 4 (CPC spike diagnosis). No quality-score cutoff is asserted here; there is no confirmed number that separates a quality problem from competition.
+Quality score is not the primary cause. This is competitive pressure: other advertisers are bidding more for these keywords. Refer to Tree 2 Step 4 (CPC spike diagnosis). No quality-score cutoff is asserted anywhere in this skill; there is no confirmed number that separates a quality problem from competition. Quality score is watched as a trend, and the reportable shape is a falling score with impressions collapsing while ad rank and bid hold.
 
 ---
 
@@ -730,7 +730,7 @@ Read change history for bid strategy changes. Count the days since the last chan
 Look at 30-day conversion count per campaign (GAQL 2.3).
 
 - **tCPA running below the account's reliability floor**, which is volume-dependent judgment rather than a fixed count: insufficient. The algorithm cannot learn effectively. Recommendation: switch to Maximize Conversions (no tCPA target) until volume builds. Maximize Conversions is more forgiving at low volume because it's optimizing direction rather than a specific target.
-- **Maximize Conversions with very low conversions (< 5/month)**: even this strategy struggles. Consider whether eCPC (manual with bid adjustments) is more appropriate until the account builds enough history.
+- **Maximize Conversions still below the account's reliability floor**: even this strategy struggles. Where average CPC is also high against the campaign's own trailing 30-day median, route to PB-08: switch to Maximize Clicks with a CPC cap to buy volume and rebuild conversion signal while capping runaway auctions, with a 3 to 4 week revisit and conversion rate watched, because Max Clicks optimises for clicks. Enhanced CPC and manual CPC are not the low-volume fallback; enhanced CPC does not appear in the bidding hierarchy at all.
 
 ---
 

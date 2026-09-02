@@ -5,6 +5,10 @@ account-notes/
 # ...except the committed synthetic eval fixtures (real account-notes/ stays ignored)
 !evals/fixtures/account-notes/
 session-logs/
+notes/
+# Journals written by a run with no PPC_JOURNAL_ROOT set: the default data
+# root is this repo, so ./journal/<slug>.jsonl must never be committed.
+/journal/*.jsonl
 references/learnings.md
 skills/
 __pycache__/

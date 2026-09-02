@@ -5,7 +5,7 @@ Runs in CI on every push/PR to this public repo. It knows nothing about
 any specific client, firm, or account — it only looks for SHAPES that
 real account data tends to take:
 
-  1. 10-digit numbers shaped like a Google/Meta Ads customer ID
+  1. 10-digit numbers shaped like a Google Ads customer ID
   2. phone-number-shaped strings (xxx-xxx-xxxx / (xxx) xxx-xxxx / xxx.xxx.xxxx)
   3. email addresses that are not obviously placeholder addresses
 

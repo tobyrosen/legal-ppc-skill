@@ -29,7 +29,7 @@ class JournalTests(unittest.TestCase):
             "platform": "google",
             "type": "obs",
             "status": "closed",
-            "source": {"actor": "ra-clients", "ref": None},
+            "source": {"actor": "operator", "ref": None},
             "session": "2026-07-01-example-family-law",
             "tags": ["watch"],
             "body": "Synthetic observation.",
@@ -173,7 +173,7 @@ class JournalTests(unittest.TestCase):
         )
         self.assertIn("account `PRESENCE` (baseline `PRESENCE_OR_INTEREST`)", rendered)
         self.assertIn("scope: Search - Family Law", rendered)
-        self.assertIn("approved by ra-clients on 2026-07-01", rendered)
+        self.assertIn("approved by operator on 2026-07-01", rendered)
         overrides_block, rules_block = rendered.split("## Standing Rules", 1)
         self.assertIn("example-family-law-20260701-01", overrides_block)
         self.assertNotIn("example-family-law-20260701-01", rules_block)

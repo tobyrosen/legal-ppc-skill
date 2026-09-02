@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Append, validate, query, render, and summarize Google Ads journals."""
+"""Append, validate, query, render, and summarize Google Ads journals.
+
+Journals, rendered notes, and session logs live under a data root. Set
+PPC_JOURNAL_ROOT to put that root wherever you keep account data, which
+for an operator is normally a private directory outside this repo. With
+no override the root is the repo itself, so journals land in ./journal.
+"""
 
 from __future__ import annotations
 
@@ -16,20 +22,18 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-# Where journals, rendered notes, and session logs live: always OUTSIDE the
-# skill repo. Operators set PPC_JOURNAL_ROOT; otherwise a sibling
-# `RA-Clients/GoogleAds` layout is used if present, else ~/.legal-ppc-skill.
+REPO_ROOT = SCRIPT_DIR.parent
+# Where journals, rendered notes, and session logs live. PPC_JOURNAL_ROOT
+# overrides, and an operator holding real account data should set it to a
+# private directory outside this repo. The default root is the repo itself,
+# so an unconfigured run writes ./journal/<slug>.jsonl next to this file.
 
 
 def _data_root() -> Path:
     env = os.environ.get("PPC_JOURNAL_ROOT")
     if env:
         return Path(env).expanduser()
-    if len(SCRIPT_DIR.parents) > 3:
-        legacy = SCRIPT_DIR.parents[3] / "RA-Clients" / "GoogleAds"
-        if legacy.is_dir():
-            return legacy
-    return Path.home() / ".legal-ppc-skill"
+    return REPO_ROOT
 
 
 DATA_ROOT = _data_root()
@@ -748,7 +752,7 @@ def build_parser() -> argparse.ArgumentParser:
     append_parser.add_argument("--review-by")
     append_parser.add_argument("--re", action="append")
     append_parser.add_argument("--verdict", choices=VERDICT_ORDER)
-    append_parser.add_argument("--source-actor", default="ra-clients")
+    append_parser.add_argument("--source-actor", default="operator")
     append_parser.add_argument("--source-ref")
     append_parser.add_argument("--session")
     append_parser.add_argument("--metrics-json")

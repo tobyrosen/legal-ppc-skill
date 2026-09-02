@@ -22,10 +22,10 @@ overwritten by the next render.
 | Path                                                                | What                                                                                  | Written by                          |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------- |
 | `$PPC_JOURNAL_ROOT/journal/<slug>.jsonl`                            | The journal (system of record)                                                        | `journal.py append` during checks   |
-| `$PPC_JOURNAL_ROOT/journal/vocab.json`                              | Controlled tag vocabulary                                                             | ra-proj (deliberate additions only) |
+| `$PPC_JOURNAL_ROOT/journal/vocab.json`                              | Controlled tag vocabulary                                                             | methodology maintainer (deliberate) |
 | `$PPC_JOURNAL_ROOT/notes/<slug>.md`                                 | Rendered account notes (open rules, pending by review date, recent outcomes, context) | `journal.py render`                 |
 | `$PPC_JOURNAL_ROOT/session-logs/<date>-<slug>.md`                   | Rendered per-check log                                                                | `journal.py render`                 |
-| skill `journal/` dir (schema.json, vocab schema, journal.py, tests) | Method + tooling                                                                      | ra-proj                             |
+| skill `journal/` dir (schema.json, vocab schema, journal.py, tests) | Method + tooling                                                                      | methodology maintainer              |
 
 Account slugs match the operator's existing capture set: one lower-case, hyphenated firm slug per
 account, for example `example-family-law`. The roster itself is private and lives outside this repo.
@@ -40,7 +40,7 @@ One JSON object per line. Required: `id`, `ts`, `account`, `platform`, `type`, `
 - `id` — `<slug>-<YYYYMMDD>-<NN>` (per-account, per-day sequence). Unique per file.
 - `ts` — ISO 8601 with offset (`2026-08-10T09:15:00+07:00`).
 - `account` — account slug.
-- `platform` — `google | meta | callrail | ga4 | hubspot | site | admin | other`.
+- `platform`: `google | call-tracking | analytics | crm | site | admin | other`.
 - `type` — the event kind:
   - `obs` — data point / observation, no action implied
   - `flag` — anomaly raised for a decision
@@ -58,10 +58,11 @@ One JSON object per line. Required: `id`, `ts`, `account`, `platform`, `type`, `
 - `re` — array of entry ids this entry refers to (outcome → its decision; superseding entry → superseded).
 - `verdict` — on outcome: `met | not_met | mixed | unclear`.
 - `config_override` — on a `rule` only: `{setting, account_value, agency_default, applies_to?}`. Records a deliberate departure from `references/agency-defaults.md`. See §8.
-- `source`: `{actor, ref}`. `actor` is the party the entry came from, and the schema accepts exactly five
-  values: `operator`, `toby`, `ra-clients`, `ra-proj`, `automation`. `ref` is an optional external reference
-  id, or null. A ref is a generic identifier: letters, digits, dot, colon, underscore and hyphen, starting
-  with a letter or digit. Decisions belong to the operator unless recorded otherwise.
+- `source`: `{actor, ref}`. `actor` is the party the entry came from, recorded as a free-form non-empty
+  string rather than a fixed list. Recommended values, offered as examples and not as an enum:
+  `operator`, `agent`, `automation`. `ref` is an optional external reference id, or null. A ref is a
+  generic identifier: letters, digits, dot, colon, underscore and hyphen, starting with a letter or
+  digit. Decisions belong to the operator unless recorded otherwise.
 - `session` — check id, `YYYY-MM-DD-<slug>` (matches the rendered session-log filename).
 - `migrated` — `true` only on backfilled entries parsed from the legacy md ledgers.
 
@@ -73,7 +74,7 @@ check. The check then appends `outcome` entries with honest verdicts. Over time
 `journal.py` can answer: budget raises at budget-lost >50% — how often did CPL hold?
 That is the tuning database this standard exists to build.
 
-## 5. Check workflow (ra-clients, every check)
+## 5. Check workflow (operator, every check)
 
 1. `journal.py due <slug>` — reviews due today; carry into the check agenda.
 2. Run the check per SKILL.md (unchanged).

@@ -30,10 +30,9 @@
     "platform": {
       "enum": [
         "google",
-        "meta",
-        "callrail",
-        "ga4",
-        "hubspot",
+        "call-tracking",
+        "analytics",
+        "crm",
         "site",
         "admin",
         "other"
@@ -154,7 +153,8 @@
       "required": ["actor", "ref"],
       "properties": {
         "actor": {
-          "enum": ["operator", "toby", "ra-clients", "ra-proj", "automation"]
+          "type": "string",
+          "minLength": 1
         },
         "ref": {
           "type": ["string", "null"],
