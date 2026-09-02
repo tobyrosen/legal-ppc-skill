@@ -13,10 +13,10 @@ These are diagnostic frameworks, not flowcharts. They guide judgment — they do
 
 **Version note:** This skill has two operational modes:
 
-- **Toby version** — reads `learnings.md` and the relevant `account-notes/[account].md` at session start. Has historical context. Generates a session log at session end.
+- **Operator version:** reads the account's recorded context at session start, so it carries account history. The operating steps for that live outside this skill.
 - **Public version** — reads skill reference files only. No historical context. No session logging.
 
-Sections marked _[Toby version]_ describe behaviors that only apply in the internal version.
+Sections marked _[operator version]_ describe behaviour that applies only where recorded account context exists.
 
 ---
 
@@ -42,21 +42,31 @@ Evaluate the `type` and `name` fields together. The types that represent real le
 - `AD_CALL` or `PHONE_CALL` actions (auto-tracked call extensions)
 - `UPLOAD_CLICKS` (offline import — only meaningful if the firm is actually importing intake data)
 
-Flag immediately if the primary conversion action (`include_in_conversions_metric = TRUE`) is:
+- `WEBPAGE` actions recording an ebook or guide download. **These are PRIMARY by standing operator
+  ruling**, in every account and every campaign. They are never a demotion candidate and never a
+  finding. This applies equally to the CRM-native and the tag-manager or analytics versions of the
+  same event.
 
-- A session or page view (name suggests "All Visits," "Sessions," "Time on Site")
-- A soft engagement action (scroll depth, video play)
-- A duplicate of another primary action with identical settings
+Flag if the primary conversion action (`include_in_conversions_metric = TRUE`) is:
+
+- A session or generic page view (name suggests "All Visits", "Sessions", "Time on Site")
+- A generic engagement action (scroll depth, video play, directions click)
+
+An ebook or guide download is none of these. Do not route it to the soft-action branch.
+
+Flag a suspected duplicate only with event-level proof that two primaries fire on the same lead.
+Identical settings, matching totals, or similar decimal tails are a prompt to match the actions per
+lead across systems, never grounds to demote on their own (PB-23).
 
 **Is conversion volume plausible given clicks?**
-If there are 500 clicks in 30 days but 0 conversions, the tracking is almost certainly broken — even low-converting legal accounts convert at some rate with that much traffic.
+If there are 500 clicks in 30 days but 0 conversions, tracking is the leading hypothesis: even low-converting legal accounts convert at some rate with that much traffic. (unconfirmed threshold.) Check the sibling primaries before calling it a break, and note that a call tracker forwarding only qualified leads can produce a legitimate zero.
 
 > ⚠️ **BLIND SPOT — Tag firing cannot be verified via API**
 > The API shows conversion action configuration. It cannot confirm whether the tag is actually firing on the correct page events.
 > → If conversions are zero despite meaningful click volume, please share a screenshot of the Google Tag Manager container (or GA4 debug view) showing whether the conversion tag fires on a form submission or call event.
 
 **Are there duplicate conversion actions?**
-Look for multiple actions of the same type with similar names and `include_in_conversions_metric = TRUE`. Duplicates inflate conversion counts and deflate CPA — the account appears to perform better than it does.
+Look for multiple actions of the same type with similar names and `include_in_conversions_metric = TRUE`. A genuine duplicate inflates the conversion count and deflates CPA. Confirm it by matching the two actions per lead across systems before demoting either one, then demote the noisier duplicate, record the effective date, and rebuild both sides of every comparison spanning that date (PB-23, PB-06).
 
 **What attribution model is being used?**
 Data-driven attribution is fine for accounts with volume. Last-click is acceptable. Time-decay is acceptable. Position-based is unusual for legal. Flag any attribution model that seems inconsistent with how the firm's intake process actually works.
@@ -80,7 +90,7 @@ Evaluate against the good-account checklist from the knowledge base. These are b
 - **Brand campaign isolated?** Review campaign names for evidence of brand/non-brand separation. There is no API flag for this — use naming convention as the signal. Flag if any campaign name suggests it may contain both.
 - **Broad match keywords present?** Pull GAQL 3.2 (match type distribution). Flag any `BROAD` type keywords outside of explicitly named test campaigns.
 
-_[Toby version]: Cross-reference structural flags against `account-notes/[account].md`. Some known accounts have deliberate exceptions to standard structure — don't re-flag things that have already been investigated and resolved._
+_[operator version]: Cross-reference structural flags against the account's recorded overrides. Deliberate exceptions to the standard structure are inputs to the check, not findings: do not re-flag what has already been settled._
 
 ---
 
@@ -163,7 +173,7 @@ Indicators: high click volume, meaningful spend, consistent zero or near-zero co
 > ⚠️ **BLIND SPOT — Landing page quality cannot be assessed via API**
 > → Please share a screenshot of the landing page(s) receiving ad traffic. Assess: Is there a clear, prominent CTA? Is the messaging aligned with what the ads promise? Is there a phone number visible above the fold? Is the mobile experience functional?
 
-_[Toby version]: Check `account-notes/[account].md` for prior landing page findings. If this has been flagged before and hasn't been addressed, note the recurrence in the session log._
+_[operator version]: Check the account's recorded context for prior landing-page findings, and note a recurrence rather than reporting it as new. A standing structural flag has a shelf life: re-pull before re-asserting it._
 
 ---
 
@@ -310,7 +320,7 @@ Do not skip this step. The change history often answers the question before any 
 - **Bid strategy or budget changes within the last 14 days**: strong learning phase disruption hypothesis. See Sub-tree D (Smart Bidding Instability) before anything else.
 - **No significant changes**: external factors are likely. Continue to Step 2.
 
-_[Toby version]: Check `account-notes/[account].md` for seasonal patterns or prior incidents that might explain the current drop._
+_[operator version]: Check the account's recorded context for seasonal patterns or prior incidents that might explain the current drop. A seasonal claim still needs the same-period-last-year check (PB-31)._
 
 ---
 
@@ -429,7 +439,7 @@ At this point you have a list of flags from every step. Prioritize by: estimated
 
 The output of a first-review session is a prioritized findings list, not a to-do list. Some findings require further investigation before becoming actionable. Note which ones do.
 
-_[Toby version]: Write a session log for this session even if no actions were taken. First-review sessions often contain the most valuable `Session Observations` — the things that are surprising about how the account was run._
+_[operator version]: Record the session even when no action was taken. A first review often carries the most valuable observations about how the account has been run._
 
 ---
 
@@ -655,7 +665,7 @@ Google has assessed that the landing page doesn't deliver what the ad promises, 
 > ⚠️ **BLIND SPOT — Landing page quality cannot be assessed via API**
 > → Please share a screenshot of the landing page receiving traffic from this campaign. Assess: Does the page content match what the ad says? Is there a visible CTA? Does the keyword theme appear in the page headline? Is the page functional on mobile?
 
-_[Toby version]: Check `account-notes/[account].md`. If LP quality was flagged as BELOW_AVERAGE in a prior session and remains unresolved, escalate to P1. Note explicitly: bid strategy adjustments, keyword changes, and QS optimization have limited leverage while landing page quality is the binding constraint. The account can improve most other things and still underperform if the LP is not addressed._
+_[operator version]: Check the account's recorded context. If landing-page quality was flagged BELOW_AVERAGE in a prior session and remains unresolved, escalate it. Note explicitly: bid strategy adjustments, keyword changes, and QS optimization have limited leverage while landing page quality is the binding constraint. The account can improve most other things and still underperform if the LP is not addressed._
 
 **Multiple components are BELOW_AVERAGE:**
 Address in order: landing page first (highest impact, foundational), then ad relevance (structural fix), then CTR (copy optimization). Don't optimize ad copy on a broken landing page.
@@ -724,44 +734,26 @@ Look at 30-day conversion count per campaign (GAQL 2.3).
 
 ---
 
-**Question 3: Is the tCPA target achievable?**
+**Question 3: Is the tCPA target achievable, and where did it come from?**
 
-Compare the current tCPA target against the actual CPA from the prior 90-day period (GAQL 6.2).
+The target comes from firm economics: average case value, lead-to-signed rate, and acceptable cost per signed case (PB-05). **Never back-solve it from the account's own historical CPA.** That is the one forbidden move in target setting: the account's history reflects whatever is broken about current performance, so a target derived from it merely ratifies the status quo.
 
-A tCPA target set significantly below historical CPA forces the algorithm to oscillate — it bids low (to hit the target), loses auctions, generates no conversions, then bids high in the next period to compensate, overspends, resets. This is the most common pattern in accounts where "smart bidding isn't working."
+Compare the current live target against the economics target, and compare actual CPA (GAQL 6.2) against both. A live target set far below the economics target forces the algorithm to oscillate: it bids low to hit the target, loses auctions, produces no conversions, then overspends to compensate.
 
-Action: reset the tCPA target to the historical average (or slightly above it), let the account stabilize for 14+ days, then lower the target incrementally — no more than 10–15% at a time with 14-day stabilization windows between adjustments.
+Action: move the live target toward the economics target in steps of no more than 10 to 15% at a time, with 14-day stabilization windows between adjustments (unconfirmed step size and window). Where no economics target exists, ask for the firm's numbers rather than inventing one from account history. Where the current target is unusable and the economics number is not yet available, remove the target and run Maximize Conversions until it is, rather than setting the historical average as a target.
 
 ---
 
 **Question 4: Is the learning phase disruption pattern chronic?**
 
-If change history shows repeated bid strategy changes at 1–2 week intervals — often with manual bid adjustments in between — the account has likely never completed a learning phase. This is the most common pattern in inherited accounts with a history of anxious management.
+If change history shows repeated bid strategy changes at one to two week intervals, often with manual bid adjustments in between, the account has likely never completed a learning phase. (unconfirmed: churn has not been observed on the accounts in scope, per PB-10.)
 
 Breaking the cycle requires patience — and a hard rule: **do not change the tCPA target at the start of the freeze window.** Setting a "better" number still resets the learning clock. The freeze must start from the current live value, whatever it is.
 
 Two valid approaches:
 
-1. **Hold the current tCPA target.** Commit to no changes for a minimum of **4 full weeks (28 days)**. Not 21 days — 4 weeks. The learning phase requires at least 14 days of clean data; 28 days provides a meaningful buffer above that floor. Do not lower the target, do not raise it, do not pause the campaign. Hold.
+1. **Hold the current tCPA target.** Commit to no changes for a minimum of 4 full weeks (28 days), not 21 days. The learning phase requires at least 14 days of clean data and 28 days provides a buffer above that floor. (unconfirmed: both windows are carried over, not measured here.) Do not lower the target, do not raise it, do not pause the campaign. Hold.
 
 2. **Switch to Maximize Conversions (no target).** If the current tCPA is far from any achievable baseline — as often happens after a staircase of raises — removing the target entirely allows the algorithm to optimize direction rather than hit an arbitrary number. This is often the correct call when the tCPA has been raised multiple times without completing a learning cycle, because no single "current" value reflects real performance data.
 
 Either approach is valid. What is NOT valid: making any additional bid strategy changes, target changes, or budget changes during the stabilization window. This is often difficult to explain to clients — budget spending erratically during learning phases looks bad in the short term even when the long-term outcome will be better.
-
-_[Toby version]: Note in session log under `Session Observations` if the client has been briefed on the learning phase concept and their reaction. This context is useful for managing expectations in future sessions._
-
----
-
-## Session Log Reminder
-
-_[Toby version only]_
-
-At the end of every analysis session, generate a session log using the template in `SKILL.md` and save it to `session-logs/YYYY-MM-DD-[account-name].md`.
-
-The most important fields for future skill development are:
-
-- **Diagnostic Path** — what you actually checked and in what order
-- **Blind Spots Hit** — what you couldn't see and whether a screenshot resolved it
-- **Session Observations** — anything that surprised you, anything the current trees don't account for
-
-After approximately 4–8 sessions, the session logs should be reviewed collectively to identify patterns worth incorporating into these trees. That synthesis happens in a dedicated session, not incrementally.

@@ -147,7 +147,8 @@
         "Does NOT rank by impact alone ahead of evidence tier"
       ],
       "trap": "Cards more than 3 move lines, places a playbook line above the RED FLAGS block, or ranks by impact alone ahead of evidence tier (e.g. PB-18 before PB-01).",
-      "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-04. Tests the 3-line cap and evidence-tier-then-impact ordering (playbooks.md step 3; SKILL.md PLAYBOOKS group)."
+      "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-04. Tests the 3-line cap and evidence-tier-then-impact ordering (playbooks.md step 3; SKILL.md PLAYBOOKS group).",
+      "superseded_by": "evals_v5.json case 509 (the PB-22 Display Probate leg is rescoped to PMax)"
     },
     {
       "id": 206,
@@ -179,7 +180,8 @@
         "[FORMAT] Metrics are presented as labelled lines/clauses rather than a single unlabelled comma-chained run of numbers",
         "[OUTPUT DISCIPLINE] The playbook line ends 'accept/reject' and does not characterize the account"
       ],
-      "notes": "Card-format case: red-flags-first ordering plus the ban on comma-chained metric runs, using a genuine red flag paired with a genuine playbook trigger."
+      "notes": "Card-format case: red-flags-first ordering plus the ban on comma-chained metric runs, using a genuine red flag paired with a genuine playbook trigger.",
+      "retired": "Card format and ordering only, no tactic content. Retired 2026-09; not carried into evals_v5.json."
     },
     {
       "id": 302,
@@ -195,7 +197,8 @@
         "[FORMAT] Each carded line follows the grammar 'playbook PB-nn (<scope>): standard move for <pattern> is <move>. accept/reject' rather than a metric-dump sentence",
         "[OUTPUT DISCIPLINE] No line uses banned verdict language ('should', 'needs', 'recommend', 'underperforming', 'the problem is')"
       ],
-      "notes": "Card-format case: the 3-line cap under a 'no red flags' account, plus the explicit 'RED FLAGS: none' requirement and the fixed card-line grammar (vs. a free-form metrics sentence)."
+      "notes": "Card-format case: the 3-line cap under a 'no red flags' account, plus the explicit 'RED FLAGS: none' requirement and the fixed card-line grammar (vs. a free-form metrics sentence).",
+      "retired": "Encodes PB-15, retired 2026-09, and a Display-scoped PB-20 leg. Replaced by evals_v5.json case 510."
     },
     {
       "id": 207,
@@ -213,7 +216,10 @@
         "[OUTPUT DISCIPLINE] Reports spend direction, weekly-conversion direction, and 30-day CPL direction as separate data points and does not issue a go/no-go or 'underperforming' verdict on the campaign",
         "[COMPLETENESS] Reports the rising weekly-conversion trend (4/week to 7/week) explicitly as the leading indicator alongside the 30-day figure"
       ],
-      "notes": "Pattern validated in practice per playbooks.md PB-34 Evidence field (validated in practice, seven sequential 30-day readings) and PB-29's own Contradiction note, which records that the largest measured PB-29-shaped trigger was itself a ramp in disguise. No client reference; fictional figures only."
+      "notes": "Pattern validated in practice per playbooks.md PB-34 Evidence field (validated in practice, seven sequential 30-day readings) and PB-29's own Contradiction note, which records that the largest measured PB-29-shaped trigger was itself a ramp in disguise. No client reference; fictional figures only.",
+      "unconfirmed": [
+        "The +/-15% ramp gate separating PB-34 from PB-29 is unconfirmed."
+      ]
     },
     {
       "id": 208,
@@ -263,7 +269,12 @@
         "[FORMAT] States the 3-to-4-week revisit window with CVR named as the metric to watch",
         "[REASONING] States the sub-floor conversion count (6, versus the 15-20 floor) explicitly as the reason no CPL judgment is being made on this campaign"
       ],
-      "notes": "Pattern validated in practice per playbooks.md PB-08 Evidence field (validated in practice, 1 outcome, five monthly readings): conversions held flat then went to zero after the switch in the measured case, which is why the entry -- and this case -- bans promising a conversion or CPL improvement from the move. No client reference; fictional figures only."
+      "notes": "Pattern validated in practice per playbooks.md PB-08 Evidence field (validated in practice, 1 outcome, five monthly readings): conversions held flat then went to zero after the switch in the measured case, which is why the entry -- and this case -- bans promising a conversion or CPL improvement from the move. No client reference; fictional figures only.",
+      "unconfirmed": [
+        "The CPC cap sized at the trailing 30-day median CPC is unconfirmed.",
+        "The practice-area CPC band the case leans on is PROPOSED and unconfirmed, and the personal-injury and real-estate bands were removed in the 2026-09 refresh."
+      ],
+      "superseded_by": "evals_v5.json case 501 (the practice-area CPC band it leans on lost its personal-injury and real-estate rows)"
     },
     {
       "id": 211,
@@ -283,5 +294,6 @@
       ],
       "notes": "Pattern validated in practice per playbooks.md PB-39 Evidence field (validated in practice, 2 outcomes): both measured flips reverted within three to four days with nothing touched, which is the direct basis for the hold-and-re-read line here. No client reference; fictional figures only."
     }
-  ]
+  ],
+  "unconfirmed_note": "Suite-level note added 2026-09-02 with the drift correction: several pass conditions in this suite rest on thresholds that are unconfirmed, meaning general practice not yet confirmed by the operator. Per-case unconfirmed claims are listed in each case's `unconfirmed` field. Where a case is superseded by the refresh, evals_v5.json carries the corrected version and governs."
 }

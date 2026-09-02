@@ -1,815 +1,525 @@
 ---
 name: google-ads-analysis
 description: >-
-  Use this skill when analyzing, auditing, or diagnosing Google Ads accounts for law firms. Triggers include explicit requests (account audit, search term review, GAQL query, conversion tracking check, negative keyword review, impression share analysis, config-baseline verification, optimization playbook matching) and implicit ones (why is CPA high, leads are down, this campaign feels off, something changed this week, why is this not spending, performance is down). Use even if the user doesn't say "Google Ads" — phrases like "check the campaigns", "run an audit", "performance seems off", or "why are leads down" should all activate it. Does NOT cover campaign creation, Facebook/Meta ads, SEO, keyword research for new accounts, or client reporting via AgencyAnalytics.
-compatibility: Requires googleAdsServer MCP with run_gaql tool (Google Ads API access). Designed for Claude Code.
+  Use this skill to improve the performance of Google Ads Search and Performance Max campaigns for family law, immigration law, and elder law firms. It encodes the tactics used to diagnose and fix a live account: conversion-tracking integrity, bidding targets and direction, budget and impression-share routing, keyword and match-type remediation, search-term waste, geo control, creative and asset checks, and configuration-baseline verification. Triggers include explicit requests (account audit, search term review, GAQL query, conversion tracking check, negative keyword review, impression share analysis, config-baseline verification, optimization playbook matching) and implicit ones (why is CPA high, leads are down, this campaign feels off, something changed this week, why is this not spending, performance is down). Use even if the request does not say "Google Ads": "check the campaigns", "run an audit", "performance seems off", and "why are leads down" all activate it. Does NOT cover campaign creation, keyword research for new accounts, or any advertising platform other than Google Ads.
+compatibility: Requires a GAQL execution tool with Google Ads API access. Designed for Claude Code.
 ---
 
-# Google Ads Analysis Skill — Rosen Advertising
+# Google Ads Analysis: Search and Performance Max for legal accounts
 
 ## Purpose
 
-This skill enables autonomous analysis and optimization of Google Ads accounts for law firms. It encodes expert-level knowledge about legal PPC and provides structured tools for diagnosis, auditing, and optimization without requiring step-by-step direction.
+This skill is an encoded version of the tactics used to improve a Google Ads campaign for a family law, immigration law, or elder law firm. Scope is Google Ads Search and Performance Max only. The subject is campaign performance: what to check, what the data has to say before a move is on the table, what the standard move is, and what would make that move wrong.
+
+It is not an organization layer for reporting or data management. It presents DATA, one account at a time. The analytical calls belong to the operator.
+
+**Evidence labels.** Tactics carry an evidence tier: `validated in practice`, `partially validated`, `textbook only`, or `unconfirmed`. Unconfirmed means general practice not yet confirmed by the operator; it is presented as a candidate, never as a house tactic. `PROPOSED` on a threshold means the same thing for that number. Full definition: `references/playbooks.md`.
+
+**Immigration note.** Immigration is in scope, but no immigration-specific tactics are encoded yet. Treat immigration accounts with the general Search and PMax tactics here and record what proves out.
 
 ---
 
-## Output Format — plain text, NEVER images (Toby, locked 2026-06-29)
+## Data rules that gate every finding
 
-Present the check's data as **plain text** in the Telegram message — concise per-account lines (campaign → spend / conv / CPL / impression share split / weekly-trend note). **NEVER render the PPC-check data as an image / PNG / table-card.** Toby has explicitly said the rendered images are _not helpful_ for the Monday/Thursday checks and does not want them. This **overrides** the global `communication.md` "Presenting numbers and data → visual table image" rule _for PPC checks specifically_ (that rule's own carve-out already exempts recurring research-base data from disposable ONGs — the PPC check is exactly that case). No markdown tables either (pipes render as junk on Telegram) — short lines / bullets only, one metric group per line.
+These are prerequisites to the tactics, not presentation preferences.
 
-**Always include DIRECTION (Toby, 2026-06-29):** every account reports **up/down vs the previous week AND vs the previous 30 days** for spend, conversions, and CPL — never a bare current-period figure. Pull last-7d vs prior-7d (or the two latest complete weeks) and last-30d vs prior-30d (`FROM customer`, explicit `segments.date BETWEEN` ranges), and state each metric's % move + the better/worse direction (CPL down = better).
+**Data, not verdicts.** State what the data shows, what is likely wrong, and the decision framework that applies. Do not issue the go/no-go call ("pause it", "it's good", "scale it", "yes/no"). When asked for a straight yes/no on pause, scale, or kill, present the figures and the framework, then return the decision to the operator explicitly.
 
-**Zero-conversion comparison periods — CPL % is `n/a`, never invented.** When either side of a comparison has 0 conversions, the CPL percentage move is undefined. Report it as `CPL n/a`. Never write "infinite", never manufacture "100% better", and never silently drop CPL to satisfy the direction rule above. The required output in that case is: spend direction as normal, the conversion change stated in **absolute** terms ("conversions 0 → 2", not a percentage), the current period's CPL if it is defined, and the low-volume caveat — a period at or near zero conversions is far below the 15–20-conversion reliability threshold (see "Handling Comparative and Premise-Based Questions"). Moving off a zero-conversion period is not evidence of improvement; do not frame it as a recovery, and do not let an operator's framing ("CPL improved infinitely") into the output.
+**Aligned windows only, no partial-vs-full comparisons.** Every comparison compares like with like: complete week against complete week, or the same elapsed weekday count on both sides. A Thursday Mon-Thu period is compared against the prior Mon-Thu, never against a full prior Mon-Sun. Comparing a partial window with a full one shorts the numerator by days, and the resulting decline is an artifact of the calendar, not the account.
 
-**Aligned windows only — no partial-vs-full comparisons.** Every comparison compares like with like: complete week vs complete week, or the same elapsed weekday count on both sides. A Thursday Mon–Thu period is compared against the **prior Mon–Thu**, never against a full prior Mon–Sun. Comparing a partial window with a full one shorts the numerator by days, and the resulting "decline" is an artifact of the calendar, not the account.
+**Conversion lag: label immature windows provisional.** Form and call conversions keep posting for days after the click (assume a 72-hour lag unless the account's own data says otherwise). A current or partial window's conversion count is a floor, not a final number. The conversion count, the conversion percentage move, and the CPL from any window still inside the lag period are labelled provisional, with the reason stated. Spend is mature immediately; conversions and CPL are not. No trend conclusion is drawn from an immature window.
 
-**Conversion lag — label immature windows provisional.** Conversions mature after the click: form and call conversions keep posting for days afterward (assume a ~72-hour lag unless the account's own data says otherwise). A current or partial window's conversion count is therefore a **floor**, not a final number. Rule: the conversion count, the conversion % move, and the CPL from any window still inside the lag period are labelled **provisional**, with the reason stated. Spend is mature immediately; conversions and CPL are not — never present them at equal confidence. No trend conclusion ("leads are down", "CPL is deteriorating") is drawn from an immature window; report the provisional numbers with the caveat and let the window mature.
+**Zero-conversion comparison periods: CPL percentage is `n/a`, never invented.** When either side of a comparison has 0 conversions, the CPL percentage move is undefined. Report `CPL n/a`. Never write "infinite", never manufacture "100% better", never silently drop CPL. Report spend direction as normal, state the conversion change in absolute terms ("conversions 0 to 2", not a percentage), give the current period's CPL if it is defined, and attach the low-volume caveat. Moving off a zero-conversion period is not evidence of improvement.
 
-**Currency — report native, never assume dollars.** `cost_micros` and every cost, CPC, and CPL figure are denominated in the **account's** currency, which is not necessarily USD. Pull the currency code for each account (`SELECT customer.currency_code FROM customer`) and report that account's figures in its own currency, with the symbol or ISO code shown. Rule: no cross-currency total, average, or ranking without an operator-approved FX source — and when one is supplied, the rate and its effective date appear in the output. Two accounts both reading "200" in different currencies are not tied. Never rank, benchmark, or aggregate accounts on raw numbers drawn from different currencies.
+**Direction ships with every figure.** A spend, conversion, or CPL number is never reported bare. Week-over-week and 30-day-versus-prior-30-day direction ships with it every time, even when the request is a one-line ask for a single number.
 
-Present DATA, one account at a time; the analytical calls are Toby's.
+**Currency: report native, never assume dollars.** `cost_micros` and every cost, CPC, and CPL figure are denominated in the account's currency. Pull it (`SELECT customer.currency_code FROM customer`) and report each account in its own currency. No cross-currency total, average, or ranking without an approved FX source; when one is supplied, the rate and its effective date appear in the output. Two accounts both reading "200" in different currencies are not tied.
 
-**RED FLAGS FIRST — severity-tiered walk cards (Toby, 2026-08-17, tg-15983).** Every per-account walk card LEADS with a `RED FLAGS:` block — one line each, before any other data. Red-flag thresholds: any 30d CPL or conversion swing over ~30%, any zero-conversion spend streak (2+ weeks with material spend), dead/silent tracking, disapprovals on serving ads. Everything else (budget-lost, carried config items, creative) comes after, clearly separated. A massive move buried mid-list is the failure mode this kills — Toby flagged it for weeks before this was written down (an 88% CPL jump on one campaign arrived as flag #1 of 5 with no severity marking). If there are no red flags, say `RED FLAGS: none` explicitly.
-
-**Playbook lines sit after the RED FLAGS block (Toby, 2026-08-18).** Triggered playbooks sit in their own `PLAYBOOKS:` group after the red-flags block and before the rest of the card. Maximum 3 per account, ordered evidence tier first (validated, then partially validated, then textbook), then impact within tier. Empty form: `playbooks: none fired`. The line states the standard move for the observed pattern and ends `accept/reject`; it never characterises the account and never displaces a red flag. Full library, triggers, and card-line grammar: `references/playbooks.md`. The agent never executes a playbook move.
-
-**LAYOUT — spread it out (Toby, 2026-08-17, tg-15986).** Flags-first is not enough on its own: the card must be READABLE. No jammed paragraphs, no comma-chained metric runs, no walls of text. One fact per line. Blank line between sections. Short labeled sections (RED FLAGS / PLAYBOOKS / the week / structure / watch) so highlights have room to draw the eye. If a line needs a second clause, it probably wants to be two lines. Cutting detail is allowed and expected — the journal holds the full record; the Telegram card holds what Toby needs to decide.
-
----
-
-## Version Note
-
-This skill operates in two modes:
-
-**Toby version (internal):** Account memory lives in `$PPC_JOURNAL_ROOT/journal/<account>.jsonl` (notation standard: `NOTATION.md`). At session start, run `python3 journal/journal.py due <account>`, then read `references/learnings.md` (if it has entries), the rendered `$PPC_JOURNAL_ROOT/notes/<account>.md`, and the most recent rendered `$PPC_JOURNAL_ROOT/session-logs/` entry for that account. During the check, append every meaningful event with `journal.py append`; at session end, run `journal.py render <account>` and `journal.py validate <account>`. Rendered notes and session logs are never hand-edited.
-
-**Public version:** Read skill reference files only. No journal data, rendered session logs, rendered account notes, or `learnings.md`. This version is derived from the Toby version when there is something worth publishing — it does not need to be maintained separately in the meantime.
-
-**Config overrides.** The configuration baseline (`references/agency-defaults.md`) ships in both versions; per-account departures from it do not. In the **Toby version** an account's overrides live in its journal as `rule` entries carrying the `config-override` tag, and are read from the **Config overrides** section of the rendered `$PPC_JOURNAL_ROOT/notes/<account>.md`. In the **public version** there is no override data at all: `account-notes/example-family-law.md` carries a fictional example showing the shape, and a public-version config check treats every departure from the baseline as a DEVIATION, stating in its output that no override set was available.
-
----
-
-## Knowledge Foundation
-
-Read these before any analysis:
-
-- **`references/google-ads-knowledge-base.md`** — Core philosophy and principles. The lens through which all findings are evaluated. Non-negotiable starting point.
-- **`references/agency-defaults.md`**: Configuration baseline: the values those principles resolve to. Every config check (PF-4) classifies live settings against this file plus recorded overrides.
-- **`references/learnings.md`** _(Toby version only)_ — Validated patterns extracted from past session logs. Read this after the knowledge base to supplement with empirically-observed patterns.
-- **`$PPC_JOURNAL_ROOT/notes/[account].md`** _(Toby version only)_ — Rendered account context, open rules, pending items, recent outcomes, and durable context. Read it; never hand-edit it.
-
----
-
-## Account Macro Context — Mandatory Reasoning Input
-
-Every audit, optimization, or diagnostic session must establish account macro context **before** any item-level work. Macro context is mandatory input to the reasoning, even when it is not surfaced in the output.
-
-**What "macro context" means:**
-
-- Spend trend: current period vs prior 90-day baseline
-- Conversion volume trend: current period vs prior 90-day baseline
-- Lead volume trend: from CRM where available, otherwise primary conversion action volume
-- CPL / CPA trend: current period vs prior 90-day baseline
-- Year-over-year comparison where the data spans long enough
-
-Pull this **before** running symptom-specific diagnosis. Every recommendation must be evaluated against the macro state of the account — recommending "raise bids on the Women campaign" lands differently when total account spend is already up 40% this month with conversions down. Tactical recommendations made in isolation from the macro frame are tunnel vision, even when the items themselves are correct.
-
-**Output rule — surface conditionally, not every session:**
-
-- The macro snapshot is NOT included in the user-facing output by default. Users do not need to see a trend dump every session.
-- Surface a **flag** in the output only when the macro signal is material enough to warrant attention:
-  - Material trend shift (e.g., conversion volume down 25%+ vs prior period)
-  - Trend reversal (account was trending up, now reversing)
-  - **Contradiction** with the tactical recommendation about to be made (e.g., recommending bid-up when spend is already up 40% MoM)
-  - Pattern that explains other findings (e.g., a sudden YoY drop alongside structural changes that may be the cause)
-- When surfacing a flag, frame it as a question or observation tied to the broader account direction — not as a separate audit section.
-
-Distinguish PULL from SURFACE: the macro/trailing-window data is pulled **every** session without exception — "not surfaced by default" governs only whether it appears in the output, never whether it is computed. This holds for narrow, urgent, or "just the number" asks: a spend/conversion/CPL figure is never reported bare — the WoW and 30-day-vs-prior-30-day direction ships with it every time, even when the brief is a one-line request.
-
-**Format when flagging:**
-
-```text
-[MACRO FLAG] [one-line description of the trend]
-[Why it matters in the context of the work being done]
-```
-
-Example: a session optimizing keyword structure finds the work tactically correct, but conversions are down 35% MoM. The macro flag surfaces because the proposed keyword expansion may amplify spend in a period where the account is already underperforming — worth pausing to investigate the conversion drop before scaling.
-
----
-
-## Reference Files
-
-| File                                      | Purpose                                                                                                                                                                                 | When to Use                                                                               |
-| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `references/gaql-query-library.md`        | Pre-built GAQL queries organized by diagnostic task                                                                                                                                     | Any time live account data is needed                                                      |
-| `references/negative-keyword-library.md`  | Master negative keyword lists by category                                                                                                                                               | Search term reviews, account audits, new account setup                                    |
-| `references/diagnosis-trees.md`           | Diagnostic frameworks for the most common account problems                                                                                                                              | Performance diagnosis, account review, issue investigation                                |
-| `references/creative-audit.md`            | Creative / image-asset audit — what to pull (sidecar tools), what to look for, API-sourceable vs manual                                                                                 | Every periodic check (creative pass in Step 4); any creative/display review               |
-| `references/playbooks.md`                 | Optimization playbook library (PB-01 to PB-39): trigger, standard move, do-not-move, verification, card line                                                                            | Whenever a data pattern matches a playbook trigger; the `playbook:` line on the walk card |
-| `references/agency-defaults.md`           | The agency configuration baseline: our standard value per setting, with rationale, override cases, and severity                                                                         | Every config check; PF-4; any 'is this setting right' question                            |
-| `references/google-ads-knowledge-base.md` | Legal-PPC-specific platform knowledge: why legal breaks Google's e-commerce assumptions, Google's incentives vs. client interests, bidding, ad copy, and account-structure fundamentals | Background reading; any question about why legal PPC behaves differently from general PPC |
-| `references/session-management.md`        | Session log template and journal/session-log workflow _(Toby version only)_                                                                                                             | Session start (read prior log) and session end (write new log), operator mode only        |
-| `account-audit-checklist.md`              | Structured first-review audit checklist (Sections A–I, pass/fail, output format)                                                                                                        | First-contact account review (Tree 5)                                                     |
-
----
-
-## MCP Tool Note
-
-Queries in `references/gaql-query-library.md` are pure GAQL and MCP-agnostic. Execute them using whatever GAQL execution tool is available in the current environment.
-
-Currently: `run_gaql(customer_id, query, format)` from the `googleAdsServer` MCP.
-
-- Prefer `format="table"` for diagnostic reads
-- Use `format="csv"` for large result sets you need to process
-- `run_gaql` is preferred over `execute_gaql_query` — it's a superset with output format control
-
-If the MCP changes, update this note only. The query library remains valid.
-
-**Login/MCC customer ID:** _(set in your MCP config — replace with your own MCC/manager account ID)_
-**First step in any new session:** `list_accounts()` — confirms which accounts are accessible.
-
-> **Account scope — hard stop.** `list_accounts()` shows what is _accessible_, not what is _in scope_. Only query accounts confirmed against the operator's private current-client roster, which is maintained outside this skill. If `list_accounts()` returns an account you cannot confirm is a current client, do not query it — surface it to the operator and stop. "All accounts," "every account," and "the whole MCC" always mean _all roster accounts_, never the full accessible list. If no roster is available in your context, do not run any multi-account pull.
-
----
-
-## GAQL Query Integrity — Keywords and Search Terms
-
-### Keyword queries (`ad_group_criterion` and `keyword_view`)
-
-The API returns **both positive and negative keywords in the same result set** — this applies to both `ad_group_criterion` AND `keyword_view` queries. Failing to distinguish them causes confirmed misdiagnosis.
-
-**Mandatory rules before flagging any keyword as an issue:**
-
-1. **Always filter `ad_group_criterion.negative = FALSE` in the WHERE clause** of any keyword query, regardless of whether the resource is `ad_group_criterion` or `keyword_view`. If this filter is missing, the result contains negatives mixed with positives — re-run before drawing any conclusions.
-
-2. **Check `negative` before flagging.** If `negative = True`, this keyword is a negative. It is working correctly. Do NOT treat it as a positive match type issue, a quality score problem, or a waste source.
-
-3. **Always SELECT and filter `ad_group.status`.** Keywords from paused ad groups are not serving. Do NOT flag them as active optimization targets. The standard keyword queries in the library filter `ad_group.status = 'ENABLED'` — use them.
-
-4. **Also SELECT `campaign.status`** for the same reason. A keyword in a paused campaign is not a live problem.
-
-**Quick check:** if a keyword query — from either `ad_group_criterion` or `keyword_view` — does not include `ad_group_criterion.negative = FALSE` in the WHERE clause, stop. Re-run the correct query from the library. Do not proceed with analysis on an incomplete result.
-
-### Search term queries (`search_term_view`)
-
-`search_term_view` returns historical search term records from **all ad groups — including PAUSED and REMOVED ones**. Without filtering, results will include data from groups that are no longer serving, producing false findings.
-
-**Mandatory rules before presenting any search term finding:**
-
-1. **Always include `ad_group.status = 'ENABLED'` in the WHERE clause.** Same rule as keyword queries — different query type, same root cause.
-
-2. **Always SELECT `search_term_view.status` in every search term query.** If this field is missing from the result, the query is incomplete — re-run using the library query before drawing any conclusions. Do not flag any term as a finding without this field present.
-
-3. **Never flag a term with `status = NONE` as an active finding.** `NONE` means the term matched historically but is no longer actively served by any keyword. It may be from a period when a broader keyword (e.g., BROAD match) was active and has since been tightened or paused. It is not a current waste source. Confirmed misdiagnosis: "quiet title action westhollow" (fictional, 2026-04), flagged as active, was status NONE from a paused BROAD keyword.
-
-4. **Check which ad group a term came from before flagging it.** If `ad_group.status = PAUSED` or `REMOVED`, that term is historical. Do NOT flag it as an active waste source or a current keyword structure problem.
-
-**Quick check:** If a search term query result does not include `search_term_view.status`, stop. Re-run the correct query from the library. Do not proceed with analysis on an incomplete result.
-
-**Root cause:** Google's API scopes data by account and date, not by serving status. Paused ad groups and expired keyword matches still have historical records. Always filter and verify explicitly.
-
-### Auditing search term data you are handed
-
-The rules above govern queries you run. The same logic applies when someone **gives** you search term data (a pasted table, a CSV, a screenshot). You didn't run the query — you don't know if the `ad_group.status = ENABLED` filter was applied.
-
-**Before flagging any handed search term as waste, check CPC plausibility:**
-
-Legal PPC CPCs are typically $5–50+ per click for competitive terms (probate, family law, personal injury, elder law). If a handed result shows a legal search term at under ~$2/click, that is anomalously cheap for the practice area.
-
-Cheap CPC on a competitive legal term is a red flag that the data includes paused ad group history — paused ad groups accumulate low-cost historical impressions/clicks from when CPCs were lower, or from test periods.
-
-**Protocol for handed search term data:**
-
-1. Before drawing any conclusions, scan the CPC column. If you see legal-intent terms at under $2/click (especially under $1), flag this immediately: "These CPCs look anomalously low for legal PPC — typical range is $5–50+. This may include data from paused ad groups."
-2. Ask: "Can you confirm which ad groups these terms came from, and whether the query filtered for ENABLED ad groups only?"
-3. Do NOT present terms with suspicious CPCs as active waste findings until the source is confirmed.
-4. If the source is confirmed as a paused ad group, they are historical — no action needed.
-
-Handed search-term data is subject to the same ~50% coverage ceiling as data you pull — an export that looks complete is not. Before presenting any finding from handed data, state that coverage is unknown and either (a) request the campaign's actual total spend for the period so the ratio can be computed, or (b) if that is unavailable, disclose explicitly that findings cover only the visible portion and cannot be scaled. Never treat a pasted or exported search-terms list as full-coverage.
-
----
-
-## Smart Bidding — Post-Tracking-Fix Protocol
-
-_Playbook: PB-06 (post-tracking-fix lockdown), PB-07 (tCPA below the conversion floor), PB-08 (sub-floor volume plus high CPC). Card line and verification windows: `references/playbooks.md`._
-
-When conversion tracking contamination is fixed on an account running tCPA or any smart bidding strategy, the **bidding model is now invalid** — it was trained on inflated or incorrect conversion data. The following protocol is mandatory.
-
-**Do NOT adjust the tCPA target immediately after fixing tracking.**
-
-This is the single most common mistake made after a tracking cleanup. The instinct to "correct" the target to match new, cleaner CPA numbers is wrong. Here's why: the algorithm hasn't learned what the clean-data CPA actually is yet. Any target you set is still anchored to contaminated history. Setting a new target before relearning completes just gives the algorithm a new wrong number instead of the old wrong number.
-
-**The correct sequence:**
-
-1. **Fix the tracking.** Confirm it's clean.
-2. **Hold the current tCPA target.** Do not change it yet.
-3. **Announce a 2–4 week lockdown.** No bid strategy changes, no target changes, no budget changes. Treat it like a standard learning phase — because it is one.
-4. **Expect apparent CPA to rise.** This is not the account getting worse. It's the tracking getting accurate. Previously reported CPA was artificially low because conversions were double-counted. The "new" higher CPA is the real number. Do not react to it.
-5. **After 2–4 weeks of clean data**, evaluate whether the target needs adjustment. Now you have a real baseline. Adjust based on that — not on the pre-fix numbers.
-
-**What to monitor during relearning:**
-
-- Learning status in the campaign settings (should show "Learning" initially, then clear)
-- 14-day rolling CPA (expect rise, then stabilization)
-- Impression share (may drop as algorithm recalibrates auction bids)
-- Absolute conversion volume (will appear to drop — this is the duplicate count disappearing)
-
-**Low-volume flag:** If the account was already near the 15–20 conversion/month reliability threshold before the fix, the cleaned-up volume may fall below it. If this happens, consider switching to Maximize Conversions rather than tCPA until volume recovers.
-
-**Low-volume flag — already on Maximize Conversions + high CPC.** Maximize Conversions is not always the safe harbor. When a campaign is **already on Maximize Conversions, running below the ~15–20 conv/month reliability floor, AND carrying a high avg CPC for its practice area**, the algorithm is bidding blind on thin signal and burning budget per click. The fix is **Maximize Clicks with a CPC cap** — buy volume and rebuild conversion signal while capping runaway auctions — not another target tweak. Set a 3–4 week revisit and watch CVR (Max Clicks optimizes for clicks, not conversions). See learnings P9.
-
----
-
-## tCPA Direction Rule
-
-_Playbook: PB-04. Card line and verification windows: `references/playbooks.md`._
-
-**Only lower tCPA when actual cost/conv is already comfortably below the current target.** Lowering tCPA when CPA is at or above target restricts campaign volume — it signals to the algorithm to win fewer auctions, which reduces conversion opportunities when the account is already struggling to generate them.
-
-**Decision framework:**
-
-- **cost/conv well below target** (e.g., target $150, actual $90): Safe to lower tCPA to capture efficiency. Move in 10–15% increments, not all at once.
-- **cost/conv near target** (e.g., target $150, actual $140): Hold. Insufficient headroom. Lowering risks volume loss without efficiency gain.
-- **cost/conv above target** (e.g., target $150, actual $210): Do NOT lower tCPA. Fix root causes first — QS, ad relevance, LP conversion rate, negative keyword gaps. Lowering further restricts an already underperforming campaign.
-- **cost/conv well above target AND low impression share:** Root cause is almost always QS/bid quality, not budget. Adding budget does not fix a tCPA campaign that's losing impressions to rank. Diagnose rank-lost IS (use GAQL 5.1).
-
-**The instinct to "tighten" tCPA when CPA is high is wrong.** When the algorithm is already under pressure to find converting traffic, lowering the target tells it to spend less per conversion — which means it enters fewer auctions and gets fewer conversions, not cheaper ones. This is the most common bidding mistake in legal PPC.
-
-**Exception:** If budget is clearly not the constraint (budget-lost IS is near 0) and rank-lost IS is very high, the issue is bid quality — tCPA can be raised to give the algorithm room to compete, not lowered.
-
----
-
-## Target Setting — Targets Come From Firm Economics, Not Account Data
-
-_Playbook: PB-05. Card line and verification: `references/playbooks.md`. The 15% acquisition share in the worked example below is an illustration, not a house default: PB-05 flags it for confirmation._
-
-A bidding target (tCPA, target CPL, target cost per signed case) is an **external input** — not something you back-solve from the account's own numbers. The account's current CPA tells you how performance compares to the target; it is never the _source_ of the target.
-
-**Where a target comes from, in priority order:**
-
-1. **Firm economics in the rendered `$PPC_JOURNAL_ROOT/notes/[account].md`** (recorded as journal `context`/`rule` entries)**.** The firm's average case value, lead-to-signed rate, and acceptable cost per signed case give you the target CPL/CPA. These are operator-recorded business inputs — use them.
-2. **An explicit operator override.** If the operator states a target (or different economics) for the task at hand, that supersedes the notes.
-3. **If neither exists, ask.** Request the firm's economics — average signed-case value, lead-to-signed rate, acceptable cost per signed case. Do not set a target without them.
-
-**Never back-solve a target from the account's own current CPA or spend.** Averaging what the account currently pays per conversion and calling that "the target" is circular: the current CPA reflects the account's current performance, including whatever is broken about it, so a target derived from it merely ratifies the status quo. It is a loop that can never improve the account — every "target" is just last period's result wearing a new label. This is the one forbidden move in target setting.
-
-**Why the instinct is wrong:** a target is a business decision about what a signed case is worth and what the firm will pay to win one. That decision lives with the firm, not in the auction data. Pull the account's CPA to _measure against_ the target; pull the target itself from the firm's economics.
-
-**Worked logic:** average signed-case value $12,000 × a 15% acquisition budget = $1,800 target cost per signed case; at a 30% lead-to-signed rate that is a ~$540 target CPL. If the account's current CPL is $900, it is 67% over the external target — that is a finding. You did not learn $540 by looking at the account; you brought it from the firm's economics.
-
-**When the external target sits well below current performance,** that gap is the finding — not a reason to abandon the target. Fix the drivers first (QS, landing page, structure). If you then move the live tCPA toward the economics target, step it down in increments (see the tCPA Direction Rule above) so the algorithm does not oscillate. The economics number is the destination; the increments are how you reach it without thrashing. "Realistic target" means achievable in steps, never "back-solved from current CPA."
-
----
-
-## Campaign-Level CPC Anomaly — Routing Protocol
-
-_Playbook: PB-33 (anomalously low CPC), PB-25 (high CPC with zero conversions), PB-08 (high CPC with sub-floor conversions). `references/playbooks.md`._
-
-When campaign-level avg CPC looks anomalous (not search term level — the campaign performance summary), route the diagnosis based on direction:
-
-**Anomalously LOW avg CPC for the practice area:**
-
-Legal PPC typical ranges: family law $8–25, elder law $10–35, personal injury $20–80, partition/real estate $15–40, elder abuse $60–150+.
-
-If campaign avg CPC is well below these ranges (e.g., $3.20 in an elder-planning campaign, or $2.50 in a divorce campaign):
-
-1. **First check: tracking integrity.** Low avg CPC on competitive legal terms is a red flag for data contamination — possibly includes historical data from paused ad groups or test periods when CPCs were lower, or a conversion tracking issue that is inflating apparent traffic.
-2. **Do NOT route to keyword targeting as the first frame.** The instinct to explain cheap clicks as "wrong match type" or "low-intent keywords" is secondary. Check data integrity first.
-3. Pull campaign history (PF-3) and confirm the avg CPC trajectory. If it was historically normal and recently dropped, something changed — conversion tracking, keyword structure, or bid strategy reset.
-4. If search term data confirms the clicks are coming from low-intent queries at low CPC, then keyword/match type diagnosis applies. But only after ruling out data contamination.
-
-**Anomalously HIGH avg CPC:**
-
-For high-value practice areas (elder abuse, complex commercial litigation), $80–150/click is normal — do not flag as problematic by default. Context: case values in elder abuse can be $500K–$2M+; a $120 CPC acquiring one case is exceptional ROI.
-
-Flag as potentially problematic only when HIGH avg CPC is combined with: (a) zero or near-zero conversions over 14+ days, AND (b) impression share is adequate (>30%). This combination suggests the algorithm is bidding high for clicks that don't convert — possible LP issue, wrong audience, or conversion tracking failure.
-
-**Third condition — high CPC + sub-floor (not zero) conversions + budget-lost IS → bidding-strategy fix, not the LP/tracking diagnosis.** Distinct from the zero-conversion case above: when avg CPC is high, the campaign **is** converting but **below** the ~15–20 conv/month reliability floor, and it is losing impression share to budget, the problem is that smart bidding has too little signal to bid well on expensive auctions. Route this to the bidding-strategy fix — Maximize Clicks with a CPC cap (see the Smart Bidding low-volume flag and learnings P9) — rather than the LP/audience/tracking diagnosis. The zero-conversion branch points at LP/tracking; this thin-but-nonzero branch points at the bidding model.
-
----
-
-## Search Term Data — Coverage Ceiling
-
-`search_term_view` typically shows **~50% of actual campaign spend**. This is a Google Ads API limitation — the API withholds low-volume search terms and has a hard row cap per query. It is not fixable through query splitting or pagination (GAQL does not support OFFSET).
-
-**Coverage check is mandatory before presenting any search term findings.** Do this first, before analysis, before findings, before recommendations:
-
-1. Pull actual campaign spend for the period via `FROM campaign`
-2. Sum total cost from your `search_term_view` results
-3. Report the ratio: "Search term data covers $X of $Y actual spend (Z%)"
-
-Do not present findings, waste estimates, or negative keyword recommendations until this ratio is on the table. The user needs to know what they're working with before deciding how much weight to give any finding. If coverage is low, scale estimates accordingly and say so — don't ask whether the user still wants the analysis on bad data. The answer is always to disclose the coverage and proceed transparently, not to ask permission.
-
-**Per-campaign querying (not per-account)** is still required — pulling all campaigns in one query caps at ~500 rows and will give far worse coverage than querying per campaign. But even per-campaign or per-ad-group querying converges at ~50% coverage — this is the ceiling.
-
-**What this means for analysis:** waste estimates and conversion totals from search term data represent the visible portion only. Scale dollar figures by the coverage ratio when reporting (e.g., if visible waste is $244 at 54% coverage, estimated total waste is ~$452). Patterns and categories observed in the visible 50% are representative — the hidden 50% is randomly distributed, not systematically different.
-
-**Never recommend blocking a term category solely based on search term data showing zero conversions.** Account-level conversion data (from `FROM campaign`) is authoritative for spend; search term data is a sampling.
-
-**Negative-keyword precision — two decision rules:**
-
-- **Never negate a term that has converted**, no matter how much it looks like junk, a referral/nonprofit name, or a geo/category mismatch. Check the term's conversion data before excluding it — a converting term is a customer, not waste. (A term that looks like a nonprofit-referral mismatch can still be a real lead source.)
-- **On a geo-mismatched query that contains your core service term, negate the geo token only — never the service term.** Decompose the query first: for a city-mismatched query like `[core service term] [wrong city]`, negate `[wrong city]`, not `[core service term]`, so the campaign keeps serving the service term in its real geo. See learnings P10–P11.
-
-**Wasteful broad keyword that is ALSO a major conversion source → convert broad→phrase, don't pause.** When a broad-match _positive_ keyword shows real waste (a chunk of clearly-irrelevant search spend) but is _also_ driving a large share of the campaign's conversions — especially on a Maximize Conversions / smart-bidding campaign where the conversions feed the bidding model — pausing or deleting it is the wrong first move: it throws away the conversion volume and starves smart bidding of signal. The remediation default is **convert broad → phrase match** (tighten the matching while keeping the conversion history), **add specific negatives** for the irrelevant search categories, and **set a monitoring window** before any further tightening. Pause only if, after phrase conversion + negatives, the keyword's converting traffic does not survive. (This is the keyword-level twin of P13's marginal-contribution logic: judge a high-conversion source on what it produces, not on its visible waste alone.)
-
-_Playbook: PB-12. The coverage rules above are a required-green gate on PB-12, PB-13, PB-14, and PB-28, not playbooks themselves._
-
----
-
-## QS Throttling — All-BELOW_AVERAGE + Zero Impressions
-
-_Playbook: PB-15. Card line and verification: `references/playbooks.md`._
-
-The Google Ads UI displays a "limited by quality score" label for severely underperforming keywords. The API does not expose this label as a field — `system_serving_status` returns `ELIGIBLE` even for throttled keywords. To diagnose QS throttling via API, use this heuristic:
-
-**Throttled keyword pattern:** QS ≤ 2, AND all three components BELOW_AVERAGE (`search_predicted_ctr`, `creative_quality_score`, `post_click_quality_score`), AND zero or near-zero impressions over the most recent 7-14 days on an active campaign with available budget.
-
-When all three conditions are present, the keyword has been effectively removed from auction consideration by Google. This is categorically different from a keyword with QS 4-6 and one weak component.
-
-**Standard QS optimization does not recover a throttled keyword.** Improving ad copy, landing page, or CTR applies to underperforming keywords that are still entering auctions. For a throttled keyword, Google is not entering it into auctions at all — incremental quality improvements cannot recover it from this baseline.
-
-**The correct intervention is structural replacement:**
-
-1. Pause the throttled keyword
-2. Create a new keyword variant in a new or reorganized ad group with dedicated ad copy and a landing page that precisely matches the query intent
-3. A fresh keyword gives Google a clean quality signal with no prior history
-
-State the heuristic explicitly when diagnosing — do not present `system_serving_status = ELIGIBLE` as confirmation that the keyword is serving normally.
-
----
-
-## BROAD Match Keyword Remediation — Default Path
-
-_Playbook: PB-11, with PB-12 when the keyword is also a major conversion source and PB-03 when it is front-loading the daily budget. `references/playbooks.md`._
-
-When a BROAD match keyword is flagged for cleanup (high CPA, waste, or match type tightening), the default recommendation is **convert to phrase match first** — not delete, not pause, not jump directly to exact.
-
-**Why phrase, not exact:** BROAD → exact skips the intermediate step that preserves near-intent query variants while filtering the looser ones. Exact match may lose reach unnecessarily. Phrase match is the standard intermediate step.
-
-**Why not delete or pause:** If a BROAD keyword has conversion history, it carries smart bidding signal. Deleting or pausing removes that signal. Phrase match conversion preserves the signal while tightening control.
-
-**When hard delete is appropriate:** Only for irrelevant terms — wrong practice area, wrong geography, competitor brand names. Relevant keywords that are simply too broad get converted to phrase, not deleted.
-
-**Sequence:**
-
-1. Convert BROAD to phrase match
-2. Monitor search terms for 2-4 weeks
-3. If CPA remains above target after phrase conversion, identify specific waste terms to negative or evaluate tightening to exact
-
----
-
-## Search Partners CPA Distortion — Network Segmentation Required
-
-_Playbook: PB-26 (segment before deciding), PB-27 (partners or display enabled with no reason on record). `references/playbooks.md`._
-
-When a brief presents a CPA figure for a campaign running on **both Search and Search Partners**, that figure is a blended average across two networks with different traffic quality. Search Partners traffic typically converts at a lower rate and higher CPA than Google Search traffic in legal PPC.
-
-**Before drawing any CPA conclusion or recommending any bid change, flag whether the campaign includes Search Partners:**
-
-Pull: GAQL 6.4 or `segments.network` — segment campaign performance by `SEARCH` vs. `SEARCH_PARTNERS`.
-
-If network data is not provided and Search Partners status is unknown:
-
-- State explicitly: the reported CPA may be a blended figure that includes Search Partners
-- Do not diagnose "CPA is high" or recommend a tCPA change until network split is confirmed
-- The required next step is: pull performance by `segments.network` (clicks, conversions, cost, CPA) for each network separately
-
-**Smart bidding signal risk:** Excluding Search Partners is not a simple win. Removing the Partners network reduces the total conversion signal available to the smart bidding algorithm. If the campaign is near the 15-20 conv/month reliability threshold, excluding Partners may push it into Sub-tree D territory. Always check conversion volume contribution before recommending exclusion.
-
-**Decision framework after pulling network data:**
-
-- If Search Partners CPA is above target AND Partners conversion volume is small relative to Search → exclusion is reasonable; signal loss is minimal
-- If Search Partners CPA is above target BUT Partners is contributing significant conversion volume → exclusion risk is real; consider whether blended CPA is still on-target if Partners is removed
-- If Search CPA is already on-target → the issue is contained to Partners; exclusion is the likely fix, but confirm volume contribution first
-
----
-
-## Config Ground Truth: deviation from OUR standard, not from nothing
-
-A configuration finding is a departure from **our** baseline. Not from Google's defaults, not from a general best-practices list, and not from nothing. `references/agency-defaults.md` is that baseline: every setting we deliberately choose, its GAQL field, our value, why, and the severity if an account differs. A setting matching it is not a finding. In a routine check it does not appear in the output; in verification mode it is listed in the MATCHES summary.
-
-**Why this exists.** On 2026-08-17 a Performance Max config verification reported `positive_geo_target_type = PRESENCE_OR_INTEREST` as a problem. It is our house standard, chosen on purpose and re-affirmed since. Nothing was wrong with the account. The check had no baseline to measure against, so it measured against Google's defaults and produced a false flag on a setting we had deliberately set. Every config check runs against the baseline from now on.
-
-**Accounts differ from the baseline on purpose.** Those departures are recorded once, as config overrides in the account journal (`NOTATION.md` §8), and surfaced in the rendered account notes under **Config overrides**. An override is not an exception to the check; it is an input to it.
-
-### The procedure
-
-1. **Read the baseline.** `references/agency-defaults.md`. Note which entries are marked PROPOSED: a PROPOSED entry may produce a config item at most, never a red flag, until it is confirmed.
-2. **Read the account's overrides.**
-   - _Toby version:_ the **Config overrides** section of `$PPC_JOURNAL_ROOT/notes/<account>.md`, rendered from the journal.
-   - _Public version:_ `account-notes/example-family-law.md` shows the shape. There is no real override set in the public skill, so a public-version config check reports every departure as a DEVIATION and says so in the output, rather than implying the account has been audited.
-3. **Pull live config.** `references/gaql-query-library.md` §14, the config baseline pull. Read the resource; never infer a setting's current value from the absence of a change event.
-4. **Classify every setting** in the baseline, one of three ways:
-
-   | Class          | Test                                                                                                                                                                                     | Output                                                                        |
-   | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-   | MATCH          | live value equals the baseline standard, or a standard's own stated carve-out (e.g. §1.10 `LEARNING` with `BIDDING_STRATEGY_LEARNING`; §5.8 `POOR` on an asset group still under review) | routine check: not reported. verification mode: listed in the MATCHES summary |
-   | OVERRIDE-MATCH | live value differs from the baseline **and** equals a recorded override                                                                                                                  | one summary line only, both modes                                             |
-   | DEVIATION      | live value differs from the baseline with no recorded override                                                                                                                           | a flag, at the baseline's severity                                            |
-
-5. **Report.** Only DEVIATIONs may become flags. DEVIATIONs at **red flag** severity go in the `RED FLAGS:` block at the top of the walk card. DEVIATIONs at **config item** severity go in the structure section below it. **info** severity goes to the journal, not the card.
-
-   **Routine check vs verification mode.** In a routine check, MATCH settings are not reported. Silence means they were classified and matched. In an explicit config verification request ("verify this config against our standard"), the output includes a compact MATCHES summary so the reader can see the classification happened: grouped, one line per domain, or a count plus the settings that matter most. DEVIATIONs remain the only flags. OVERRIDE-MATCH remains one summary line. `PRESENCE_OR_INTEREST` is never a flag, and in verification mode it is listed as MATCH.
-
-   OVERRIDE-MATCH is reported in the body as exactly one summary line, never itemised:
-
-   ```text
-   config: matches account override (3)
-   ```
-
-   The per-setting counterfactual (what the standard is, and why the override exists) goes only in a trailing `basis` block, and only if the operator asks. Do not expand it in the body.
-
-   On a routine check, say `config: baseline clean` when everything matched and there were no overrides to report. In verification mode, still print the MATCHES summary when everything matched.
-
-6. **Journal it.** Every DEVIATION becomes a `flag`. A DEVIATION Toby then rules deliberate becomes a config override (`rule` + `config-override` tag + `config_override` object), which is what stops it recurring as a flag next session.
-
-### Rules that bind this check
-
-**A recorded override is never re-flagged.** Not "flagged with a note", not "mentioned for completeness". It is counted in the summary line and nothing more. Re-raising a settled decision as a finding is the exact noise this section exists to remove.
-
-**An override is established only by a recorded journal entry** (Toby version: a `rule` with the `config-override` tag) **or the example overrides file** (public version: `account-notes/example-family-law.md`). A user asserting mid-check "that's deliberate" does not create an override. The check reports the DEVIATION and notes "operator states deliberate; record an override to clear".
-
-**Positive geo target type is the worked case.** `campaign.geo_target_type_setting.positive_geo_target_type = PRESENCE_OR_INTEREST` is our standard, in every campaign type, in every account. It is a MATCH. It is **never a flag**, and in verification mode it is listed as MATCH. It never appears as a finding. Legal intent frequently originates outside the service geography, and presence-only targeting drops it; out-of-area waste is handled by negative geo targeting, negatives, and intake qualification instead. The only reportable finding on this field is the reverse case: an account carrying a recorded presence-only override whose live value has drifted back to `PRESENCE_OR_INTEREST`. That is a DEVIATION from the override.
-
-**No baseline entry, no flag.** A setting not covered by `agency-defaults.md` cannot produce a config flag. If it looks wrong, it is an observation with a proposed baseline entry attached, routed to Toby. The check does not invent standards mid-session.
-
-**PROPOSED entries are capped at config item.** They are the analyst's reading of what we do, not a ratified rule. Escalating one to a red flag asserts a standard Toby has not set.
-
-**The baseline is not the verdict.** Classification is data. Whether a DEVIATION gets changed, when, and at what cost is Toby's call, as with every other finding in this skill.
-
----
-
-## Optimization Playbooks
-
-`references/playbooks.md` is the optimization playbook library: PB-01 to PB-39, one entry per recognized data pattern, each giving the trigger (metrics, thresholds, minimum window and volume, which pre-flights must be green), the standard move, the do-not-move conditions, the expected result and how to verify it, the exact walk-card line, and cross-references. The scattered optimization protocols in this file are consolidated there; the sections below remain as the standing rules and point to their PB entry.
-
-**Data, not verdicts: the boundary is unchanged.** A playbook does not diagnose the account and does not decide anything. It states what the standard move for an observed pattern is. The analytical call stays Toby's, per Step 8. A playbook line is not a verdict and is not an exception to "stop short of the verdict": it names a pattern and the standard response to that pattern, and it always ends by handing the decision back.
-
-**The agent never executes a playbook move.** Not before acceptance, not after. Acceptance authorises Toby (or whoever he directs) to make the change; it is never an instruction to the check.
-
-**Card placement and the `PLAYBOOKS:` group.**
-
-- Playbook lines go on the per-account walk card **after** the `RED FLAGS:` block, in their own labelled group headed `PLAYBOOKS:`, before the rest of the card's sections. Empty form, when none fire: `playbooks: none fired`.
-- One line per triggered playbook. **Maximum 3 per account.** Order evidence tier first (validated, then partially validated, then textbook), then impact within tier (spend at stake × confidence the pattern is real). If more than 3 trigger, card 3 and acknowledge the rest with `surplus journaled: PB-nn, PB-nn` (not a move line, not accept/reject). **PB-37 (an unexpected change made by someone else) is exempt from this cap:** it is a flag-class line reported in the `RED FLAGS:` block or immediately after it, not counted against the 3 playbook slots.
-- Exact form (header plus one line). Full grammar, empty form, and the surplus worked example: `references/playbooks.md` Card-line grammar.
-
-  ```text
-  PLAYBOOKS:
-  playbook PB-nn (<scope>): standard move for <the pattern in the data> is <the move>. accept/reject
-  ```
-
-- Banned in a card line: "should", "needs", "recommend", "underperforming", "the problem is", or any go/no-go on the account. If the line cannot be written without one, the playbook does not fire.
-- A playbook whose do-not-move conditions hold does not fire at all. The gate's finding is reported instead, in its normal place on the card.
-- No playbook line ever displaces or dilutes a red flag. Red flags lead, always.
-
-**Journaling an accept or reject** _(Toby version only)_: every carded playbook line gets one journal entry, so the same line does not resurface next check:
-
-- **Accept** → a `decision` entry: `body` names the PB id and the move, `expect.statement` is the playbook's expected result, `expect.review_by` is the playbook's verification window, `source.actor` is `toby` with his `tg-` ref. If Toby makes the change himself in the UI, the applied change is a separate `change` entry.
-- **Reject** → a `decision` entry recording the rejection and, where he gave one, the reason, with a `review_by` set to the next check. A rejected playbook is not re-carded before that date.
-- **Gated (did not fire)** → no entry unless the gate itself is a finding.
-- The `outcome` entry at the review date scores the expectation `met | not_met | mixed | unclear`, and that accumulating record is what tunes the thresholds.
-
-**Thresholds marked PROPOSED** in `references/playbooks.md` were set by judgment, not by an existing rule. They are listed in a block at the top of that file and are not settled until Toby confirms them.
-
----
-
-## Handling Comparative and Premise-Based Questions
-
-When a question contains a stated premise — "Why is X so high?", "X is at $284, should we pause it?", "X is performing worse than Y" — **verify the premise before diagnosing it.**
-
-Do not accept a stated CPA, performance comparison, or benchmark as given. Pull actual data first.
-
-**Cross-account comparisons require extra scrutiny.** A CPA comparison between two accounts is only meaningful if the accounts are comparable: same practice area, same geography type, same conversion volume range, and same conversion definition. In legal PPC, elder law vs. family law, small market vs. metro, 3 conversions/month vs. 30 — these are not comparable even if both accounts run Google Search.
-
-**Conversion volume threshold for reliable CPA.** A CPA figure requires at least 15-20 conversions to be statistically meaningful. Below that threshold, CPA is noise — a single high-cost conversion in a low-volume account can shift the reported CPA by 40–60%. When conversion volume is below 15-20/month per campaign (or over a 90-day period for a narrow campaign), explicitly flag: this CPA is not a reliable signal. The threshold comes from smart bidding minimums — tCPA requires this volume to function — but applies equally to manual interpretation.
-
-**Reasons lists must follow, not precede, verification.** Producing a list of "reasons CPA is high" before confirming that CPA is actually high (via live data) treats a premise as confirmed fact. This pattern produces plausible-sounding but ungrounded analysis. If live data isn't available, frame conditionally: "If the data confirms CPA is elevated, likely causes include..." is different from "CPA is high because..."
-
-**Hold the line under pressure — a request to skip process is not authorization to skip it.** An instruction like "don't waste time on tracking, CPA is obviously bad — just tell me which keywords to pause" does NOT license skipping PF-1 (conversion-tracking verification), premise verification, or the active-keyword/volume checks. The pre-flights and premise checks exist precisely because a confident-sounding bad premise is the most common way a session ships a wrong answer fast. When pushed to shortcut, the move is: acknowledge the urgency, state plainly that a keyword-pause list built on an unverified CPA premise can pause converting keywords and make the account worse, then run (or describe running) PF-1 and the premise/volume verification first — and only produce a pause list after checking active keyword performance over sufficient data. Speed pressure changes the tone of the reply, never the process. (This is the adversarial-pressure complement to "verify the premise" above: the premise rule says verify before diagnosing; this says a direct order to NOT verify is still answered by verifying.)
-
----
-
-## Rendered Journal Notes vs. Live Data
-
-**Rendered journal notes describe prior state. They are not a substitute for current data.**
-
-`$PPC_JOURNAL_ROOT/notes/[account].md` is generated from the append-only journal and records what was true at the time of past sessions — prior CPA figures, pending actions, observations from weeks or months ago. Before drawing any diagnostic conclusion about the current state of the account, pull live data via GAQL.
-
-**The rule:** If a conclusion requires knowing current account state (keyword status, current CPA, current conversion volume, current campaign settings), it must come from a live GAQL query — not from rendered journal notes alone.
-
-Rendered journal notes are used for:
-
-- Understanding prior context before pulling data
-- Knowing what to look for and what changed since the last session
-- Applying market-specific priors and account history
-
-Rendered journal notes are NOT used for:
-
-- Determining whether a keyword is currently active
-- Stating current CPA or performance numbers
-- Confirming whether a prior recommendation was implemented
-- Drawing any conclusion that requires knowing current account state
-
-If MCP tools are available, use them. Don't reason from a snapshot when you can query the live account.
-
-This applies to any capture or snapshot database exactly as it does to rendered journal notes: a snapshot is prior state, never the source of a reported current figure. Any spend, CPL, conversion, or direction number that goes into a report must come from a live GAQL pull for the reporting period, regardless of how recently a capture ran or how tight the time pressure is. "It's already in the snapshot" is not grounds to skip the live query.
-
-**A standing "structural" flag has a shelf life.** A note that a CPA gap is "LP-gated," "structural," or "out of scope" is a _hypothesis recorded at a point in time_ — not a permanent truth. Re-pull live data before re-asserting it, and retire it when the data shows the gap has closed. Creative or ad changes (a refresh, new headlines) can lift a ceiling long blamed on structure; don't let a stale standing flag keep an ad group on the problem list after it has recovered. See learnings P12.
-
----
-
-## Impression Share — Two Separate Metrics
-
-_Playbook: PB-01 (budget-lost on a converting campaign), PB-02 (rank-lost ceiling), PB-03 (budget-lost with a BROAD keyword front-loading spend). `references/playbooks.md`._
-
-`search_rank_lost_impression_share` and `search_budget_lost_impression_share` are not the same thing.
-
-- **Rank-lost IS** — impressions lost because Ad Rank was too low. Fix: QS improvement, ad relevance, landing page quality, or bid adjustment. Adding budget does not help.
-- **Budget-lost IS** — impressions lost because the daily budget ran out. Fix: increase budget.
-
-**Rule:** When assessing IS, always pull GAQL 5.1 which includes both fields. Never characterize a campaign as "budget-constrained" based on rank-lost IS alone — that is a QS/LP problem requiring creative work, not spend.
-
-**Rank-lost IS on Maximize Conversions = QS issue only.** On campaigns using Maximize Conversions (no tCPA), the algorithm already bids as high as it calculates optimal for each auction. If rank-lost IS is high on a Max Conv campaign, the algorithm is not "holding back" — it is losing auctions because Ad Rank is insufficient. The fix is QS and landing page quality, not a bid strategy change. Never diagnose rank-lost IS as a bid constraint on a Max Conv campaign — there is no bid ceiling to raise.
-
-**Budget-lost IS can occur without hitting the daily cap.** BROAD match keywords can consume budget disproportionately early in the day — serving on high-volume, lower-intent queries before more targeted phrase/exact keywords compete. This produces budget-lost IS even when daily spend is below the budget ceiling. If a campaign has budget-lost IS and a BROAD keyword consuming most of the daily budget before 10am, the fix is converting the BROAD to phrase match — not increasing budget. Increasing budget gives the BROAD more to consume early-day and does not solve the problem.
-
----
-
-## Creative / Image-Asset Audit — Standing Periodic Check
-
-_Playbook: PB-21 (coverage gap), PB-22 (asset fatigue), PB-19 (RSA hygiene), PB-20 (creative staleness and CTR decline). `references/playbooks.md`._
-
-A creative pass is a **standing part of every periodic (Monday/Thursday) check**, not an optional add-on. Rosen Advertising accounts are shifting heavily toward image, and all running accounts move toward display soon — so image-asset coverage and quality are now a first-class account-health dimension. Run the creative pass every periodic session; keep it proportionate (a focused pass, not a forensic teardown).
-
-**Tooling — sidecar only.** The image-asset tools live **only in the incumbent `googleAdsServer` sidecar** (the official MCP lacks them — that's why the sidecar is retained). Use these four tools and only these; do not substitute or invent others:
-
-- `get_image_assets` — list image assets in the account (inventory)
-- `get_asset_usage` — map which campaigns / ad groups use which assets (coverage)
-- `download_image_asset` — fetch the image file (for inspection / vision)
-- `analyze_image_assets` — vision analysis of image content / quality
-
-**What the pass covers (full detail in `references/creative-audit.md`):**
-
-- **(a) Coverage** — map every ENABLED campaign against `get_asset_usage`; flag campaigns thin or missing image assets. As accounts move to display, a campaign with no image coverage cannot fill its inventory — the highest-priority creative finding. Don't flag pure Search campaigns for lacking display creative.
-- **(b) Quality + content** — `analyze_image_assets` (with `download_image_asset` to confirm) against three bars: on-brand, legible, and message-matched to the ad group's intent. Vision is a strong first read; the final brand/compliance call on a legal client is a manual review.
-- **(c) Usage gaps** — assets uploaded but attached to nothing (`get_image_assets` minus `get_asset_usage`), and campaigns with no coverage.
-- **(d) Fatigue** — long-running unchanged assets (cross-reference change history, GAQL §8) and declining signals; where per-asset performance is thin, fall back to ad-group/campaign CTR proxy and say so. Don't over-call fatigue on low volume.
-
-**API-sourceable vs. manual — be explicit (skill convention).** Inventory, usage mapping, coverage gaps, and the file download are **API-sourceable** via the four sidecar tools. Image content is **API-assisted via vision** (`analyze_image_assets`) — a strong read, not a final verdict. The **on-brand / compliance / message-match call is a manual/visual review**, per-asset performance is only **partially API-sourceable**, and how an asset renders in a live placement is a **blind spot** — request a screenshot via the standard protocol. Mark the source tier on every creative finding; never present a brand/compliance verdict that rests only on vision as auto-confirmed.
-
-This section is the methodology pointer — it wires into "How to Approach a Session" Step 4 as a creative sub-step. Full procedure, the source-tier table, and the blind-spot wording are in `references/creative-audit.md`.
-
----
-
-## Using Sub-Agents for Heavy Analysis
-
-For tasks that involve pulling and analyzing large search term datasets across multiple campaigns, run parallel sub-agent analyses — one per campaign. Delegate via the delegate lane (`delegate.py`); use a Claude subagent only when explicitly chosen per the delegation policy in `~/.claude/rules/actions.md`. This:
-
-- Prevents search term files from consuming the main context window
-- Enables parallel data pulls (faster wall-clock time)
-- Keeps each agent's analysis focused on one campaign
-
-**Pattern:**
-
-```text
-Main agent → fires N sub-agents in parallel (one per campaign)
-Each sub-agent → pulls search terms, runs intent categorization, returns structured summary:
-  { campaign, spend_visible, spend_actual, waste_terms[], converting_terms[], flags[] }
-Main agent → synthesizes all summaries into findings + action list
-```
-
-Use this pattern any time a search term review spans more than 2 campaigns.
-
-**Compatibility:** Requires Claude Code with the `Agent` tool available. If running in an environment where the `Agent` tool is not available, run each campaign's search term pull sequentially in the same session rather than in parallel.
-
----
-
-## Skill Dependencies
-
-This skill works best alongside other installed skills. Check availability at session start and use them when relevant:
-
-| Skill                   | Use for                                                               | Required?   |
-| ----------------------- | --------------------------------------------------------------------- | ----------- |
-| `xlsx`                  | Negative keyword upload files, bulk change sheets, structured exports | Recommended |
-| `pptx` / `docx`         | Client-facing reports                                                 | Optional    |
-| _(data skill — future)_ | Statistical aggregation, complex analysis                             | Planned     |
-
-If a dependency is missing and the user asks for output that skill would handle, note what's missing and suggest installing it rather than producing a lower-quality substitute.
-
----
-
-## How to Approach a Session
-
-### Step 1 — Establish the brief
-
-Every session has a brief. It may be explicit (client concern, specific issue) or self-directed (monthly review, regular optimization). The brief determines where to focus. There is no universal starting point.
-
-Common brief types:
-
-- **Performance review** — What happened over the last period? What changed?
-- **Issue investigation** — Something is wrong. Diagnose and explain.
-- **Account audit** — First look at an account or periodic structural review.
-- **Search term review** — Mine search terms for negatives and keyword opportunities.
-- **Ad copy review** — Assess creative performance and identify refresh candidates.
-- **Creative / image-asset audit** — Image-asset coverage, quality, usage gaps, and fatigue. Runs as a standing creative pass in every periodic check (see Step 4b and the "Creative / Image-Asset Audit" section); also a brief in its own right as accounts move to display.
-- **Conversion tracking audit** — Verify that what's being tracked is correct and complete.
-
-**Brief clarity gate:** Assess whether the brief is specific enough to target the session. A clear brief (explicit concern, named campaign, defined scope) → proceed directly. A vague brief ("run a review", "check performance", "see what's going on", "[account] feels off") → do the following:
-
-1. **State the diagnostic entry point.** Name which Tree in `references/diagnosis-trees.md` applies — e.g., "This looks like a Tree 4 (performance drop) entry point" or "Defaulting to Tree 5 (account review) since no specific concern was named." Say this out loud in your response. Don't silently assume an entry point.
-
-2. **Proceed to Steps 2 and 3.** Pre-flight checks run regardless of brief clarity — do not wait for clarification before running them. See Step 3.
-
-3. **Ask 1–2 focused clarifying questions after pre-flight**, using what you found as context:
-   - "Is there a specific concern driving this — performance drop, budget issue, something the client flagged?"
-   - "Is there a campaign or time period you want to prioritize?"
-
-This isn't gatekeeping — it's targeting. Pre-flight data makes clarifying questions more precise. Name the entry point, run pre-flight, then ask.
-
-### Step 2 — Review due journal entries and prior pending items _(Toby version only)_
-
-Before any new analysis:
-
-1. Run `python3 journal/journal.py due <account>`.
-2. Read `$PPC_JOURNAL_ROOT/notes/<account>.md`, especially `## Pending` and `## Standing Rules`.
-3. Pull current account state via GAQL for every due or pending item before judging it.
-
-**If the journal doesn't exist:** This is a new account with no prior journal history. Note this, skip prior-item verification, and create the first entries during the check with `journal.py append`. Proceed to Step 3.
-
-For each pending item, pull current account state via GAQL and verify whether it was implemented:
-
-- **Expectation met / not met / mixed / unclear** → append an `outcome` that references the decision/change id and records the honest verdict
-- **Not yet reviewable** → leave it open; append a new observation or flag only if the state materially changed
-- **Implemented incorrectly** → append a specific flag; do not rewrite the earlier entry
-
-This closes the feedback loop. The skill recommended the action; now it confirms whether it happened and can begin attributing performance changes to specific interventions. Don't skip this even if the user hasn't mentioned it — it's how the skill builds a reliable thesis about what works in this account.
-
-### Step 3 — Run pre-flight checks
-
-Before any symptom-specific diagnosis, run the pre-flight checks from `account-audit-checklist.md` and `references/diagnosis-trees.md`:
-
-- **PF-0: Account macro context** (reasoning input — surface as flag only when material; see "Account Macro Context" section above)
-- PF-1: Conversion tracking verification
-- PF-2: Structural red flags — includes ad-level policy status. Pull GAQL 7.3 (`ad_group_ad.policy_summary.approval_status` / `.review_status`) and flag any ad with `approval_status` in {`DISAPPROVED`, `APPROVED_LIMITED`} or `review_status` in {`UNDER_REVIEW`, `REVIEW_IN_PROGRESS`}. Policy is API-checked first — a screenshot is the fallback only for the human-readable disapproval reason, not for the approval status itself. A campaign reading `serving_status = SERVING` does not clear ad-level policy issues. Network settings (Search Partners, display), ad rotation, and campaign type including PMax presence are classified by PF-4 against the agency baseline; do not flag them independently here.
-- PF-3: Change history read
-- **PF-4: Config ground truth.** Pull the config baseline (GAQL library §14) and classify every setting against `references/agency-defaults.md` plus the account's recorded overrides. Only a DEVIATION from our baseline may become a flag; an override match is one summary line. In verification mode, MATCH settings appear in a MATCHES summary. Full procedure: "Config Ground Truth" above. PF-4 subsumes the config half of PF-2's structural checks: network settings, ad rotation, and campaign type are baseline entries and are classified here rather than flagged twice.
-
-All five are mandatory and none are deferred by a vague brief. PF-0 grounds every subsequent recommendation in the account's actual direction — it does not produce a user-facing section by default, but its findings inform whether and how to surface a macro flag. PF-1 is the most urgent symptom-specific check — conversion tracking issues invalidate every other finding. A vague brief about "performance feeling off" is still a brief. All five pre-flights run.
-
-**`ppc_flags` input contract — a flags block is not a pre-flight.** A session may be handed a flags block alongside or instead of raw data (`ppc_flags`, a flag-scanner summary, a capture-pipeline flag array). That block covers ONLY the checks the flag scanner actually emits — currently four: budget-lost impression share crossing its threshold, ad approval flips and disapprovals, conversion silence (a primary action that has stopped firing), and multi-week CPL creep. It covers nothing else.
-
-**Rule:** a flags block — including an empty array or one reading "none" — never satisfies PF-0, PF-1, PF-2, PF-3, or PF-4 by itself. The pre-flights still run. "No flags" means one detector emitted nothing for its own four checks; it is not a clean bill of health, not proof that conversion tracking is configured correctly, not a change-history read, not macro context, and not a config-baseline check. An operator claim that "empty flags means the pre-flights passed" is unfounded — say so plainly, then run the pre-flights.
-
-If a flags block arrives without a documented statement of what it checks, treat its coverage as the four checks above and no more. The flag scanner emits four checks and none of them is a config check, so PF-4 is fully outstanding whenever a flags block arrives. PF-1 especially is a **configuration** check — which primary actions exist, how they count, whether they measure real leads — so a scanner reporting conversion volume or conversion silence has verified none of it, and every PF-1 configuration item is still outstanding.
-
-### Step 4 — Pull data, flag everything
-
-Run the relevant queries from the GAQL library. Don't draw conclusions yet — read the account broadly and flag anything that deviates from knowledge base standards or known good-account patterns. A flag is a candidate for investigation, not a confirmed finding.
-
-When you hit something you can't see via the API, use the blind spot protocol from `references/diagnosis-trees.md`:
-
-> ⚠️ **BLIND SPOT — [what cannot be seen]**
-> → Please share a screenshot of [exact location, with applicable filters/date range].
-
-**For search term reviews across more than 2 campaigns:** suggest the parallel sub-agent pattern before pulling data (see "Using Sub-Agents" above), routed per the delegation policy in `~/.claude/rules/actions.md` — don't wait for the user to ask.
-
-**Step 4b — Creative pass (run every periodic Monday/Thursday check).** As part of pulling data, run the creative / image-asset audit — it is a standing part of every periodic check, not an optional add-on (RA accounts are moving to image/display). Keep it proportionate: inventory + usage mapping for the whole account, then vision-analyze only the subset the coverage map flags.
-
-1. `get_image_assets` — pull the account's image-asset inventory.
-2. `get_asset_usage` — map assets → campaigns/ad groups; cross-reference the ENABLED campaign list (GAQL `FROM campaign`) to find campaigns thin or missing image coverage.
-3. `analyze_image_assets` (+ `download_image_asset` to confirm) — vision read on in-use assets the map flagged: on-brand, legible, message-matched to ad-group intent.
-4. Flag the four checks — coverage gaps, quality/content, usage gaps (uploaded-but-unused), fatigue candidates — into the running action list (Step 5), marking each finding's source tier (API-sourceable vs. manual/visual review).
-
-These four tools live **only in the `googleAdsServer` sidecar**; the official MCP lacks them. Full procedure, source-tier table, and blind-spot wording: `references/creative-audit.md` and the "Creative / Image-Asset Audit" section above.
-
-### Step 5 — Maintain a running action list
-
-This is the most important habit in multi-section sessions. As each analysis section completes, immediately append its action items to a running list — don't wait until the end. Items from section A must still be present when section C is done.
-
-At session end, the action list is the union of every section's items. Nothing gets dropped because a later section produced its own list.
-
-Format each item as:
-
-```text
-- [ACTION] [target] — [one-line rationale] | [scope: account/campaign/ad-group]
-```
-
-_(Toby version only)_ Append each meaningful observation, flag, decision, change, outcome, rule, or context item to `$PPC_JOURNAL_ROOT/journal/<account>.jsonl` with `journal.py append`. Use the copy-paste shapes in `journal/templates.md`. Never hand-edit the rendered notes.
-
-### Step 6 — Prioritize flags by impact
-
-Prioritize by: estimated spend impact × confidence it's a real problem. Structural issues affecting budget allocation every day rank ahead of cosmetic issues.
-
-**Then match the prioritized flags against `references/playbooks.md`.** For each flag whose data pattern meets a playbook's trigger, confirm the named pre-flights are green and no do-not-move condition holds. A playbook that passes both gates earns one card line; a playbook that is gated does not fire, and the gate's finding is reported in its normal place. Rank the survivors evidence tier first, then impact within tier, and card at most 3.
-
-### Step 7 — Diagnose priority flags
-
-For each priority flag, work through the relevant diagnosis tree. A flag becomes a finding when you can state: what is wrong, why it matters, what likely caused it, and what should be done.
-
-### Step 8 — Produce output
-
-- **Internal analysis** → prioritized findings list with context and recommendations
-- **Client communication** → translated into plain language, focused on business impact
-- **Reporting** → handled separately via AgencyAnalytics, not this skill
-- **Journal + rendered session log** _(Toby version only)_ → required outputs of every session, not extras. The findings and decisions above are not "produced" until their entries are appended, the views are rendered, and the journal validates (Step 9).
-
-Stop short of the verdict. You may state what the data shows, what is likely wrong, and the decision framework that applies — you may NOT issue the go/no-go call ("pause it," "it's good," "scale it," "yes/no"). When asked for a straight yes/no on pause/scale/kill, present the relevant figures and the framework and return the decision to the operator explicitly. The recommendation apparatus in the trees produces _candidate_ actions for the operator to decide, never a final ruling delivered as yours.
-
-**A `PLAYBOOKS:` line is not a verdict, and is bounded by this rule rather than excepted from it.** It names an observed pattern and the standard move for that pattern, then returns the decision explicitly (`accept/reject`). It never says the account is good or bad, never says an item should be paused or scaled, and never reports a move as taken. Grammar and banned wording: `references/playbooks.md`.
-
-**Campaign → Ad Group path is mandatory in every finding.** Every keyword, search term, ad, or ad group finding must lead with the full path so the user can navigate to it in the Google Ads UI:
+**Campaign to ad group path is mandatory in every finding.** Every keyword, search term, ad, or ad group finding leads with the full path so the item can be located in the UI:
 
 ```text
 Campaign: [campaign name] | Ad Group: [ad group name] | [keyword or term]
 ```
 
-Without the campaign name, a finding is unactionable — the user cannot locate the item. This applies to every finding in every output format, without exception. A finding that omits the path is incomplete.
+A finding that omits the path is incomplete.
 
-### Step 9 — Finalize journal and render views _(Toby version only)_
-
-**The journal is the only write surface. A session is not complete until its entries are appended, rendered, and validated.** Before closing:
-
-1. Append any remaining entries with `journal.py append <account>`; every decision/change includes `expect.statement` and `expect.review_by`, and every outcome includes `re` and `verdict`.
-2. Run `python3 journal/journal.py render <account>`.
-3. Run `python3 journal/journal.py validate <account>`. Do not fix data silently; surface any failure.
-4. Confirm that `$PPC_JOURNAL_ROOT/session-logs/YYYY-MM-DD-<account>.md` exists as the generated view for this session.
-
-**Pairing requirement — reference the prior rendered log at session start.** At the start of a Toby-version session, read the most recent generated log for the account alongside `learnings.md` and the rendered account notes. Do not hand-edit either generated Markdown file.
+_Card format, severity ordering, layout, and the walk-card template live in the internal operations runbook, not in this file._
 
 ---
 
-## Accounts
+## Knowledge foundation
 
-Add your accounts here. The `login_customer_id` is your MCC ID (if using a manager account).
-
-| Account              | ID         | Notes                                                |
-| -------------------- | ---------- | ---------------------------------------------------- |
-| Example — Family Law | 1234567890 | See `$PPC_JOURNAL_ROOT/notes/example-family-law.md`. |
-| MCC/Login            | 0000000000 | Use as login_customer_id when querying sub-accounts  |
-
-_(Replace with your own accounts. One row per account. Account memory is created through the journal, never by hand-writing a notes file.)_
+Precedence, highest first: a live GAQL pull, then the operator's recorded rulings and account overrides, then `references/agency-defaults.md` (the configuration baseline), then `references/google-ads-knowledge-base.md` (the legal-PPC lens). A conclusion that requires knowing current account state comes from a live query, never from a snapshot, a capture database, or a rendered note.
 
 ---
 
-## Journal Templates and Skill Development Loop _(Toby version only)_
+## Account macro context: a reasoning gate, not a report section
 
-Use `journal/templates.md` for entry shapes. See `references/session-management.md` for the skill development loop; its legacy prose-log template no longer writes account data.
+Before any item-level work, establish the account's direction: spend, conversion volume, lead volume, and CPL against the prior 90-day baseline, plus year-over-year where the data spans long enough. This is pulled every session without exception.
 
-**Continual-update cadence (Toby, 2026-08-18).** The skill improves from measured outcomes, not from rewrites:
+It is a gate on the recommendation, not an output section. Surface it only when it changes the reading:
 
-- Every check journals decisions and outcomes (Step 9). Monthly, re-run the outcome mining over the journals: new outcomes update each playbook's `Evidence` field, promote textbook entries to validated, and add do-not-move conditions from vindicated holds. The private evidence ledger lives outside this repo.
-- Every newly validated move gets an eval case the same day it is written into `references/playbooks.md`.
-- On-the-spot evals stay small: only the cases a change touches, one model. Full suites run on the Thursday cadence, not on Mondays.
-- Releases to the public repo go only through the release procedure: leak gate on tree and history, fresh-context verification, then a single push. Sanitization is a standing release step, not a one-off.
+- A material trend shift, for example conversion volume down 25% or more against the prior period.
+- A trend reversal.
+- A contradiction with the move about to be proposed. Recommending a bid increase lands differently when account spend is already up 40% with conversions down.
+- A pattern that explains other findings, for example a year-over-year drop alongside a structural change.
 
 ---
 
-## Audit Mode & Search-Query Mining (agency-agents mine 2026-06-02)
+## Reference files
 
-Net-new capability added from the paid-search division of the agency-agents mine — the highest-RA-revenue item in that mine. Turns Google Ads account access into a sellable deliverable (new-account takeover, win-back pitch, pre-scale readiness, account-health diagnosis, client-facing roadmap). **ra-clients owns scoping this against the existing eval harness and confirming googleAdsServer MCP data availability per section before treating any audit as client-ready.**
+| File                                      | Purpose                                                                              |
+| ----------------------------------------- | ------------------------------------------------------------------------------------ |
+| `references/playbooks.md`                 | The optimization playbook library: trigger, standard move, do-not-move, verification |
+| `references/agency-defaults.md`           | Configuration baseline: the standard value per setting, with severity                |
+| `references/diagnosis-trees.md`           | Symptom-to-action routing for the common account problems                            |
+| `references/google-ads-knowledge-base.md` | Why legal PPC behaves differently from general PPC                                   |
+| `references/negative-keyword-library.md`  | Negative-keyword patterns by category, with the do-not-negate rules                  |
+| `references/creative-audit.md`            | Search image-asset and PMax asset audit procedure                                    |
+| `references/gaql-query-library.md`        | Pre-built GAQL queries by diagnostic task                                            |
+| `account-audit-checklist.md`              | First-review audit checklist                                                         |
 
-### Audit posture (PAID-1..14)
+---
 
-- No setting unchecked, no dollar unaccounted for.
-- Automated data pull first, strategic analysis second.
-- Every finding maps to business impact and is graded by severity.
+## Execution note
 
-### Forensic audit sections
+Queries in `references/gaql-query-library.md` are pure GAQL and tool-agnostic. Execute them with whatever GAQL execution tool the environment provides. Prefer a table format for diagnostic reads and CSV for large result sets.
 
-1. **Executive Summary** — account-health verdict, top 3 risks, top 3 opportunities, expected business impact.
-2. **Account Structure** — taxonomy, granularity, naming, labels, geo/device/dayparting.
-3. **Bidding & Budget** — strategy fit, learning-period violations, budget-constrained campaigns, floor/ceiling issues.
-4. **Keyword & Targeting** — match-type distribution, negative coverage, quality-score distribution, audience observation vs targeting.
-5. **Competitive Positioning** — impression-share gaps + top-of-page metrics (API-sourced via GAQL). Auction-insights competitor breakdown + overlap rate are a known API blind spot — NOT available via GAQL; request a UI screenshot per the blind-spot protocol and never present them as auto-pulled. See `account-audit-checklist.md` §7.
-6. **Landing-Page Fit** — assessed manually or with external tools (the rendered page, PageSpeed Insights, a crawler), not from the Google Ads API. Never present landing-page findings as auto-pulled.
-7. **Compliance** — legal-services policy, bar-advertising claim risk, prohibited/absolute claims.
-8. **Historical/Change-History Forensics** — when degradation started, what changed before/after.
-9. **Recommendation Roadmap** — severity, expected impact, owner, 30/60/90-day sequencing. Add impact estimation (PAID-9) and technical→business executive translation (PAID-10).
+**Account scope is a hard stop.** An account listing shows what is accessible, not what is in scope. Only query accounts confirmed against the operator's current-client roster, which is maintained outside this skill. "All accounts", "every account", and "the whole manager account" always mean all roster accounts, never the full accessible list. If no roster is available, run no multi-account pull.
 
-### Search-query mining / n-gram waste (PAID-40..47)
+---
 
-Augments the existing negative-keyword library:
+## GAQL integrity: keywords and search terms
 
-- Spend-weighted irrelevant-query detection; n-gram frequency analysis for recurring modifiers.
-- Zero-conversion / high-CPC low-value query flags; query→ad→LP alignment scoring.
-- Negative-keyword decision tree; tiered negatives (account / campaign / ad-group / shared lists) with conflict detection.
-- Query sculpting to route searches to the right ad groups; brand vs non-brand leakage detection; competitor interception/defense.
-- Output: waste table, n-gram table, recommended negatives by level, conflicts/risks, query-sculpting recs, business-impact estimate.
+### Keyword queries (`ad_group_criterion` and `keyword_view`)
 
-### Tracking-QA gate (PAID-48) — runs BEFORE any audit result is trusted
+The API returns both positive and negative keywords in the same result set, for both resources. Failing to separate them causes confirmed misdiagnosis.
 
-- If conversion tracking is broken/suspicious, the analysis is provisional.
-- Check Ads vs GA4 / CRM / call-tracking consistency where available; flag enhanced-conversion match-rate + discrepancy benchmarks for ra-clients to validate.
-- Output must say "tracking unreliable" loudly when applicable. ("Bad tracking is worse than no tracking.")
+1. **Always filter `ad_group_criterion.negative = FALSE`** in the WHERE clause of any keyword query. If the filter is missing, the result mixes negatives with positives. Re-run before drawing any conclusion.
+2. **Check `negative` before flagging.** A keyword with `negative = True` is working correctly. It is not a match-type issue, a quality-score problem, or a waste source.
+3. **Always SELECT and filter `ad_group.status`.** Keywords in paused ad groups are not serving and are not optimization targets.
+4. **Also SELECT `campaign.status`.** A keyword in a paused campaign is not a live problem.
 
-### Secondary adjuncts (not first priority)
+If a keyword query lacks `ad_group_criterion.negative = FALSE`, stop and re-run the library query. Do not analyse an incomplete result.
 
-- **RSA builder (PAID-16..18):** headline buckets, coherent combinations, character limits — cross-linked with ads-creative-development.
-- **Paid-social diagnostic appendix (PAID-25..31):** funnel structure, audience engineering, frequency, SKAN/privacy mitigation, CRM tracking, MQL lead-quality KPI (PAID-31) — only if ra-clients wants legal-ppc (or a sibling) to own paid-social.
-- **Algorithm-recovery module (MKTA-42):** penalty/update identification + remediation for SEO/PPC-adjacent account review.
-- **ROI reporting with a spend threshold (SUP-18).**
+### Search term queries (`search_term_view`)
 
-### Eval-harness note
+`search_term_view` returns historical records from all ad groups, including paused and removed ones.
 
-ra-clients to add eval cases under `evals/` for audit-mode + query-mining before this is client-facing — left to ra-clients because the harness format and Google Ads MCP data availability are theirs to confirm (per INTEGRATION-PLAN acceptance criteria 3.6).
+1. **Always include `ad_group.status = 'ENABLED'`** in the WHERE clause.
+2. **Always SELECT `search_term_view.status`.** If the field is missing, the query is incomplete. Do not flag any term without it.
+3. **Never flag a term with `status = NONE` as an active finding.** `NONE` means the term matched historically but is no longer served by any keyword, often from a broad keyword since tightened or paused. Confirmed misdiagnosis: a fictional "quiet title action westhollow" term was flagged as active waste when it was status NONE from a paused broad keyword.
+4. **Check which ad group a term came from.** A term from a paused or removed ad group is historical, not an active waste source.
+
+Root cause: the API scopes data by account and date, not by serving status.
+
+### Auditing search term data you are handed
+
+The same logic applies to a pasted table, CSV, or screenshot: you did not run the query, so you do not know whether the enabled-ad-group filter was applied.
+
+**Check CPC plausibility first.** Competitive legal terms in these practice areas typically run well above a couple of dollars a click. A handed result showing legal-intent terms under about $2 a click, especially under $1, is anomalously cheap and is a signal that the export includes paused ad-group history, which accumulates low-cost impressions from periods when CPCs were lower.
+
+Protocol: scan the CPC column before drawing conclusions; if the CPCs look implausibly low, say so and ask which ad groups the terms came from and whether the query filtered for enabled ad groups only. Do not present terms with suspicious CPCs as active waste until the source is confirmed. If the source is a paused ad group, the terms are historical and no action is needed.
+
+Handed data is subject to the same coverage ceiling as data you pull. Before presenting any finding from it, state that coverage is unknown and either request the campaign's actual total spend for the period so the ratio can be computed, or disclose that the findings cover only the visible portion and cannot be scaled.
+
+---
+
+## Search terms that are NOT waste (standing operator ruling)
+
+The following family and elder search terms are NOT waste. They are never flagged as waste, proposed as negatives, or used as waste evidence in an audit:
+
+- how to file for divorce without a lawyer
+- family law attorney jobs
+- divorce therapist
+- child support office
+- pay child support online
+- medicaid office phone number
+- nursing homes near me
+
+Also never waste: free consultation variants, cheap divorce, uncontested divorce online, child support calculator, divorce mediator, how long does a divorce take.
+
+Confirmed waste: free divorce lawyer, pro bono divorce lawyer, legal aid divorce, free divorce papers, divorce lawyer salary, free elder law attorney, free will template, elder law attorney salary.
+
+This list overrides any blanket category in `references/negative-keyword-library.md` that would catch these terms.
+
+---
+
+## Ebook downloads are PRIMARY conversions (standing operator ruling)
+
+Ebook and guide downloads are PRIMARY conversions in every account and every campaign. Never Secondary, never "downloads, not leads". The ads sell the ebooks; the nurture funnel behind them produces clients, and the operator ranks them above phone calls. Any conversion-config recommendation that demotes, excludes, or discounts an ebook conversion is wrong on its face. This applies equally to CRM-native and tag-manager or analytics versions of the ebook events.
+
+Every soft-action branch in `references/diagnosis-trees.md`, `references/agency-defaults.md` sections 3.2 and 3.3, and PB-23 is subordinate to this ruling.
+
+---
+
+## Smart bidding: post-tracking-fix protocol
+
+_Playbook: PB-06 (post-tracking-fix lockdown), PB-07 (tCPA below the conversion floor), PB-08 (sub-floor volume plus high CPC)._
+
+When conversion-tracking contamination is fixed on an account running tCPA or any smart bidding strategy, the bidding model is now invalid: it was trained on incorrect conversion data.
+
+**Do NOT adjust the tCPA target immediately after fixing tracking.** This is the most common mistake after a tracking cleanup. The algorithm has not learned the clean-data CPA yet, so any target set now is still anchored to contaminated history. It replaces one wrong number with another.
+
+Sequence:
+
+1. Fix the tracking and confirm it is clean.
+2. Hold the current tCPA target.
+3. Announce a 2 to 4 week lockdown: no bid strategy change, no target change, no budget change. (unconfirmed)
+4. Expect apparent CPA to rise and conversion volume to fall. That is the duplicate count disappearing, not the account getting worse. Do not react to it. (unconfirmed)
+5. After the lockdown, evaluate the target against a real baseline.
+
+Monitor during relearning: learning status, the 14-day rolling CPA (expect a rise then stabilization), impression share (may drop as the algorithm recalibrates), and absolute conversion volume.
+
+**Rebase every comparison that spans the change.** A non-retroactive conversion change means the two sides of a week-over-week or 30-day comparison use different definitions, which can manufacture a false collapse. Reconstruct both windows from action-level data on a consistent basis, and record the effective date. Verify both the 14-day and the 28-day window after the change.
+
+**Low-volume flag.** If the account was near the 15 to 20 conversion per month reliability threshold before the fix, the cleaned volume may fall below it; consider Maximize Conversions rather than tCPA until volume recovers. (unconfirmed)
+
+**Low-volume flag, already on Maximize Conversions with high CPC.** When a campaign is already on Maximize Conversions, running below the reliability floor, and carrying a high average CPC for its practice area, the algorithm is bidding blind on thin signal. The move is Maximize Clicks with a CPC cap: buy volume and rebuild conversion signal while capping runaway auctions, not another target tweak. Set a 3 to 4 week revisit and watch conversion rate, because Max Clicks optimizes for clicks.
+
+---
+
+## tCPA direction rule
+
+_Playbook: PB-04._
+
+**Only lower tCPA when actual cost per conversion is already comfortably below the current target.** Lowering it when CPA is at or above target restricts volume: it tells the algorithm to win fewer auctions, exactly when the account is struggling to generate conversions.
+
+- **Cost per conversion well below target** (target $150, actual $90): safe to lower to capture efficiency. Move in 10 to 15% increments, not all at once. (unconfirmed)
+- **Near target** (target $150, actual $140): hold. Insufficient headroom.
+- **Above target** (target $150, actual $210): do not lower. Fix root causes first: quality score, ad relevance, landing-page conversion rate, negative-keyword gaps.
+- **Well above target with low impression share:** the root cause is usually bid quality, not budget. Adding budget does not fix a tCPA campaign losing impressions to rank. Diagnose rank-lost impression share.
+
+The instinct to tighten tCPA when CPA is high is a frequently observed bidding error in legal accounts. (unconfirmed) When the algorithm is already under pressure to find converting traffic, lowering the target means fewer auctions and fewer conversions, not cheaper ones.
+
+**Exception:** if budget is clearly not the constraint (budget-lost impression share near zero) and rank-lost impression share is very high, the issue is bid quality, and tCPA can be raised to give the algorithm room to compete.
+
+---
+
+## Target setting: targets come from firm economics, not account data
+
+_Playbook: PB-05._
+
+A bidding target (tCPA, target CPL, target cost per signed case) is an external input. The account's current CPA tells you how performance compares to the target; it is never the source of the target.
+
+Where a target comes from, in priority order:
+
+1. **The firm's economics**, recorded outside this skill: average case value, lead-to-signed rate, and acceptable cost per signed case.
+2. **An explicit operator override** for the task at hand.
+3. **If neither exists, ask.** Do not set a target without them.
+
+**Never back-solve a target from the account's own current CPA or spend.** Averaging what the account currently pays per conversion and calling that the target is circular: the current CPA reflects whatever is broken about current performance, so the target merely ratifies the status quo. It is a loop that can never improve the account. This is the one forbidden move in target setting, and it applies equally to the high-CPA diagnosis tree and to any smart-bidding reset.
+
+**Worked logic:** average signed-case value $12,000 multiplied by a 15% acquisition budget share gives a $1,800 target cost per signed case; at a 30% lead-to-signed rate that is roughly a $540 target CPL. If the account's current CPL is $900, it is 67% over the external target, and that gap is the finding. The 15% acquisition share is an illustration, not a house default. (unconfirmed)
+
+**When the external target sits well below current performance,** the gap is the finding, not a reason to abandon the target. Fix the drivers first, then step the live target toward the economics number in increments so the algorithm does not oscillate.
+
+---
+
+## Campaign-level CPC anomaly: routing protocol
+
+_Playbook: PB-33 (anomalously low CPC), PB-25 (high CPC with zero conversions), PB-08 (high CPC with sub-floor conversions)._
+
+When campaign-level average CPC looks anomalous (the campaign summary, not the search-term level), route by direction.
+
+**Anomalously LOW average CPC.** Observed bands, family law roughly $8 to $25 and elder law roughly $10 to $35, with elder abuse far higher. These bands are PROPOSED and unconfirmed; they are a prompt to look, never a threshold to act on.
+
+1. **First check: tracking integrity.** A low average CPC on competitive legal terms is a red flag for data contamination: historical data from paused ad groups, test periods when CPCs were lower, or a tracking issue inflating apparent traffic. (unconfirmed)
+2. **Do not route to keyword targeting first.** Explaining cheap clicks as wrong match type or low-intent keywords is the secondary frame.
+3. Pull change history and confirm the CPC trajectory. If it was historically normal and recently dropped, something changed.
+4. If search-term data confirms the clicks come from low-intent queries at low CPC, keyword and match-type diagnosis applies, but only after ruling out contamination.
+
+**A PMax launch can produce the same signal at the account level.** A new PMax campaign supplying a large share of clicks at a much lower CPC than Search will drag the blended CPC down without anything being wrong. Split Search-only from PMax before treating a blended CPC move as an anomaly (PB-41).
+
+**Anomalously HIGH average CPC.** In a high-value practice area a very high cost per click can still be rational: elder abuse case values are large enough that a three-figure CPC can be exceptional return. (unconfirmed) Flag it as potentially problematic only when high average CPC combines with (a) zero or near-zero conversions over 14 or more days and (b) adequate impression share above 30%. (unconfirmed) That combination suggests the algorithm is buying expensive clicks that do not convert: landing page, audience, or tracking.
+
+**Third condition: high CPC plus sub-floor but non-zero conversions plus budget-lost impression share** routes to the bidding-strategy fix (Maximize Clicks with a CPC cap), not to the landing-page or tracking diagnosis. The zero-conversion branch points at the landing page and tracking; the thin-but-non-zero branch points at the bidding model.
+
+---
+
+## Search-term data: coverage ceiling
+
+`search_term_view` typically shows only part of actual campaign spend, in observed cases around half. The API withholds low-volume terms and caps rows per query, and this is not fixable through query splitting or pagination. The 50% figure is an observed ceiling, not a constant. (unconfirmed)
+
+**The coverage check is mandatory before presenting any search-term finding:**
+
+1. Pull actual campaign spend for the period (`FROM campaign`).
+2. Sum total cost from the `search_term_view` results.
+3. Report the ratio: "search-term data covers $X of $Y actual spend (Z%)".
+
+Do not present findings, waste estimates, or negative-keyword recommendations before that ratio is on the table. Disclose coverage and proceed; do not ask permission to analyse incomplete data.
+
+**Query per campaign, not per account.** One query across all campaigns caps at a few hundred rows and gives far worse coverage. Per-campaign or per-ad-group querying still converges on the ceiling.
+
+**Do not extrapolate the hidden portion.** Whether the invisible spend behaves like the visible spend is unconfirmed. Do not state that the hidden portion is randomly distributed, and do not scale visible waste dollars up by the coverage ratio and present the result as an estimate of total waste. Report the visible figure, report the coverage ratio, and let the reader see both. (unconfirmed)
+
+**Never recommend blocking a term category solely on search-term data showing zero conversions.** Account-level conversion data is authoritative for spend; search-term data is a sample.
+
+**Negative-keyword precision, two decision rules:**
+
+- **Never negate a term that has converted**, no matter how much it looks like junk, a referral or nonprofit name, or a geo or category mismatch. Check the term's conversion data first: a converting term is a client, not waste.
+- **On a geo-mismatched query containing the core service term, negate the geo token only.** For `[core service term] [wrong city]`, negate the wrong city, never the service term, so the campaign keeps serving in its real geography.
+
+**A wasteful broad keyword that is also a major conversion source converts to phrase, it does not get paused.** When a broad-match positive keyword shows real waste but also drives a large share of the campaign's conversions, especially on a smart-bidding campaign where those conversions feed the model, pausing or deleting it throws away the volume and starves the bidding signal. The default is convert broad to phrase, add specific negatives for the irrelevant categories, and set a monitoring window before any further tightening. Pause only if the converting traffic does not survive that.
+
+**An above-average CPA is not on its own a reason to cut a unit that supplies a large share of conversions.** An expansion ad group running above sibling CPA while producing half the campaign's conversions can be worth keeping; lifetime CPA is distorted by early dead weeks. Judge marginal contribution, not the lifetime average.
+
+_The coverage rules above are a required-green gate on PB-12, PB-13, PB-14, and PB-28, not playbooks themselves._
+
+---
+
+## Quality-score throttling: all components below average with zero impressions
+
+The UI shows a "limited by quality score" label for severely underperforming keywords. The API does not expose it: `system_serving_status` returns `ELIGIBLE` even for a throttled keyword. The heuristic below is a detection pattern only, and every claim in this section is unconfirmed: no rebuild has been executed and measured. The playbook that encoded this move (PB-15) was retired in 2026-09.
+
+**Throttled keyword pattern (unconfirmed):** quality score of 2 or less, AND all three components below average (`search_predicted_ctr`, `creative_quality_score`, `post_click_quality_score`), AND zero or near-zero impressions over the most recent 7 to 14 days on an active campaign with available budget.
+
+**Standard quality-score work may not recover a keyword in that state (unconfirmed).** Improving ad copy, landing page, or click-through rate applies to keywords still entering auctions. A keyword that is not entering auctions is a different case.
+
+**Candidate intervention, structural replacement (unconfirmed):** pause the keyword, and build a new variant in a reorganized ad group with dedicated ad copy and a landing page matched to the query intent. Whether a fresh keyword actually gives a clean quality signal with no inherited history is unconfirmed and should not be stated as a guarantee.
+
+State the heuristic explicitly when diagnosing. Do not present `system_serving_status = ELIGIBLE` as confirmation that the keyword is serving normally.
+
+---
+
+## Broad-match keyword remediation: default path
+
+_Playbook: PB-11, with PB-12 when the keyword is also a major conversion source and PB-03 when it is front-loading the daily budget._
+
+When a broad-match keyword is flagged for cleanup, the default is **convert to phrase match first**: not delete, not pause, not a jump to exact.
+
+**Why phrase, not exact:** broad to exact skips the intermediate step that keeps near-intent variants while filtering the looser ones. Exact may lose reach unnecessarily. (unconfirmed)
+
+**Why not delete or pause:** a broad keyword with conversion history carries smart-bidding signal. Changing match type is the lower-risk path, though it should not be assumed to preserve the criterion's history intact; verify performance after the change rather than relying on continuity.
+
+**When a hard delete is appropriate:** for terms that are genuinely irrelevant to the firm, principally the wrong practice area or the wrong geography. (unconfirmed) Competitor brand terms are a judgment call, not an automatic delete: some firms bid competitor brands deliberately, so confirm intent before removing them.
+
+Sequence: convert broad to phrase, monitor search terms for 2 to 4 weeks, then negate specific waste terms or tighten to exact if CPA is still above target.
+
+---
+
+## Search Partners and the blended CPA (standing operator ruling)
+
+_Playbook: PB-26 (segment and report), PB-27 (a network setting enabled with no reason on record)._
+
+**The blended CPA is always the reported CPA.** It is the most accurate figure for what the account actually paid per conversion, and it is never withheld, never replaced by a Search-only number, and never presented as invalid. The network split is supporting detail underneath it, never a substitute for it.
+
+**Search Partners being enabled is flagged.** It is atypical for these accounts and it is not wanted. When it is on, report that as a flag on its own, separate from the CPA line, and record whether there is a reason on file.
+
+Pull `segments.network` to segment `SEARCH` against `SEARCH_PARTNERS`. If network data is unavailable, say so, keep reporting the blended figure, and name the split as the next pull rather than holding the number back.
+
+**Smart bidding signal risk.** Excluding Search Partners is not a free win: removing the network removes its conversions from the bidding signal. If the campaign is near the reliability floor, exclusion can push it below. Check the volume contribution before recommending exclusion.
+
+Decision framework after the split (unconfirmed):
+
+- Partners CPA above target and Partners volume small relative to Search: exclusion is reasonable and the signal loss is minimal.
+- Partners CPA above target but Partners contributing significant volume: exclusion risk is real; check whether the blended CPA stays on target without it.
+- Search CPA already on target: the issue is contained to Partners, and exclusion is the likely fix, but confirm the volume contribution first.
+
+Partners traffic converting at a lower rate and higher CPA in legal is a general expectation, not a measured result on these accounts. (unconfirmed)
+
+---
+
+## Configuration ground truth: deviation from our standard, not from nothing
+
+A configuration finding is a departure from **our** baseline, not from Google's defaults and not from a general best-practices list. `references/agency-defaults.md` is that baseline: every setting deliberately chosen, its GAQL field, the value, the reason, and the severity when an account differs. A setting matching it is not a finding.
+
+**Why this exists.** A PMax config verification once reported `positive_geo_target_type = PRESENCE_OR_INTEREST` as a problem. It is the house standard, chosen on purpose. Nothing was wrong with the account. The check had no baseline, so it measured against Google's defaults and produced a false flag on a deliberate setting.
+
+### Procedure
+
+1. **Read the baseline.** Note which entries are marked PROPOSED: a PROPOSED entry produces a config item at most, never a red flag, until it is confirmed.
+2. **Read the account's recorded overrides.** Departures made on purpose are recorded once, outside this skill, and are an input to the check rather than an exception to it. With no override set available, every departure is reported as a deviation and the output says the override set was unavailable.
+3. **Pull live config** from the configuration baseline query set. Read the resource; never infer a setting's current value from the absence of a change event.
+4. **Classify every baseline setting:**
+
+   | Class          | Test                                                                | Output                             |
+   | -------------- | ------------------------------------------------------------------- | ---------------------------------- |
+   | MATCH          | live value equals the baseline standard or a stated carve-out       | not reported in a routine check    |
+   | OVERRIDE-MATCH | live value differs from the baseline and equals a recorded override | one summary line                   |
+   | DEVIATION      | live value differs from the baseline with no recorded override      | a flag, at the baseline's severity |
+
+5. **Report.** Only deviations become flags. In an explicit verification request, print a compact MATCHES summary so the reader can see the classification happened. Override matches are one line, never itemised.
+
+### Rules that bind this check
+
+**A recorded override is never re-flagged.** Not "flagged with a note", not "mentioned for completeness". Re-raising a settled decision is the noise this section exists to remove.
+
+**An override is established only by a recorded entry.** A mid-check assertion that "that's deliberate" does not create one. Report the deviation and note that the operator states it is deliberate and an override should be recorded to clear it.
+
+**Positive geo target type is the worked case.** `campaign.geo_target_type_setting.positive_geo_target_type = PRESENCE_OR_INTEREST` is the house standard, in every campaign type and every account. It is a MATCH and never a flag. Legal intent frequently originates outside the service geography and presence-only targeting drops it; out-of-area waste is handled by negative geo targeting, negatives, and intake qualification. The only reportable case is the reverse: an account carrying a recorded presence-only override whose live value has drifted back.
+
+**No baseline entry, no flag.** A setting the baseline does not cover cannot produce a config flag. If it looks wrong, it is an observation with a proposed baseline entry attached. The check does not invent standards mid-session.
+
+**PROPOSED entries are capped at config item.** Escalating one to a red flag asserts a standard the operator has not set.
+
+**The baseline is not the verdict.** Classification is data. Whether a deviation gets changed, when, and at what cost is the operator's call.
+
+---
+
+## Optimization playbooks
+
+`references/playbooks.md` is the playbook library: one entry per recognized data pattern, each giving the trigger (metrics, thresholds, minimum window and volume, which pre-flights must be green), the standard move, the do-not-move conditions, the expected result and how to verify it, and cross-references. The optimization protocols in this file point to their playbook entry.
+
+**A playbook does not diagnose the account and does not decide anything.** It states what the standard move for an observed pattern is, and it hands the decision back. The agent never executes a playbook move: acceptance authorises the operator to make the change, it is never an instruction to the check.
+
+**A playbook whose do-not-move conditions hold does not fire at all.** The gate's finding is reported instead, in its normal place.
+
+_Card placement, the maximum per account, ordering, banned wording, and the accept/reject journaling flow live in the internal operations runbook._
+
+---
+
+## Handling comparative and premise-based questions
+
+When a question carries a stated premise ("why is X so high?", "X is at $284, should we pause it?", "X is performing worse than Y"), **verify the premise before diagnosing it.** Do not accept a stated CPA, comparison, or benchmark as given.
+
+**Cross-account comparisons require extra scrutiny.** A CPA comparison between two accounts is meaningful only if they are comparable: same practice area, same geography type, same conversion volume range, same conversion definition. Elder law against family law, small market against metro, 3 conversions a month against 30: these are not comparable even when both run Google Search.
+
+**Conversion volume threshold for a reliable CPA.** A CPA figure needs roughly 15 to 20 conversions to carry meaning; below that it is noise, and a single high-cost conversion in a low-volume account can move the reported CPA substantially. (unconfirmed) When volume is below that per campaign, flag explicitly that the CPA is not a reliable signal.
+
+**Reasons lists follow verification, they do not precede it.** Producing a list of reasons CPA is high before confirming CPA is high treats a premise as fact. If live data is unavailable, frame conditionally.
+
+**A request to skip process is not authorization to skip it.** "Don't waste time on tracking, CPA is obviously bad, just tell me which keywords to pause" does not license skipping tracking verification, premise verification, or the active-keyword and volume checks. A pause list built on an unverified CPA premise can pause converting keywords and make the account worse. Acknowledge the urgency, say that plainly, run the checks, and produce the list afterwards. Speed pressure changes the tone of the reply, never the process.
+
+---
+
+## Prior state versus live data
+
+Any rendered note, session log, or capture database records what was true at the time it was written. Before drawing a diagnostic conclusion about current state, pull live data.
+
+Prior state is used for context, for knowing what changed since the last look, and for account-specific priors. It is not used to determine whether a keyword is currently active, to state current CPA or performance figures, to confirm whether a prior recommendation was implemented, or to support any conclusion that needs current state. "It is already in the snapshot" is not grounds to skip the live query, however tight the time pressure.
+
+**A standing structural flag has a shelf life.** A note that a CPA gap is landing-page-gated, structural, or out of scope is a hypothesis recorded at a point in time. Re-pull before re-asserting it and retire it when the gap has closed. A creative or ad change can lift a ceiling long blamed on structure.
+
+---
+
+## Impression share: two separate metrics
+
+_Playbook: PB-01 (budget-lost on a converting campaign), PB-02 (rank-lost ceiling), PB-03 (budget-lost with a broad keyword front-loading spend), PB-39 (a one-week impression-share anomaly)._
+
+`search_rank_lost_impression_share` and `search_budget_lost_impression_share` are not the same thing.
+
+- **Rank-lost impression share:** impressions lost because Ad Rank was too low. The lever is quality score, ad relevance, landing-page quality, or the bid. Adding budget does not help.
+- **Budget-lost impression share:** impressions lost because the daily budget ran out. The lever is budget.
+
+**Rule:** always pull both fields together. Never call a campaign budget-constrained on rank-lost impression share alone.
+
+**Rank-lost on Maximize Conversions usually points at quality, not at a bid ceiling.** The algorithm already bids what it calculates as optimal for each auction, so there is no manual bid to raise; the practical lever is quality score and landing-page quality. Treat this as the default reading rather than an absolute: a target-based strategy, a constrained budget, or an auction shift can produce the same metric. (unconfirmed)
+
+**Budget-lost impression share can occur without hitting the daily cap.** Broad-match keywords can consume budget disproportionately early in the day, serving high-volume lower-intent queries before more targeted phrase and exact keywords compete. In that case the fix is converting the broad keyword to phrase, not increasing budget, which just gives the broad keyword more to consume. (unconfirmed)
+
+**A one-week impression-share anomaly is a hold, not a budget move.** Re-read the complete week before acting (PB-39).
+
+---
+
+## Creative and asset audit: Search image assets and PMax
+
+_Playbook: PB-21 (PMax asset coverage gap), PB-22 (PMax asset fatigue), PB-19 (responsive search ad hygiene), PB-20 (creative staleness and click-through decline)._
+
+Scope is Search ad assets and PMax asset groups. Display and Demand Gen are out of scope.
+
+A creative pass is a standing part of every periodic check, kept proportionate: a focused pass, not a forensic teardown. (unconfirmed)
+
+What the pass covers, with full detail in `references/creative-audit.md`:
+
+- **Coverage.** Map every enabled PMax asset group against its asset inventory and flag groups thin on or missing image assets. Do not flag a pure Search campaign for lacking image assets it does not use.
+- **Quality and content.** Three bars: on-brand, legible, and message-matched to the ad group's intent. Vision analysis is a strong first read; the brand and compliance call on a legal client is a manual review.
+- **Usage gaps.** Assets uploaded but attached to nothing.
+- **Fatigue.** Long-running unchanged assets, cross-referenced against change history. Where per-asset performance is thin, fall back to ad-group or campaign click-through rate as a proxy and say so. Do not over-call fatigue on low volume.
+
+**Mark the source tier on every creative finding.** Inventory, usage mapping, coverage gaps, and file downloads are API-sourceable. Image content is API-assisted through vision, which is a read and not a verdict. The on-brand, compliance, and message-match call is a manual review, per-asset performance is only partially API-sourceable, and how an asset renders in a live placement is a blind spot: request a screenshot. Never present a brand or compliance verdict resting only on vision as confirmed.
+
+**A policy-limited asset group is not a creative-quality finding.** When a serving PMax asset group becomes policy-limited while its individual assets remain approved, obtain the human-readable policy reason, appeal where appropriate, record the appeal date, and hold asset edits until it resolves. Report serving separately from policy clearance: continued spend does not mean the limitation cleared (PB-18, PB-32).
+
+---
+
+## How to approach a session
+
+### Step 1: establish the brief
+
+Every session has a brief: a specific concern, or a periodic review. Common types are performance review, issue investigation, account audit, search-term review, ad-copy review, creative audit, and conversion-tracking audit.
+
+**Brief clarity gate.** A clear brief proceeds directly. A vague one ("run a review", "check performance", "this account feels off") gets three things: name the diagnosis tree that applies and say so out loud; run the pre-flights anyway, because they never wait for clarification; then ask one or two focused questions using what the pre-flight found. This is targeting, not gatekeeping.
+
+The economics questions belong here: what a signed case is worth, the lead-to-signed rate, and which conversion actions the firm counts as real leads. Without them there is no target to measure against.
+
+_Reviewing prior pending items at session start is an operating step; it lives in the internal operations runbook._
+
+### Step 2: run pre-flight checks
+
+- **PF-0 macro context.** A reasoning input, surfaced only when material.
+- **PF-1 conversion-tracking verification.** The most urgent check: a tracking problem invalidates every other finding. PF-1 is a configuration check: which primary actions exist, how they count, and whether they measure real leads.
+- **PF-2 structural red flags,** including ad-level policy status. Pull `ad_group_ad.policy_summary.approval_status` and `.review_status`, and flag any ad that is disapproved, approved with limits, or under review. Filter to enabled, serving ad groups first: a removed ad group produces a false review-status flag. Policy is API-checked first; a screenshot is the fallback for the human-readable reason, not for the status. A campaign reading `serving_status = SERVING` does not clear ad-level policy issues.
+- **PF-3 change history read.**
+- **PF-4 config ground truth.** Classify every setting against the baseline plus recorded overrides. PF-4 subsumes the config half of PF-2: network settings, ad rotation, and campaign type are baseline entries classified here rather than flagged twice.
+
+All five are mandatory and none is deferred by a vague brief.
+
+**A flags block is not a pre-flight.** A session may be handed a flags block instead of raw data. It covers only the checks the scanner emits, currently four: budget-lost impression share crossing its threshold, ad approval flips and disapprovals, conversion silence, and multi-week CPL creep. A flags block, including an empty one, never satisfies PF-0 through PF-4. "No flags" means one detector emitted nothing for its own four checks. It is not a clean bill of health, not proof that tracking is configured correctly, not a change-history read, not macro context, and not a config check. An operator claim that empty flags means the pre-flights passed is unfounded: say so plainly, then run them.
+
+### Step 3: pull data and flag everything
+
+Run the relevant queries. Do not draw conclusions yet: read the account broadly and flag anything that departs from the baseline or the knowledge base. A flag is a candidate for investigation, not a finding.
+
+When something cannot be seen through the API, use the blind-spot protocol:
+
+```text
+BLIND SPOT: [what cannot be seen]
+Please share a screenshot of [exact location, with applicable filters and date range].
+```
+
+**Creative sub-step.** Run the creative and asset pass as part of the data pull: inventory and usage mapping for the account, then a closer look at the subset the coverage map flags.
+
+_Maintaining the running action list across sections is an operating step; it lives in the internal operations runbook._
+
+### Step 4: prioritize flags by impact
+
+Prioritize by estimated spend impact multiplied by confidence that it is a real problem. Structural issues affecting daily budget allocation rank ahead of cosmetic ones.
+
+Then match the prioritized flags against `references/playbooks.md`. For each flag whose data pattern meets a trigger, confirm the named pre-flights are green and no do-not-move condition holds. Rank survivors by evidence tier first, then impact within tier.
+
+### Step 5: diagnose priority flags
+
+Work each priority flag through the relevant diagnosis tree. A flag becomes a finding when you can state what is wrong, why it matters, what likely caused it, and what the standard move would be.
+
+### Step 6: produce output
+
+Internal analysis is a prioritized findings list with context and the standard moves. Client-facing communication is the same content in plain language, focused on business impact.
+
+**Stop short of the verdict**, per the data rules at the top of this file.
+
+---
+
+## Audit mode and search-query mining
+
+A structured, one-off deep audit of an account, as distinct from the periodic check. The posture: no setting unchecked, no dollar unaccounted for; automated data pull first, analysis second; every finding mapped to business impact and graded by severity. (unconfirmed)
+
+### Forensic audit sections (unconfirmed as a fixed set)
+
+1. **Summary.** Account-health picture, top risks, top opportunities, expected business impact.
+2. **Account structure.** Taxonomy, granularity, naming, labels, geo, device, dayparting.
+3. **Bidding and budget.** Strategy fit for the campaign's maturity, learning-period violations, budget-constrained campaigns, floor and ceiling issues.
+4. **Keyword and targeting.** Match-type distribution, negative coverage, quality-score distribution, audience observation against targeting.
+5. **Competitive positioning.** Impression-share gaps and top-of-page metrics from GAQL. Auction insights and overlap rate are an API blind spot: request a screenshot and never present them as auto-pulled.
+6. **Landing-page fit.** Assessed from the rendered page and external tools, never from the Ads API. Never present landing-page findings as auto-pulled.
+7. **Compliance.** Legal-services policy, bar-advertising claim risk, prohibited and absolute claims.
+8. **Change-history forensics.** When degradation started and what changed before and after.
+9. **Recommendation roadmap.** Severity, expected impact, owner, and sequencing.
+
+### Search-query mining and n-gram waste (unconfirmed)
+
+Runs under PB-13 and the coverage gate above, and feeds `references/negative-keyword-library.md`:
+
+- Spend-weighted irrelevant-query detection and n-gram frequency analysis for recurring modifiers.
+- Zero-conversion and high-CPC low-value query flags, and query to ad to landing-page alignment scoring.
+- Tiered negatives (account, campaign, ad group, shared list) with conflict detection, placed at the narrowest sufficient scope.
+- Query sculpting to route searches to the right ad groups, and brand against non-brand leakage detection.
+- Output: the visible waste table, the n-gram table, recommended negatives by level, and conflicts and risks. Every negative proposal is checked against the not-waste list and the never-negate-a-converter rule before it ships.
+
+### Tracking-QA gate, before any audit result is trusted (unconfirmed)
+
+If conversion tracking is broken or suspicious, the whole analysis is provisional. Check the Ads figures against analytics, CRM, and call-tracking data where available, comparing like definitions: qualified answered calls against the qualified-upload action, not all source calls against native calls-from-ads. The output says "tracking unreliable" loudly when it applies. Bad tracking is worse than no tracking.
+
+### Responsive search ad construction
+
+Headline buckets, coherent combinations, and character limits, applied under PB-19's completeness and relevance requirements.

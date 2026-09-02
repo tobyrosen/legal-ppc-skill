@@ -9,3 +9,6 @@ references/learnings.md
 skills/
 __pycache__/
 *.pyc
+
+# Internal operations overlay - runbook, other-platform drafts. Never released.
+internal/

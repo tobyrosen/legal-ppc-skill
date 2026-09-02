@@ -1,6 +1,6 @@
 {
   "skill_name": "google-ads-analysis",
-  "description": "Trigger reliability evals. Tests whether the skill activates on relevant prompts (should-trigger) and stays dormant on adjacent prompts (should-not-trigger). Separate from output quality testing in evals.json and evals_v2.json.",
+  "description": "Trigger reliability evals. Tests whether the skill activates on relevant prompts (should-trigger) and stays dormant on adjacent prompts (should-not-trigger). Separate from output quality testing in the numbered suites. Refreshed 2026-09: the out-of-scope-platform and out-of-scope-practice-area cases were cut with the drift correction; T17 preserves the campaign-creation boundary without naming an out-of-scope vertical.",
   "evals": [
     {
       "id": "T1",
@@ -63,40 +63,10 @@
       "rationale": "Impression share is a Google Ads metric. Should trigger even without the platform name."
     },
     {
-      "id": "T11",
+      "id": "T17",
       "type": "should-not-trigger",
-      "prompt": "Write a Facebook ad for our family law campaign targeting divorced adults 35-55.",
-      "rationale": "Facebook/Meta ads — explicitly different platform. Skill covers Google Ads only."
-    },
-    {
-      "id": "T12",
-      "type": "should-not-trigger",
-      "prompt": "Can you help me write a blog post about child custody laws in Michigan?",
-      "rationale": "Content creation / SEO — no PPC context. Should not activate."
-    },
-    {
-      "id": "T13",
-      "type": "should-not-trigger",
-      "prompt": "Pull our AgencyAnalytics report for this month and format it for the client.",
-      "rationale": "Client reporting via AgencyAnalytics — explicitly excluded in skill description."
-    },
-    {
-      "id": "T14",
-      "type": "should-not-trigger",
-      "prompt": "What keywords should we target for a new immigration law campaign?",
-      "rationale": "Keyword research for a new campaign — excluded. Skill covers diagnosis and optimization, not campaign creation."
-    },
-    {
-      "id": "T15",
-      "type": "should-not-trigger",
-      "prompt": "Can you improve the SEO on our landing page? We need better organic rankings.",
-      "rationale": "SEO — explicitly excluded in skill description."
-    },
-    {
-      "id": "T16",
-      "type": "should-not-trigger",
-      "prompt": "Set up a new Google Ads campaign for our personal injury practice.",
-      "rationale": "Campaign creation — excluded. Even though Google Ads is named, the task is creation not analysis."
+      "prompt": "Build us a new Google Ads campaign from scratch for the elder law practice, with the ad groups and keywords.",
+      "rationale": "Campaign creation and new-account keyword research are out of scope. The skill covers diagnosis and optimization of live campaigns, so it stays dormant even though Google Ads is named."
     }
   ]
 }

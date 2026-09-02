@@ -31,7 +31,12 @@
         "[REASONING] Flags smart bidding signal loss risk if Greenfield is near or below 15-20 conversions/month per campaign",
         "[LEGAL CONTEXT] Adapts the answer to Greenfield's elder law/probate/small-market context instead of applying a blanket Apex/family-law rule"
       ],
-      "notes": "Expected failure: generic rule-following says Search Partners is bad in legal and skips signal-loss analysis."
+      "notes": "Expected failure: generic rule-following says Search Partners is bad in legal and skips signal-loss analysis.",
+      "unconfirmed": [
+        "The 15 to 20 conversions a month signal-loss gate on a network exclusion decision is unconfirmed.",
+        "Superseded on the reporting half: the blended CPA is always the reported number and Search Partners enabled is flagged as atypical. See evals_v5.json case 504."
+      ],
+      "superseded_by": "evals_v5.json case 504 (reporting half only; the signal-loss gate still stands)"
     },
     {
       "id": 17,
@@ -46,7 +51,10 @@
         "[REASONING] Checks conversion count against the 15-20 conversion reliability threshold before trusting the $190 CPA",
         "[CONDITIONAL FRAMING] If a budget increase is discussed, frames it as conditional on tracking, conversion volume, and recent-change checks"
       ],
-      "notes": "Expected failure: a polished runner will justify budget increase because the visible metrics point that way, missing reliability gates."
+      "notes": "Expected failure: a polished runner will justify budget increase because the visible metrics point that way, missing reliability gates.",
+      "unconfirmed": [
+        "The 15 to 20 conversions a month signal-loss gate on a network exclusion decision is unconfirmed."
+      ]
     },
     {
       "id": 18,
@@ -61,7 +69,12 @@
         "[REASONING] Considers blended CPA and business target before recommending network exclusion",
         "[CONDITIONAL FRAMING] Recommendation is conditional or cautious, such as monitor, test, or exclude only if blended economics fail after assessing volume impact"
       ],
-      "notes": "Expected failure: current doctrine says Search Partners is usually worse, but the conflicting conversion-volume signal should dominate."
+      "notes": "Expected failure: current doctrine says Search Partners is usually worse, but the conflicting conversion-volume signal should dominate.",
+      "unconfirmed": [
+        "The 15 to 20 conversions a month signal-loss gate on a network exclusion decision is unconfirmed.",
+        "Superseded on the reporting half: the blended CPA is always the reported number. See evals_v5.json case 504."
+      ],
+      "superseded_by": "evals_v5.json case 504 (reporting half only; the signal-loss gate still stands)"
     },
     {
       "id": 19,
@@ -76,7 +89,10 @@
         "[OUTPUT DISCIPLINE] Recommends a 2-4 week clean-data hold/monitoring window before evaluating budget increases",
         "[REASONING] Notes that budget and bid strategy changes during relearning can disrupt the algorithm"
       ],
-      "notes": "Expected failure: the item-level budget signal is intentionally attractive, but the tracking-fix sequence should block action."
+      "notes": "Expected failure: the item-level budget signal is intentionally attractive, but the tracking-fix sequence should block action.",
+      "unconfirmed": [
+        "The 2 to 4 week post-tracking-fix relearn window used as the pass condition is unconfirmed."
+      ]
     },
     {
       "id": 20,
@@ -166,7 +182,10 @@
         "[OUTPUT DISCIPLINE] Recommends a 2-4 week hold/lockdown window with no target/budget/bid strategy changes",
         "[REASONING] Notes that the tCPA model was trained on contaminated data and needs clean-data relearning"
       ],
-      "notes": "Expected failure: user pressure plus worse-looking CPA tempts the runner into the exact wrong tCPA move."
+      "notes": "Expected failure: user pressure plus worse-looking CPA tempts the runner into the exact wrong tCPA move.",
+      "unconfirmed": [
+        "The 2 to 4 week post-tracking-fix relearn window used as the pass condition is unconfirmed."
+      ]
     },
     {
       "id": 26,
@@ -182,7 +201,10 @@
         "[EXECUTION] Describes running GAQL 2.1/2.2 for conversion actions and checking brand/placement/channel contamination before any budget move",
         "[OUTPUT DISCIPLINE] Treats the $72 CPA as suspect, not as proof PMax is outperforming Search"
       ],
-      "notes": "Expected failure: low CPA lure. Correct answer must reject the premise because the conversion definitions are bad and PMax likely captures easy demand."
+      "notes": "Expected failure: low CPA lure. Correct answer must reject the premise because the conversion definitions are bad and PMax likely captures easy demand.",
+      "unconfirmed": [
+        "That a 15-second phone call is too short to be a legal lead is unconfirmed."
+      ]
     },
     {
       "id": 27,
@@ -199,5 +221,6 @@
       ],
       "notes": "DESIGNED TO FAIL before the PF-2 ad-policy GAQL update. The prior skill framed ad/campaign policy as a screenshot-only blind spot (diagnosis-trees.md Tree 3 Step 1). Expected pre-fix failure: the runner accepts serving_status = SERVING as clearing policy, or asks for a Policy Manager screenshot to check approval, instead of pulling ad_group_ad.policy_summary via GAQL 7.3."
     }
-  ]
+  ],
+  "unconfirmed_note": "Suite-level note added 2026-09-02 with the drift correction: several pass conditions in this suite rest on thresholds that are unconfirmed, meaning general practice not yet confirmed by the operator. Per-case unconfirmed claims are listed in each case's `unconfirmed` field. Where a case is superseded by the refresh, evals_v5.json carries the corrected version and governs."
 }

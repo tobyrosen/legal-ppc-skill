@@ -1,159 +1,159 @@
-# Legal PPC Skill — Google Ads Analysis for Law Firms
+# Legal PPC skill: Google Ads Search and Performance Max for law firms
 
-![Version](https://img.shields.io/badge/version-v3.6-blue)
-![Evals](https://img.shields.io/badge/eval%20delta-%2B86pp-brightgreen)
+![Version](https://img.shields.io/badge/version-v4.1-blue)
 ![Status](https://img.shields.io/badge/production-active-success)
 
-Data-first Google Ads analysis for legal PPC. The skill pulls live account data, runs mandatory pre-flights, and presents what the data shows plus the standard move for a recognized pattern. It does not issue verdicts. Pause, scale, and go/no-go calls stay with the operator.
+An encoded set of tactics for improving Google Ads Search and Performance Max campaigns at family law, immigration law, and elder law firms. The skill pulls live account data, runs mandatory pre-flights, and presents what the data shows plus the standard move for a recognized pattern. It does not issue verdicts. Pause, scale, and go/no-go calls stay with the operator.
 
 ---
 
 ## What it does
 
-Load it in Claude Code with a Google Ads MCP. Give it a brief, or say the account feels off. It runs the diagnostic in order, with the safeguards a general model skips.
+Load it in Claude Code alongside a Google Ads MCP. Give it a brief, or say the account feels off. It runs the diagnostic in order, with the safeguards a general model skips.
 
 **Session flow:**
 
-1. Read the agency config baseline, any recorded overrides, and account notes (operator mode)
-2. Run five mandatory pre-flights: macro context (PF-0), conversion tracking (PF-1), structural red flags (PF-2), change history (PF-3), config ground truth (PF-4)
-3. Pull live data via GAQL and flag candidates
-4. Match recognized patterns to the playbook library (at most three `playbook:` lines on the walk card)
-5. Produce a prioritized action list as data and standard moves, never as verdicts
+1. Establish the brief, including the firm's economics, and name the diagnosis tree that applies.
+2. Run five mandatory pre-flights: macro context (PF-0), conversion tracking (PF-1), structural red flags (PF-2), change history (PF-3), config ground truth (PF-4).
+3. Pull live data through the GAQL library and flag candidates.
+4. Match recognized patterns against the playbook library.
+5. Produce a prioritized findings list as data and standard moves, never as verdicts.
 
-**Two capabilities this version adds:**
+**The two structural pieces:**
 
-- **Config ground truth.** A configuration finding is a departure from a stated agency standard (`references/agency-defaults.md`), not from Google's defaults and not from nothing. Matching settings are silent. Recorded overrides are one summary line. Only an unrecorded departure becomes a flag.
-- **Optimization playbooks.** 39 pattern-to-standard-move entries in `references/playbooks.md` (PB-01 to PB-39). A triggered playbook adds one labelled `playbook PB-nn:` line to the walk card, after red flags, ending `accept/reject`. The agent never executes the move.
+- **Config ground truth.** A configuration finding is a departure from a stated baseline (`references/agency-defaults.md`), not from Google's defaults and not from nothing. Matching settings are silent. Recorded overrides are one summary line. Only an unrecorded departure becomes a flag.
+- **Optimization playbooks.** 40 pattern-to-standard-move entries in `references/playbooks.md`. Each carries a trigger, the standard move, the do-not-move conditions, the verification window, and an evidence tier. The agent never executes a move.
 
-**What it gets right that a general model doesn't:**
+**Evidence tiers.** Every playbook carries one of `validated in practice`, `partially validated`, `textbook only`, or `unconfirmed`. Unconfirmed means general practice not yet confirmed by the operator: a candidate, never a house tactic. As of the 2026-09 refresh: 13 validated, 12 partially validated, 15 textbook only, with unconfirmed markers on individual claims and thresholds throughout.
 
-| Failure mode                       | What a general model does                 | What this skill does                                                                       |
-| ---------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Negative keywords in GAQL results  | Flags them as active optimization targets | Filters `negative = FALSE` — required in every keyword query                               |
-| Paused ad group search terms       | Treats them as active waste               | Requires `ad_group.status = ENABLED` filter; `status = NONE` terms are explicitly excluded |
-| Cheap CPC on a legal term          | Explains it as "low-intent traffic"       | Routes to data contamination first — paused ad group history bleeding in                   |
-| 58% rank-lost IS                   | Recommends raising budget                 | Correctly identifies as QS/bid quality problem; budget won't help                          |
-| tCPA above target                  | Recommends lowering tCPA to "tighten up"  | Applies direction rule: lowering when above target restricts volume, not cost              |
-| CPA from 4 conversions             | Treats it as a reliable signal            | Flags the 15-20 conversion threshold; below that, CPA is noise                             |
-| Search term waste estimates        | Reports face-value numbers                | Discloses the ~50% API coverage ceiling and scales estimates accordingly                   |
-| Config that matches house standard | Flags it against Google's defaults        | Classifies against `agency-defaults.md`; a MATCH is silent                                 |
+**What it gets right that a general model does not:**
+
+| Failure mode                       | What a general model does                 | What this skill does                                                                      |
+| ---------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Negative keywords in GAQL results  | Flags them as active optimization targets | Filters `negative = FALSE`, required in every keyword query                               |
+| Paused ad group search terms       | Treats them as active waste               | Requires `ad_group.status = ENABLED`; `status = NONE` terms are explicitly excluded       |
+| Cheap CPC on a legal term          | Explains it as low-intent traffic         | Routes to data contamination first, then to a Search versus PMax split                    |
+| High rank-lost impression share    | Recommends raising budget                 | Separates rank-lost from budget-lost; budget does not fix a rank problem                  |
+| tCPA above target                  | Recommends lowering tCPA to tighten up    | Applies the direction rule: lowering when above target restricts volume, not cost         |
+| CPA from a handful of conversions  | Treats it as a reliable signal            | Flags the reliability floor; below it, CPA is noise                                       |
+| Search term waste estimates        | Reports face-value numbers                | Discloses the coverage ratio and refuses to extrapolate the hidden portion                |
+| Config that matches house standard | Flags it against Google's defaults        | Classifies against the baseline; a MATCH is silent                                        |
+| Ebook and guide downloads          | Demotes them as soft conversions          | Treats them as PRIMARY conversions by standing operator ruling, never demotion candidates |
 
 ---
 
-## Public vs operator mode
+## Public and operator modes
 
-The public skill ships the methodology, query library, config baseline, and playbooks, with fictional example notes only. The operator version additionally reads the per-account journal, rendered notes, session logs, and learnings; per-account config overrides live in that journal, not in this repo.
+The public skill ships the methodology, query library, config baseline, and playbooks, with fictional example notes only. The operator version additionally reads the per-account journal and rendered notes; per-account config overrides live in that journal, not in this repo.
 
-Operator mode configuration: set `PPC_JOURNAL_ROOT` to the directory that holds `journal/`, `notes/`, and `session-logs/` (default `~/.legal-ppc-skill`, always outside this repo) and `PPC_JOURNAL_TZ` to your IANA timezone (default: the machine's local zone). Entry ids and "today" are computed in that zone.
+Operator mode configuration: set `PPC_JOURNAL_ROOT` to the directory holding the journal and rendered views (default `~/.legal-ppc-skill`, always outside this repo) and `PPC_JOURNAL_TZ` to your IANA timezone. Entry ids and "today" are computed in that zone.
 
 ---
 
 ## Adapting the config baseline
 
-`references/agency-defaults.md` is Rosen Advertising's baseline. To use this skill at another agency, replace each STANDARD value with yours and keep the MATCH / OVERRIDE-MATCH / DEVIATION classification. Entries marked PROPOSED stay at config-item severity until you confirm them. Per-account exceptions belong in your own notes or journal as overrides, not in the baseline file.
+`references/agency-defaults.md` is one agency's baseline. To use this skill elsewhere, replace each STANDARD value with yours and keep the MATCH / OVERRIDE-MATCH / DEVIATION classification. Entries marked PROPOSED stay at config-item severity until you confirm them. Per-account exceptions belong in your own notes or journal as overrides, not in the baseline file.
 
 ---
 
-## Eval Results
+## Evals
 
-The skill ships with an adversarial eval suite. Each eval runs the same prompt with and without the skill loaded, then scores against specific behavioral assertions. The goal: the skill should catch things a capable general model misses.
+The skill ships an adversarial eval suite. Each case runs the same prompt with and without the skill loaded, then scores against specific behavioral assertions.
 
-**Current delta: +86 percentage points** (with skill: 97.6% — without skill: 11.9%)
+**Most recent round (2026-08-18, round 2):** Sonnet scored 36 of 37 assertions with the skill loaded; Opus scored 5 of 5. Earlier suites are retained for regression coverage but their headline delta figure has been withdrawn pending a re-run on the v4.1 content.
 
-Selected discriminating evals:
+**How to run them.** Suites are JSON assertion files under `evals/`: `evals.json`, `evals_v2.json`, `evals_v3.json`, `evals_v4.json`, `evals_v5.json`, and `trigger_evals.json`. Each case is a prompt plus an `assertions` array. Run the prompt with and without the skill, then score against the assertions.
 
-| Eval                   | Scenario                                                   | With skill | Without skill |
-| ---------------------- | ---------------------------------------------------------- | ---------- | ------------- |
-| QS throttling          | All-BELOW_AVERAGE + zero impressions                       | 4/4        | 0/4           |
-| Coverage check         | Search term analysis before coverage ratio reported        | 4/4        | 0/4           |
-| Change history first   | Performance drop — change history before symptom diagnosis | 5/5        | 1/5           |
-| BROAD → phrase         | Correct default intervention for BROAD keyword             | 4/4        | 0/4           |
-| Budget vs rank IS      | Distinguishes rank-lost from budget-lost IS                | 4/4        | 1/4           |
-| CPC anomaly routing    | Low avg CPC → data integrity first, not keyword targeting  | 4/4        | 1/4           |
-| Account notes override | Account-specific rule overrides general BROAD guidance     | 4/4        | 1/4           |
+- `evals_v4.json` covers config ground truth and the optimization playbooks.
+- `evals_v5.json` is the 2026-09 refresh suite: the retired PB-15 cases are gone, Display cases are re-scoped to PMax or cut, and it adds cases for PB-40, PB-41, the PB-16 conversion-over-intent ruling, the PB-26 blended-CPA ruling, and PB-32 cap tracking.
+- `trigger_evals.json` tests skill-activation reliability, separate from output quality.
 
-**How to run evals.** Suites are JSON assertion files: `evals/evals.json`, `evals/evals_v2.json`, `evals/evals_v3.json`, `evals/evals_v4.json`, `evals/trigger_evals.json`. Each case is a prompt plus a `assertions` array. Run the same prompt with the skill loaded and without it, then score against those assertions. `evals_v4.json` is the config-ground-truth and optimization-playbook suite (17 cases): it verifies config checks classify settings against `references/agency-defaults.md` rather than Google's own defaults, and that triggered playbooks from `references/playbooks.md` appear in the walk card's `PLAYBOOKS:` group with the correct card-line format. `trigger_evals.json` tests skill-activation reliability (should-trigger vs should-not-trigger prompts), separate from output-quality testing. Fixtures for the fictional accounts (Apex Law, Greenfield Legal) live in `evals/fixtures/`. There is no in-repo eval runner; use whatever harness you use for Claude Code skill evals.
+Fixtures for the fictional accounts live in `evals/fixtures/`. There is no in-repo eval runner.
 
 ---
 
 ## Requirements
 
 - [Claude Code](https://claude.ai/code) with skill support
-- A Google Ads MCP server that exposes `run_gaql` or `execute_gaql_query`
-- The `Agent` tool must be available for multi-campaign parallel search term reviews. If not available, the skill falls back to sequential execution automatically.
+- A Google Ads MCP server exposing `run_gaql` or `execute_gaql_query`
+- The `Agent` tool for multi-campaign parallel search term reviews. Without it the skill runs sequentially.
 
 ### Recommended MCP
 
-Tested with **[cohnen/mcp-google-ads](https://github.com/cohnen/mcp-google-ads)**. Any GAQL-capable MCP works — update the tool note in `SKILL.md` if you're using a different implementation.
+Tested with **[cohnen/mcp-google-ads](https://github.com/cohnen/mcp-google-ads)**. Any GAQL-capable MCP works; update the execution note in `SKILL.md` for a different implementation.
 
 ---
 
 ## Installation
 
 ```bash
-git clone https://github.com/RosenAdvertising/legal-ppc-skill
+git clone https://github.com/tobyrosen/legal-ppc-skill
 ```
 
-1. Set up your Google Ads MCP (see cohnen/mcp-google-ads)
-2. Update the `## Accounts` table in `SKILL.md` with your account IDs
-3. Public mode: `account-notes/example-family-law.md` shows the notes/override shape; do not add real account files to this repo. Operator mode: journal and rendered notes live outside this skill.
-4. Load the skill in Claude Code and run `list_accounts()` to confirm API access
+1. Set up your Google Ads MCP.
+2. Confirm your account roster outside this skill. The skill will not run a multi-account pull without one.
+3. Public mode: `account-notes/example-family-law.md` shows the notes and override shape. Do not add real account files to this repo. Operator mode: the journal and rendered notes live outside this skill.
+4. Load the skill in Claude Code and confirm API access.
 
 ---
 
-## File Structure
+## File structure
 
 ```text
 legal-ppc-skill/
-├── SKILL.md                           # Main skill file — load this
-├── account-audit-checklist.md         # Structured first-review checklist (Sections A–I)
+├── SKILL.md                           # Main skill file, load this
+├── account-audit-checklist.md         # Structured first-review checklist
 ├── NOTATION.md                        # Journal notation standard (operator mode)
 ├── pyrightconfig.json                 # Type-check path for journal tests
 ├── account-notes/
-│   └── example-family-law.md          # Fictional example notes / override shape
+│   └── example-family-law.md          # Fictional example notes and override shape
 ├── references/
-│   ├── google-ads-knowledge-base.md   # Core philosophy — read before any analysis
+│   ├── google-ads-knowledge-base.md   # The legal-PPC lens
 │   ├── agency-defaults.md             # Configuration baseline for PF-4
-│   ├── playbooks.md                   # PB-01 to PB-39 optimization playbooks
-│   ├── diagnosis-trees.md             # Decision trees for common problems
+│   ├── playbooks.md                   # The optimization playbook library
+│   ├── diagnosis-trees.md             # Symptom-to-action routing
 │   ├── gaql-query-library.md          # Pre-built GAQL queries by diagnostic task
-│   ├── negative-keyword-library.md    # Master negative lists by practice area
-│   └── creative-audit.md              # Image-asset audit procedure
+│   ├── negative-keyword-library.md    # Candidate negative patterns by category
+│   ├── creative-audit.md              # Search asset and PMax asset audit procedure
+│   └── session-management.md          # Session record template (operator mode)
 ├── journal/                           # Journal CLI, schema, and tests (operator mode)
 └── evals/
     ├── evals.json                     # Eval suite v1
     ├── evals_v2.json                  # Eval suite v2
     ├── evals_v3.json                  # Eval suite v3
-    ├── evals_v4.json                  # Eval suite v4: config ground truth + optimization playbooks (17 cases)
-    ├── trigger_evals.json             # Skill-activation trigger reliability evals
+    ├── evals_v4.json                  # Config ground truth and playbooks
+    ├── evals_v5.json                  # 2026-09 refresh suite
+    ├── trigger_evals.json             # Skill-activation trigger evals
     └── fixtures/                      # Fictional account notes and config pulls
 ```
 
 ---
 
-## Practice Areas
+## Practice areas
 
-Negative keyword libraries, search intent guidance, and diagnostic priors for:
+Search intent guidance, negative-keyword candidates, and diagnostic priors for:
 
 - Family law (divorce, child custody, child support)
-- Probate / estate disputes
-- Elder law (estate litigation, trust disputes)
-- Personal injury
-- Criminal defense
-- Real estate / landlord-tenant
+- Elder law (estate planning, probate, estate and trust disputes, elder abuse)
+- Immigration law
+
+Immigration is in scope but carries no vertical-specific tactics yet: no encoded doctrine for case-type segmentation, multilingual intent, status-specific queries, or immigration-specific negatives. Immigration accounts run on the general Search and PMax tactics until that gap is closed.
+
+No other practice area is in scope, and no other advertising platform is.
 
 ---
 
-## Known Limitations
+## Known limitations
 
-**`search_term_view` coverage ceiling (~50%)**
-The Google Ads API caps search term rows per query and withholds low-volume terms. Expect ~50% coverage of actual campaign spend in any search term pull. The skill discloses this, scales estimates by coverage ratio, and never recommends blocking a term category based on search term data alone.
+**Search-term coverage ceiling.** The Google Ads API caps search-term rows per query and withholds low-volume terms, so a pull covers only part of actual campaign spend. The skill computes and discloses the coverage ratio, refuses to extrapolate the hidden portion, and never recommends blocking a term category on search-term data alone.
 
-**Conversion tracking configuration is read-only via GAQL**
-There's no structured API object for conversion action settings (primary vs. secondary, attribution model, counting method). The skill reconstructs this from `conversion_action` queries. For complex setups, UI verification is faster.
+**Conversion tracking configuration is read-only through GAQL.** There is no structured API object for conversion action settings. The skill reconstructs them from `conversion_action` queries. For complex setups, UI verification is faster.
 
-**Asset-level creative performance not yet covered**
-Responsive search ad headline/description scores are not pulled. Ad copy is reviewed structurally, not at asset level.
+**Asset-level creative performance is thin.** Per-asset image performance is only partially exposed by the API, and responsive search ad headline and description scores are not pulled. The skill falls back to an ad-group or campaign proxy and labels it as one.
+
+**Immigration doctrine is absent.** See the practice areas note above.
+
+**Many claims are unconfirmed.** A large share of thresholds and windows in this repo are general practice rather than measured outcomes on live accounts. They carry an `(unconfirmed)` marker or a `PROPOSED` tag. Treat them as candidates and confirm them against your own outcomes.
 
 ---
 

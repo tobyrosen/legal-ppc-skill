@@ -27,12 +27,14 @@ does not create an override.
 
 ---
 
-## Needs Toby confirmation
+## Needs operator confirmation
 
 Entries marked **PROPOSED** below are the analyst's best reading of what we do, not a ratified
 standard. They are either settings our accounts are inconsistent on, or settings no account has
 exercised yet. Confirm, edit, or reject each one; on confirmation the entry becomes STANDARD and
-this block shrinks.
+this block shrinks. Every PROPOSED entry in this block is `unconfirmed` by definition: it is
+presented as a candidate, never as a house tactic. One tag is enough, so those entries carry no
+separate marker.
 
 1. ~~Lead-action counting type~~ (§3.4). CONFIRMED 2026-08-18: `MANY_PER_CLICK` is the standard
    for lead actions; the open flag is withdrawn.
@@ -84,7 +86,7 @@ Override: the case where a different value is legitimate.
 - **info**: recorded, surfaced only on request or during a full audit.
 
 **Status**: entries are STANDARD unless labelled PROPOSED. A PROPOSED entry may be reported as a
-config item at most, never as a red flag, until Toby confirms it.
+config item at most, never as a red flag, until the operator confirms it.
 
 **Readability**: every entry names the GAQL field where the setting is readable. Where a setting
 is not exposed by the API, the entry says so and names the indirect signal or the blind spot.
@@ -125,7 +127,8 @@ budget.
 Google's optimize setting picks a winner early and starves everything else, which kills relearning.
 It decides on the first two to twelve weeks and then largely stops re-evaluating. In a low-volume
 legal account it reaches that decision before the data means anything, and new variants never get
-enough impressions to prove themselves.
+enough impressions to prove themselves. (unconfirmed: the universal performance claim and the two-
+to-twelve-week window have not been measured on these accounts.)
 Override: a campaign with genuinely high volume where rotation is deliberately handed to Google,
 recorded as such.
 
@@ -225,6 +228,9 @@ Override: a deliberately pooled set of campaigns treated as one line item, recor
 
 **`campaign.bidding_strategy_type`**, standard depends on conversion volume, config item if the strategy does not match the tier
 
+The volume bands below are `unconfirmed`: they inherit the 15 to 20 conversion reliability floor,
+which is the smart-bidding minimum carried over rather than a confirmed house number.
+
 - Below roughly 15 to 20 conversions per month: `MAXIMIZE_CONVERSIONS` with **no** target CPA. The
   algorithm needs conversion volume before a target means anything; a target set on thin data
   restricts the auction entries that would produce the data.
@@ -232,8 +238,8 @@ Override: a deliberately pooled set of campaigns treated as one line item, recor
 - Already on `MAXIMIZE_CONVERSIONS`, below the floor, **and** carrying a high average CPC for the
   practice area: `MAXIMIZE_CLICKS` with a CPC cap, to buy volume and rebuild signal while capping
   runaway auctions. Watch conversion rate, since Maximize Clicks optimizes for clicks.
-- `TARGET_ROAS` only where case values differ enough between campaigns to justify it.
-- `MANUAL_CPC` only in a genuine crisis.
+- `TARGET_ROAS` only where case values differ enough between campaigns to justify it. (unconfirmed)
+- `MANUAL_CPC` only in a genuine crisis. (unconfirmed)
 
 Override: any of the above held deliberately through a transition, recorded with the review date.
 
@@ -264,8 +270,9 @@ unset for diagnostic purposes.
 
 **`change_event` on bidding fields**, standard: no bid strategy change inside a 14-day learning
 window, config item if the window was interrupted
-Repeated strategy changes inside the learning period restart the clock and are the most common
-reason a smart-bidding account never stabilises.
+Repeated strategy changes inside the learning period restart the clock. That this is the most
+common reason a smart-bidding account never stabilises is unconfirmed: churn has not been observed
+on the accounts in scope (PB-10), and the 14-day window is itself unconfirmed.
 Override: none. A change forced by a tracking fix is recorded as a decision with its own review
 date, following the post-tracking-fix protocol in SKILL.md.
 
@@ -294,16 +301,23 @@ Override: a Search campaign with a deliberate campaign-level goal set, recorded 
 
 ### 3.2 Which goal categories are biddable
 
-**`campaign_conversion_goal.biddable` / `customer_conversion_goal.biddable`**, standard: lead categories only, red flag if a non-lead category is biddable on a live campaign
+**`campaign_conversion_goal.biddable` / `customer_conversion_goal.biddable`**, standard: lead
+categories only, config item if a non-lead category is biddable on a live campaign
 
-Biddable: the website default lead category, contact, phone call lead from call-from-ads, and lead
-form submission. Not biddable: page view, downloads, directions, store or hosted engagement,
-YouTube engagement and follow-on views.
+**Ebook and guide downloads are a LEAD category here, by standing operator ruling.** They are
+biddable, they are primary, and they are never a demotion candidate. The ads sell the ebooks and the
+nurture funnel behind them produces clients. Any recommendation to make a download category
+non-biddable is wrong on its face, whatever its volume or its Google-side category label. This
+applies equally to the CRM-native and the tag-manager or analytics versions of the same event.
 
-A page-view or content-download category left biddable trains the bid algorithm on people who
-downloaded a guide, not people who asked for a consultation. In a firm with a content library, that
-population is large enough to dominate the signal, and the resulting CPL looks excellent while the
-intake sees nothing.
+Biddable: the website default lead category, contact, phone call lead from call-from-ads, lead form
+submission, and ebook or guide download. Not biddable by default: generic page view, directions,
+store or hosted engagement, and video engagement or follow-on views. (unconfirmed as a category
+list; only the ebook ruling is operator-confirmed.)
+
+A generic page-view category left biddable trains the bid algorithm on browsing rather than on
+intake. That is a real risk, and it is a different thing from an ebook download, which the firm
+treats as a lead.
 
 Override: a category deliberately included for a specific test, recorded with the review date.
 
@@ -312,13 +326,23 @@ Absence is the negative case; do not read an omitted field as missing data.
 
 ### 3.3 Primary versus secondary actions (PROPOSED at account level)
 
-**`conversion_action.include_in_conversions_metric`**, proposed standard: `true` only on actions
-that represent a real intake event, config item where content or engagement actions are primary
-Every primary action is added into the headline "conversions" number and into the bid model. Ebook
-downloads, guide requests, and page views counted as primary do two things at once: they inflate
-the conversion count the client sees and they teach the algorithm to buy that traffic.
-Override: an account whose intake genuinely treats a content event as a lead, recorded with the
-reasoning, or a legacy set scheduled for cleanup with a date.
+**`conversion_action.include_in_conversions_metric`**, proposed standard: `true` on actions that
+represent a real intake event, config item where a generic engagement action is primary
+
+**Ebook and guide downloads are PRIMARY, by standing operator ruling.** They count in the headline
+conversions number and they train the bid model, deliberately. They are never demoted to secondary,
+never excluded, and never discounted. The operator ranks them above phone calls.
+
+The residual risk this entry covers is a generic engagement or page-view action left primary: a
+scroll depth, a navigation event, a directions click. Those inflate the count without representing
+intake. (unconfirmed as a general rule; the ebook carve-out is operator-confirmed and overrides it.)
+
+Demotion of a duplicate lead action requires event-level proof that two primaries fire on the same
+lead. Matching totals or similar decimal tails are a prompt to investigate, never grounds to demote
+(PB-23).
+
+Override: an account whose intake genuinely treats a specific engagement event as a lead, recorded
+with the reasoning, or a legacy set scheduled for cleanup with a date.
 
 ### 3.4 Counting type (STANDARD, confirmed 2026-08-18)
 
@@ -356,7 +380,8 @@ Override: any model with a stated reason.
 exist but are secondary unless they are the lead event itself, config item where imported events
 are primary in bulk
 An imported analytics event is one step further from the intake record than a native action, and
-imported event sets tend to arrive wholesale.
+imported event sets tend to arrive wholesale. (unconfirmed: the origin of an action is not by
+itself a defect signal, and an imported event can legitimately be the canonical lead record.)
 Override: an account where the analytics event is the canonical lead record, recorded as such.
 
 ### 3.8 Duplicate lead actions
@@ -383,11 +408,14 @@ low volume is the designed behaviour, and that belongs in the account's rules.
 
 ### 4.1 Account-level shared list: naming PROPOSED
 
-**`shared_set` where `type = NEGATIVE_KEYWORDS`**, standard: at least one account-level shared
-negative list exists, red flag if none exists
-No shared negative list is the clearest single sign of an unmanaged account. Category-level waste
-in legal (job seekers, DIY and self-help, free and pro bono, salary and career queries, unrelated
-practice areas) recurs across every campaign, so it belongs at account scope.
+**`shared_set` where `type = NEGATIVE_KEYWORDS`**, standard: an account-level shared negative list
+where the account's own search-term data supports one, config item if none exists
+
+(unconfirmed) That a missing shared list is a red flag conflicts with two standing positions: the
+operator's not-waste list, which several of the usual blanket categories would catch, and the
+outcome in which proposed blanket negatives were rejected. Category-level waste that recurs across
+every campaign does belong at account scope, but the categories are derived from the account's data,
+not from a template, and every candidate is checked against the not-waste list before it ships.
 Proposed naming: one canonical list per account under a fixed name so it is identifiable across
 accounts without opening each one.
 Override: none.
@@ -526,8 +554,10 @@ Override: a deliberately unsignalled test.
 **`ad_group_criterion.keyword.match_type`**, standard: `PHRASE` and `EXACT`, config item on any
 `BROAD` outside a named test structure
 The argument for broad match is that it captures intent beyond the literal keyword. In legal the
-cost of the miss is $40 to $100 a click, and adjacent-looking queries routinely carry entirely
-different intent. Phrase and exact are the defaults roughly 99% of the time.
+cost of the miss is high and adjacent-looking queries routinely carry entirely different intent.
+Phrase and exact are the defaults roughly 99% of the time. (unconfirmed as a stated proportion and
+as a stated CPC range.) Broad is not banned: it is tested deliberately in an isolated structure,
+with the PB-11 remediation path ready.
 Override: broad match isolated in single-keyword ad groups for a recorded test, monitored.
 
 **Remediation note:** a broad keyword that is both wasteful and a major conversion source converts
@@ -572,7 +602,7 @@ Override: a single-ad group during a deliberate creative reset.
 **`campaign_asset`, `ad_group_asset`**, proposed standard: sitelinks, callouts, structured
 snippets, and a call asset present on every serving Search campaign, config item where a type is
 missing
-Assets raise the ad's real estate and its Ad Rank inputs at no additional cost per click, and the
+Assets raise the ad's space on the results page and its Ad Rank inputs at no additional cost per click, and the
 call asset is the direct path for the intake channel that matters most in legal.
 Override: a campaign where an asset type is deliberately withheld, recorded.
 
@@ -617,6 +647,7 @@ budgets, bidding, or targeting
 Auto-apply lets Google make the changes Google's incentives favour, most often broad match
 expansion and budget increases, without review. A long auto-applied list is a finding regardless of
 whether the individual changes look harmless, because it means the account is not being managed.
+(unconfirmed)
 Override: a specific recommendation type deliberately left on, recorded by name.
 
 > **Blind spot.** The auto-apply _setting_ is not exposed by the API. Zero auto-applied changes in
@@ -679,8 +710,8 @@ An override is a journal entry, not an edit to this file. This file holds what t
 journal holds what a given account does differently and why.
 
 **How an override is established.** An override exists only when it is a recorded journal entry
-(Toby version: a `rule` carrying the `config-override` tag) or, in the public version, an entry in
-the example overrides file (`account-notes/example-family-law.md`). A user asserting mid-check
+(operator version: a recorded rule carrying the `config-override` tag) or, in the public version, an
+entry in the example overrides file. A user asserting mid-check
 "that's deliberate" does not create an override. The check reports the DEVIATION and notes
 "operator states deliberate; record an override to clear".
 

@@ -15,8 +15,11 @@ Every entry carries an `Evidence:` line with one of three values. It says where 
 - **`validated in practice (n outcomes)`**: the move has been made on a live account and the result measured, n separate times. The entry's abstract states the conditions, the direction and rough magnitude of what happened, and how long it took to show up. A validated entry may record a move that FAILED: a measured failure is evidence, and it usually lives in the entry's do-not-move block.
 - **`partially validated`**: either the pattern's detection is confirmed but the fix has never been executed, or the one measured outcome is confounded by a simultaneous change.
 - **`textbook only`**: correct as far as platform mechanics go, never yet tested on an account we run. Not wrong; unproven.
+- **`unconfirmed`**: general practice not yet confirmed by the operator; it is presented as a candidate, never as a house tactic. It appears as a `(unconfirmed)` marker on the individual claim or threshold, or as an `**Evidence.** unconfirmed` line where a whole section or gate carries it. A `PROPOSED` threshold is unconfirmed by definition and carries only the one tag.
 
 **Precedence.** When two entries match the same pattern, the validated one outranks the textbook one, and its abstract governs the expected result. The 3-card-line cap per account still holds: within that cap, rank validated entries above textbook ones before ranking by spend at stake.
+
+**Tally after the 2026-09 refresh.** 40 playbooks: 13 `validated in practice`, 12 `partially validated`, 15 `textbook only`. Before the refresh: 39 playbooks, 13 validated, 8 partially validated, 18 textbook. Changes this round: PB-15 retired; PB-40 and PB-41 added; PB-06, PB-32 promoted from textbook to partially validated; PB-39 incremented to 3 outcomes; PB-34 extended to eight sequential readings. 37 `unconfirmed` markers sit on individual claims, thresholds, and gates across this file.
 
 **Reading the abstracts.** Magnitudes are stated as ranges and directions, never as a promise. A range drawn from one or two outcomes is a prior, not a forecast. Where an outcome contradicts the textbook move, the entry says so in a `Contradiction` note and the entry has been rewritten to what actually worked.
 
@@ -26,15 +29,15 @@ Every entry carries an `Evidence:` line with one of three values. It says where 
 
 Every threshold and every expected result below sits inside these five facts. An entry that reads sensibly for e-commerce can be actively wrong here.
 
-**1. Volume is low, and the reliability floor gates out most playbooks most of the time.** Practice-area campaigns routinely run 0 to 12 conversions a week; whole accounts run 4 to 8 in the harder categories. Weekly CPL swings of +/-150% happen on conversion moves that are pure noise. The working resolution: **read the 30-day window for any CPL verdict, and read the week only for direction, and only when a change landed inside it.** A week is evidence of serving, not of performance.
+**1. Volume is low, and the reliability floor gates out most playbooks most of the time.** Practice-area campaigns routinely run 0 to 12 conversions a week; whole accounts run 4 to 8 in the harder categories. Weekly CPL swings of +/-150% happen on conversion moves that are pure noise. (unconfirmed as stated ranges.) The working resolution: **read the 30-day window for any CPL verdict, and read the week only for direction, and only when a change landed inside it.** (unconfirmed) A week is evidence of serving, not of performance.
 
-**2. Consideration windows are long, and informational queries are real prospects.** Some legal markets have a structural waiting period before the matter can even be filed, which creates months of research behavior before any contact. Informational and competitor-name queries can be genuine top-of-funnel in these markets, and both have been observed converting. Do not apply generic informational-intent negatives without checking whether those queries convert in this account first.
+**2. Consideration windows are long, and informational queries are real prospects.** Some legal markets have a structural waiting period before the matter can even be filed, which creates months of research behavior before any contact. Informational queries can be genuine top-of-funnel in these markets, which the operator's not-waste list confirms for the family and elder terms it names. That competitor-name queries behave the same way is unconfirmed. Do not apply generic informational-intent negatives without checking whether those queries convert in this account first.
 
 **3. Call-tracking uploads are the primary phone signal; Google-side call conversions are secondary.** The call-tracking platform is where the qualified-call signal lives, and its own qualification filter sits between the phone ringing and a conversion being counted, so a live campaign can legitimately show zero conversions while the phone rings. Google obscures its own call data, and tuning the Google-side call-length threshold is low-priority work. Report the Google call figure; do not build a diagnosis on it, and never call a low-volume zero week a tracking break without checking the sibling primaries.
 
-**4. Nothing is judged on CPL below 15 to 20 conversions.** Below the floor, the arithmetic is noise dressed as a metric. Three playbooks deliberately target the sub-floor case (PB-07, PB-08, PB-09) because at low volume the answer is a structural change, not a target tweak. Every other entry stays silent there.
+**4. Nothing is judged on CPL below 15 to 20 conversions.** (unconfirmed: the 15 to 20 figure is the smart-bidding minimum carried over, not a confirmed house number.) Below the floor, the arithmetic is noise dressed as a metric. Three playbooks deliberately target the sub-floor case (PB-07, PB-08, PB-09) because at low volume the answer is a structural change, not a target tweak. Every other entry stays silent there.
 
-**5. Seasonality is real, per practice area, and is the standard excuse for a slide.** Family law, elder care and probate do not share a calendar. Because a seasonal claim is cheap to make and expensive to act on, it needs a same-period-last-year check before it is stated as fact.
+**5. Seasonality is real, per practice area, and is the standard excuse for a slide.** That family law, elder care and probate do not share a calendar is unconfirmed: no year-over-year check has been run to establish it. Because a seasonal claim is cheap to make and expensive to act on, it needs a same-period-last-year check before it is stated as fact.
 
 **And the one that outranks all five: intake quality beats raw lead count.** A cheap conversion is not a client. Cost per lead is a proxy for cost per signed case, and the two have been observed diverging by geography inside a single account. Any CPL comparison across markets, campaigns or geographies is provisional until leads have been matched back to the firm's CRM. Say so when presenting one.
 
@@ -120,15 +123,17 @@ surplus journaled: PB-21
 
 ### Universal do-not-move conditions
 
-These override every entry below. When any of these holds, no playbook fires on the affected scope:
+These override every entry below. When any of these holds, no playbook fires on the affected scope.
 
-- **Learning period.** Any bid-strategy, budget, or targeting change inside the last 14 days on the campaign. Each change resets the clock.
-- **Below the reliability floor.** Fewer than 15 to 20 conversions in the window being read, unless the playbook explicitly targets low volume (PB-07, PB-08, PB-09).
-- **Tracking not verified.** PF-1 not run, a primary silent, or a suspected duplicate. Every downstream figure is unreliable.
-- **Immature window.** The window is still inside the ~72-hour conversion lag. Provisional conversions and CPL cannot trigger a move.
-- **Coverage unknown.** For any search-term playbook, the coverage ratio has not been computed and stated.
-- **Standing rule or open decision covers it.** An open journal `rule`, or a `decision` whose `review_by` has not arrived, holds the item. Do not re-raise what the operator already closed.
-- **Currency or comparison invalid.** Partial-vs-full windows, cross-currency aggregates, zero-conversion CPL percentages.
+**Evidence.** unconfirmed. The gates are enforced as written. The marker records that the specific windows and numbers below have not been confirmed by the operator, not that a gate is optional: an unconfirmed gate still blocks the playbook.
+
+- **Learning period.** Any bid-strategy, budget, or targeting change inside the last 14 days on the campaign. Each change resets the clock. (unconfirmed window)
+- **Below the reliability floor.** Fewer than 15 to 20 conversions in the window being read, unless the playbook explicitly targets low volume (PB-07, PB-08, PB-09). (unconfirmed threshold)
+- **Tracking not verified.** PF-1 not run, a primary silent, or a suspected duplicate. Every downstream figure is unreliable. (unconfirmed as a universal block)
+- **Immature window.** The window is still inside the ~72-hour conversion lag. Provisional conversions and CPL cannot trigger a move. (unconfirmed lag figure)
+- **Coverage unknown.** For any search-term playbook, the coverage ratio has not been computed and stated. (unconfirmed as a universal block)
+- **Standing rule or open decision covers it.** An open operator rule, or a decision whose review date has not arrived, holds the item. Do not re-raise what the operator already closed.
+- **Currency or comparison invalid.** Partial-vs-full windows, cross-currency aggregates, zero-conversion CPL percentages. (unconfirmed as a universal block; the underlying comparison rules are operator-confirmed)
 
 ---
 
@@ -136,15 +141,17 @@ These override every entry below. When any of these holds, no playbook fires on 
 
 Ordered by evidence within each theme: validated entries first, then partially validated, then textbook. `V` = validated in practice, `P` = partially validated, `T` = textbook only. This index carries the reading order. In the body each entry sits in its theme section and keeps its own number, so cross-references stay stable and new entries append rather than renumber (which is why PB-38 and PB-39 sit inside the keyword and budget sections rather than at the end).
 
-**Budget and impression share:** PB-01 `V`, PB-39 `V`, PB-02 `V`, PB-03 `T`
+**Budget and impression share:** PB-01 `V`, PB-39 `V`, PB-02 `V`, PB-40 `P`, PB-03 `T`
 **Bidding:** PB-08 `V`, PB-09 `V`, PB-04 `T`, PB-05 `T`, PB-06 `T`, PB-07 `T`, PB-10 `T`
-**Keywords and search terms:** PB-14 `V`, PB-38 `V`, PB-11 `P`, PB-13 `P`, PB-12 `T`, PB-15 `T`, PB-16 `T`, PB-17 `T`
+**Keywords and search terms:** PB-14 `V`, PB-38 `V`, PB-11 `P`, PB-13 `P`, PB-12 `T`, PB-16 `T`, PB-17 `T`
 **Ads and creative:** PB-20 `V`, PB-18 `P`, PB-19 `T`, PB-21 `T`, PB-22 `T`
 **Tracking and measurement:** PB-24 `V`, PB-25 `P`, PB-23 `P`
 **Network and geography:** PB-27 `P`, PB-26 `T`, PB-28 `T`
-**Account-level patterns:** PB-34 `V`, PB-35 `V`, PB-36 `V`, PB-37 `V`, PB-30 `P`, PB-29 `P`, PB-31 `T`, PB-32 `T`, PB-33 `T`
+**Account-level patterns:** PB-34 `V`, PB-35 `V`, PB-36 `V`, PB-37 `V`, PB-30 `P`, PB-29 `P`, PB-32 `P`, PB-41 `P`, PB-31 `T`, PB-33 `T`
 
 The four account-level validated entries (PB-34 ramp, PB-35 small-cap geo test, PB-36 reactivation, PB-37 external change) are the ones most likely to change a decision, and PB-37 should be read before any performance data on any account.
+
+PB-15 retired 2026-09. Ids are never renumbered: PB-15 is not reused.
 
 ---
 
@@ -160,7 +167,7 @@ _What happened when we did it._ Raising a daily budget into real budget-lost hea
 
 **Pre-flight green.** PF-1 (tracking verified, primaries firing), PF-3 (no budget or bid-strategy change in the last 14 days). Target CPL must exist as a firm input (PB-05); without it there is no "converting at target" test and this playbook does not fire.
 
-**Standard move.** Raise the campaign's daily budget in one step, then hold every other setting for 14 days. One step per 14 days. Budget only: no simultaneous tCPA change, no keyword or targeting edit in the same window. State the step size on the card line.
+**Standard move.** Raise the campaign's daily budget in one step, then hold every other setting for 14 days. One step per 14 days (unconfirmed). Budget only: no simultaneous tCPA change, no keyword or targeting edit in the same window. State the step size on the card line.
 
 Step-size rule (`PROPOSED` throughout):
 
@@ -183,7 +190,7 @@ If conversions do not move at all while spend and avg CPC both rise, the raise h
 playbook PB-01 (Westhollow - Divorce): standard move for budget-lost IS 25%+ on a campaign converting at target is a single 20% daily budget step, then hold 14 days. accept/reject
 ```
 
-**Related.** SKILL.md "Impression Share: Two Separate Metrics"; diagnosis trees Sub-tree A; audit checklist Section 6; knowledge base "Bidding". Cross-refs PB-02, PB-03, PB-05.
+**Related.** SKILL.md "Impression share: two separate metrics"; diagnosis trees Sub-tree A; audit checklist Section 6; knowledge base "Bidding". Cross-refs PB-02, PB-03, PB-05.
 
 ---
 
@@ -197,7 +204,7 @@ _What happened when we did it._ A rank-lost ceiling held at 52-67% for over ten 
 
 **Pre-flight green.** PF-2 (no ad-level policy issue suppressing reach: a DISAPPROVED or APPROVED_LIMITED set produces a reach ceiling that looks like rank loss, and that is PB-18, not this). PF-1.
 
-**Standard move.** Route to quality work, not spend. In order: pull QS components (GAQL 3.1) for the campaign's spending keywords, fix the weakest component first (landing page, then ad relevance, then expected CTR), and hold budget and bid strategy unchanged while it lands. On a Maximize Conversions campaign there is no bid ceiling to raise, so the move is quality work only. On tCPA with budget-lost IS near zero, raising the target is the one bid-side lever that is legitimate here, in 10 to 15% steps.
+**Standard move.** Route to quality work, not spend. In order: pull QS components (GAQL 3.1) for the campaign's spending keywords, fix the weakest component first (landing page, then ad relevance, then expected CTR), and hold budget and bid strategy unchanged while it lands. On a Maximize Conversions campaign there is no bid ceiling to raise, so the move is quality work only. On tCPA with budget-lost IS near zero, raising the target is the one bid-side lever that is legitimate here, in 10 to 15% steps (unconfirmed).
 
 **First, establish who owns the landing page.** If the page belongs to a third party the firm does not control, this stops being an in-account move. It is a client-relationship escalation with a multi-month clock, and it should be stated once, as an access ask with an owner and a date, then carried as a standing condition. Re-presenting it as an available move at every check is the failure mode we actually committed: on one account the same rank ceiling was re-raised across roughly three months while the only real lever sat behind someone else's code access. If the page IS ours, the move is real and PB-25 sequences it.
 
@@ -205,9 +212,9 @@ _What happened when we did it._ A rank-lost ceiling held at 52-67% for over ten 
 
 **Third, do not skip the cheap lever.** Before concluding the ceiling is structural, note that an ad refresh alone has been measured closing a CPA gap that had been attributed to a landing page for months (PB-20). Ad relevance is the component you can move this week without anyone else's permission.
 
-**Do not move when.** The campaign is on Maximize Conversions and someone proposes a bid or budget change: there is nothing to raise. Rank loss is rising alongside CPC with stable QS, which is competitive pressure, not an account defect (go to PB-31 or accept the new auction price). Ads are limited by policy. QS is 7+ across spending keywords, in which case this is competition and the playbook does not fire.
+**Do not move when.** The campaign is on Maximize Conversions and someone proposes a bid or budget change: there is nothing to raise. Rank loss is rising alongside CPC with stable QS, which is competitive pressure, not an account defect (go to PB-31 or accept the new auction price). Ads are limited by policy. QS is 7+ across spending keywords, in which case this is competition and the playbook does not fire (unconfirmed: the 7+ cut-off has not been confirmed by the operator).
 
-**Expected result and verification.** QS components move off BELOW_AVERAGE within 30 to 60 days; rank-lost IS falls after that, not before. Verify at 30 and 60 days: GAQL 3.1 for components, GAQL 5.1 for rank-lost IS. Nothing here verifies inside one check cycle, so do not re-fire the playbook at the next check.
+**Expected result and verification.** QS components move off BELOW_AVERAGE within 30 to 60 days; rank-lost IS falls after that, not before (unconfirmed). Verify at 30 and 60 days: GAQL 3.1 for components, GAQL 5.1 for rank-lost IS. Nothing here verifies inside one check cycle, so do not re-fire the playbook at the next check.
 
 **Card line.**
 
@@ -215,7 +222,7 @@ _What happened when we did it._ A rank-lost ceiling held at 52-67% for over ten 
 playbook PB-02 (Westhollow - Custody): standard move for rank-lost IS 40%+ is QS and landing-page work, budget held flat, no bid change. accept/reject
 ```
 
-**Related.** SKILL.md "Impression Share: Two Separate Metrics" (rank-lost on Max Conv is a QS issue only); diagnosis trees Sub-tree A and Sub-tree B; learnings P7; audit checklist Section 7. Cross-refs PB-01, PB-18, PB-25.
+**Related.** SKILL.md "Impression share: two separate metrics" (rank-lost on Max Conv is a QS issue only); diagnosis trees Sub-tree A and Sub-tree B; learnings P7; audit checklist Section 7. Cross-refs PB-01, PB-18, PB-25.
 
 ---
 
@@ -239,13 +246,15 @@ playbook PB-02 (Westhollow - Custody): standard move for rank-lost IS 40%+ is QS
 playbook PB-03 (Westhollow - Divorce): standard move for budget-lost IS with one BROAD keyword taking most of the early-day spend is broad to phrase, budget unchanged. accept/reject
 ```
 
-**Related.** SKILL.md "Impression Share" (budget-lost without hitting the daily cap) and "BROAD Match Keyword Remediation"; diagnosis trees Tree 6. Cross-refs PB-01, PB-11, PB-12.
+**Related.** SKILL.md "Impression share" (budget-lost without hitting the daily cap) and "BROAD Match Keyword Remediation"; diagnosis trees Tree 6. Cross-refs PB-01, PB-11, PB-12.
 
 ---
 
 ## PB-39: Single-week impression-share flip on a low-volume campaign
 
-**Evidence.** `validated in practice (2 outcomes)`
+**Evidence.** `validated in practice (3 outcomes)`
+
+_Refresh 2026-09._ Increment from 2 to 3. The final recorded outcome showed budget-lost impression share reverting from the mid-30% range to about 1% after the accepted hold, while rank remained the actual ceiling.
 
 _What happened when we did it._ An account with a months-long stable pattern (rank-lost high, budget-lost at zero) inverted in a single week: budget-lost went 0% to 37%, total impression share fell by roughly a third, while weekly spend FELL. Held with no action. Three to four days later the flip had gone and the original pattern was back, unchanged, with nothing touched. Second outcome, on a different account: a campaign's budget-lost figure fell from 55% to 33% on its own inside four days with conversions holding, while it was being deliberately held. Time to signal on both: 3 to 4 days.
 
@@ -266,6 +275,32 @@ playbook PB-39 (Westhollow - Probate): standard move for a one-week impression-s
 ```
 
 **Related.** Universal do-not-move conditions ("Below the reliability floor"); Legal PPC realities item 1. Cross-refs PB-01, PB-02, PB-30.
+
+---
+
+## PB-40: Top-spend campaign concentrating spend without a budget constraint
+
+**Evidence.** `partially validated`
+
+_Refresh 2026-09._ The pattern has been detected on a live account and the hold was applied, but no cap or reallocation outcome has been measured.
+
+**Trigger.** The account's top-spend Search campaign spends at least 50% above its trailing four-week weekly mean while conversions run at least 50% below that mean, budget-lost impression share is below 10%, and conversion volume is below the reliability floor. Thresholds are `PROPOSED`.
+
+**Pre-flight green.** PF-1 (tracking verified: a conversion collapse is a tracking hypothesis first). PF-3 (no budget or bid-strategy change in the last 14 days that would explain the spend move). Windows complete and mature.
+
+**Standard move.** Hold further budget increases on the campaign. Read the complete week, the trailing 30 days, the campaign's share of portfolio spend, and intake quality together rather than separately. If the pattern persists across two complete weeks, cap the campaign to its pre-spike spend band and leave the reallocation decision to the operator.
+
+**Do not move when.** It is a single sub-floor week. Signed-case quality justifies the premium: cost per signed case, not cost per lead, is the test where the matchback exists. The campaign is a deliberately bounded test still inside its cap (PB-32). Budget-lost impression share is high, which makes this a budget question and not a concentration question (PB-01).
+
+**Expected result and verification.** Incremental auction spend stops concentrating in a campaign with no proven volume, and portfolio spend share returns toward its prior band. Verify at 7 and 30 days: GAQL 6.1 for spend, conversions and CPL by campaign, GAQL 5.1 for both impression-share components.
+
+**Card line.**
+
+```text
+playbook PB-40 (campaign): standard move for a top-spend campaign absorbing materially more spend while conversions fall and budget-lost stays near zero is hold further increases and re-read the complete week plus 30-day contribution. accept/reject
+```
+
+**Related.** SKILL.md "Account macro context" and "Impression share". Cross-refs PB-01, PB-29, PB-34, PB-41.
 
 ---
 
@@ -296,7 +331,7 @@ playbook PB-39 (Westhollow - Probate): standard move for a one-week impression-s
 playbook PB-04 (Westhollow - Custody): standard move when cost/conv sits well under target is a single 10 to 15% tCPA step down, then hold 14 days. accept/reject
 ```
 
-**Related.** SKILL.md "tCPA Direction Rule" (consolidated here in full); diagnosis trees Tree 2 Step 3 and Sub-tree D Question 3; knowledge base "Bidding". Cross-refs PB-05, PB-06, PB-10.
+**Related.** SKILL.md "tCPA direction rule" (consolidated here in full); diagnosis trees Tree 2 Step 3 and Sub-tree D Question 3; knowledge base "Bidding". Cross-refs PB-05, PB-06, PB-10.
 
 ---
 
@@ -326,13 +361,17 @@ playbook PB-05 (account): standard move when no target CPL is on record is to ta
 
 ## PB-06: Post-tracking-fix bidding lockdown
 
-**Evidence.** `textbook only`. No tracking fix has been applied and then measured, so the lockdown has never actually run.
+**Evidence.** `partially validated`
+
+_Refresh 2026-09._ One interim post-counting-change hold was completed, but the full 14-day and 28-day verification was not. Rebuild both comparison windows by conversion action after any non-retroactive counting change.
 
 **Trigger.** Conversion tracking contamination has just been fixed (duplicate action removed, tag repaired, counting method corrected) on a campaign running tCPA, Maximize Conversions, or tROAS.
 
 **Pre-flight green.** PF-1 re-run after the fix and confirmed clean.
 
 **Standard move.** Hold the current target, whatever it is. Announce a 2 to 4 week lockdown: no target change, no bid-strategy change, no budget change. Expect apparent CPA to rise and conversion volume to fall, both of which are the contamination leaving the numbers. Re-evaluate the target only after 2 to 4 weeks of clean data.
+
+**Basis break, every spanning comparison (fold, 2026-09).** A counting or conversion-action change is not retroactive, so the two sides of any comparison crossing its effective date are counted on different definitions and can manufacture a false collapse. Record the effective date, and reconstruct both sides of every spanning week-over-week and 30-day comparison from action-level data before reading it. Rebuild both the 14-day and the 28-day windows by conversion action, not from headline totals. See PB-23.
 
 **Do not move when.** Always: there is no version of this pattern where an immediate target change is right. Setting a "corrected" target before relearning completes replaces one wrong number with another. If clean volume falls below the 15 to 20 conversion floor during relearning, the exception is a strategy change to Maximize Conversions (PB-07), or Max Clicks with a CPC cap if avg CPC is also high (PB-08), not a target tweak.
 
@@ -344,7 +383,7 @@ playbook PB-05 (account): standard move when no target CPL is on record is to ta
 playbook PB-06 (Westhollow - Divorce): standard move after a tracking fix on a smart-bidding campaign is a 2 to 4 week freeze at the current target, apparent CPA rise expected. accept/reject
 ```
 
-**Related.** SKILL.md "Smart Bidding: Post-Tracking-Fix Protocol" (consolidated here in full); diagnosis trees Tree 7 Step 5. Cross-refs PB-07, PB-08, PB-23.
+**Related.** SKILL.md "Smart bidding: post-tracking-fix protocol" (consolidated here in full); diagnosis trees Tree 7 Step 5. Cross-refs PB-07, PB-08, PB-23.
 
 ---
 
@@ -360,7 +399,7 @@ playbook PB-06 (Westhollow - Divorce): standard move after a tracking fix on a s
 
 **Do not move when.** Avg CPC is also at or above the top of the practice-area band, where Maximize Conversions is not the safe harbour and PB-08 applies instead. The campaign has been on tCPA for under 30 days. Conversion volume is low because the account is seasonally quiet (PB-31). Volume is below 5 per month, where even Maximize Conversions struggles and eCPC is the more honest option until history builds.
 
-**Expected result and verification.** Week-to-week swings narrow; conversion volume holds or rises; CPA becomes readable over 30 days rather than 7. Verify at 28 days: GAQL 2.3 and GAQL 6.3.
+**Expected result and verification.** Week-to-week swings narrow; conversion volume holds or rises; CPA becomes readable over 30 days rather than 7. Revert the bid strategy if conversions hit zero for 2 consecutive weeks (unconfirmed). Verify at 28 days: GAQL 2.3 and GAQL 6.3.
 
 **Card line.**
 
@@ -368,7 +407,7 @@ playbook PB-06 (Westhollow - Divorce): standard move after a tracking fix on a s
 playbook PB-07 (Westhollow - Probate): standard move for tCPA running under the 15 to 20 conversion floor is dropping the target to Maximize Conversions, then 28 days untouched. accept/reject
 ```
 
-**Related.** SKILL.md "Smart Bidding" low-volume flag and "Handling Comparative and Premise-Based Questions" (conversion volume threshold); diagnosis trees Sub-tree D Question 2; knowledge base "Bidding". Cross-refs PB-06, PB-08, PB-10.
+**Related.** SKILL.md "Smart bidding" low-volume flag and "Handling Comparative and Premise-Based Questions" (conversion volume threshold); diagnosis trees Sub-tree D Question 2; knowledge base "Bidding". Cross-refs PB-06, PB-08, PB-10.
 
 ---
 
@@ -398,7 +437,7 @@ _What happened when we did it._ On the heaviest-spend campaign of a high-CPC pra
 playbook PB-08 (Westhollow - Elder Abuse): standard move for sub-floor conversions at a top-of-band CPC is Maximize Clicks with a CPC cap, revisit in 3 to 4 weeks on CVR. accept/reject
 ```
 
-**Related.** SKILL.md "Smart Bidding" low-volume flag and "Campaign-Level CPC Anomaly" third condition; learnings P9; diagnosis trees Sub-tree D. Cross-refs PB-07, PB-25, PB-33.
+**Related.** SKILL.md "Smart bidding" low-volume flag and "Campaign-Level CPC Anomaly" third condition; learnings P9; diagnosis trees Sub-tree D. Cross-refs PB-07, PB-25, PB-33.
 
 ---
 
@@ -477,7 +516,7 @@ _What happened when we did it._ A large broad-to-phrase conversion (about 70 key
 
 **Pre-flight green.** Keyword query filtered `ad_group_criterion.negative = FALSE`, `ad_group.status = 'ENABLED'`, `campaign.status` selected. An unfiltered query returns negatives alongside positives and has produced confirmed misdiagnosis.
 
-**Standard move.** Convert BROAD to phrase match. Not exact, not delete, not pause. Phrase preserves near-intent variants and keeps the keyword's conversion history feeding smart bidding, while filtering the loosest queries. Sequence: convert to phrase, monitor search terms for 2 to 4 weeks, and only then evaluate tightening to exact or adding specific negatives if CPA is still above target.
+**Standard move.** Convert BROAD to phrase match. Not exact, not delete, not pause. Phrase preserves near-intent variants and filters the loosest queries. Whether a match-type change reliably carries the keyword's conversion history through to smart bidding is unconfirmed: verify performance after the change rather than assuming continuity. Sequence: convert to phrase, monitor search terms for 2 to 4 weeks (unconfirmed), and only then evaluate tightening to exact or adding specific negatives if CPA is still above target.
 
 **Do not move when.** The keyword is irrelevant rather than merely broad (wrong practice area, wrong geography, a competitor brand the firm is not deliberately targeting): those are hard deletes, not conversions. The keyword is also a major conversion source, where PB-12 governs the sequencing. The "BROAD keyword" turns out to be a negative keyword, which is the most common false trigger here.
 
@@ -489,7 +528,7 @@ _What happened when we did it._ A large broad-to-phrase conversion (about 70 key
 playbook PB-11 (Westhollow - Divorce, ag Uncontested): standard move for a wasteful BROAD keyword is convert to phrase, monitor search terms 2 to 4 weeks. accept/reject
 ```
 
-**Related.** SKILL.md "BROAD Match Keyword Remediation: Default Path" (consolidated here in full) and "GAQL Query Integrity"; knowledge base "Match Type Philosophy"; diagnosis trees Tree 6 Step 4; learnings P6. Cross-refs PB-03, PB-12, PB-13.
+**Related.** SKILL.md "Broad-match keyword remediation: default path" (consolidated here in full) and "GAQL Query Integrity"; knowledge base "Match Type Philosophy"; diagnosis trees Tree 6 Step 4; learnings P6. Cross-refs PB-03, PB-12, PB-13.
 
 ---
 
@@ -513,7 +552,7 @@ playbook PB-11 (Westhollow - Divorce, ag Uncontested): standard move for a waste
 playbook PB-12 (Westhollow - Custody): standard move for a wasteful BROAD keyword that also drives a quarter of conversions is phrase plus targeted negatives, not a pause. accept/reject
 ```
 
-**Related.** SKILL.md "Search Term Data: Coverage Ceiling" (wasteful-broad-that-converts paragraph, consolidated here); learnings P13 (marginal contribution logic). Cross-refs PB-11, PB-13, PB-17.
+**Related.** SKILL.md "Search-term data: coverage ceiling" (wasteful-broad-that-converts paragraph, consolidated here); learnings P13 (marginal contribution logic). Cross-refs PB-11, PB-13, PB-17.
 
 ---
 
@@ -527,7 +566,7 @@ _What happened when we did it._ The waste MEASUREMENT is validated and repeatabl
 
 **Pre-flight green.** Coverage ratio computed and stated first, per campaign, before any finding. `search_term_view.status` selected in the query, `ad_group.status = 'ENABLED'` in the WHERE clause. Terms with `status = NONE` excluded. Existing negatives (GAQL 9.1 to 9.4): caveat-and-fire, not a hard gate. If the pull is unavailable, the line still fires with the explicit caveat `existing negatives not checked`, and the standard move starts with that pull. If the pull is available, confirm the n-gram is not already blocked before carding the negative.
 
-**Standard move.** First, pull existing negatives (GAQL 9.1 to 9.4) if that pull was not already done. Then add the n-gram as a negative at the narrowest sufficient level: account-level shared list if irrelevant to everything the firm does, campaign level if irrelevant to that practice area or geography, ad group level if narrowly irrelevant. Phrase match is the default; exact where the word has legitimate uses to preserve. Where an account has accumulated many reactive exact strings sharing one 2 or 3 word root, one phrase-match categorical replaces the lot and catches future variants.
+**Standard move.** First, pull existing negatives (GAQL 9.1 to 9.4) if that pull was not already done. Then add the n-gram as a negative at the narrowest sufficient level (unconfirmed as a placement rule): account-level shared list if irrelevant to everything the firm does, campaign level if irrelevant to that practice area or geography, ad group level if narrowly irrelevant. Phrase match is the default; exact where the word has legitimate uses to preserve. Where an account has accumulated many reactive exact strings sharing one 2 or 3 word root, one phrase-match categorical replaces the lot and catches future variants (unconfirmed). Check the replacement against the not-waste list before it ships: a broader categorical is a broader blocking risk.
 
 **Contradiction: a waste percentage is not a performance diagnosis.** On the one launch where we measured both, roughly a quarter of visible search-term spend sat in obvious junk categories AND those same untreated campaigns went on to run the cheapest CPLs in the account, several times better than the mature campaigns that had years of negative-list maintenance behind them. Over the same window the account's 30-day CPL improved. We never applied the negatives, so this is not evidence that negatives do not work: it is evidence that **visible-waste share did not predict campaign CPL, and is not on its own a reason to move.** Present waste as a measured figure with its coverage ratio attached, next to the campaign's actual CPL. Never present it as the explanation for a CPL problem unless the CPL problem exists.
 
@@ -543,7 +582,7 @@ Second, practical: a negatives plan the operator has REJECTED is closed, not ove
 playbook PB-13 (Westhollow - Divorce): standard move for a zero-conversion n-gram at 3%+ of visible search spend (PROPOSED) over >= 60 days (PROPOSED) is a phrase negative at campaign level. existing negatives not checked; start with that pull. accept/reject
 ```
 
-**Related.** SKILL.md "Search Term Data: Coverage Ceiling" and its negative-precision rules; negative keyword library Sections 1 to 5; diagnosis trees Tree 6; SKILL.md "Search-query mining / n-gram waste"; learnings P1, P2, P4, P8, P10. Cross-refs PB-12, PB-14, PB-28.
+**Related.** SKILL.md "Search-term data: coverage ceiling" and its negative-precision rules; negative keyword library Sections 1 to 5; diagnosis trees Tree 6; SKILL.md "Audit mode and search-query mining"; learnings P1, P2, P4, P8, P10. Cross-refs PB-12, PB-14, PB-28.
 
 ---
 
@@ -569,31 +608,7 @@ _What happened when we did it._ On a geo-mismatched query that also carried the 
 playbook PB-14 (Westhollow - Divorce): standard move for a geo-mismatched query carrying the core service term is negating the city token only. accept/reject
 ```
 
-**Related.** SKILL.md "Search Term Data" negative-precision rules; learnings P10 and P11; negative keyword library Section 6. Cross-refs PB-13, PB-28.
-
----
-
-## PB-15: QS-throttled keyword
-
-**Evidence.** `textbook only`
-
-**Trigger.** QS <= 2, all three components BELOW_AVERAGE (`search_predicted_ctr`, `creative_quality_score`, `post_click_quality_score`), and zero or near-zero impressions over the most recent 7 to 14 days on an ENABLED campaign with available budget. All three conditions, not two.
-
-**Pre-flight green.** PF-2 (campaign serving, ads approved). Budget confirmed available: a budget-exhausted campaign produces the same zero-impression signature. `system_serving_status = ELIGIBLE` is not evidence against this pattern; the API does not expose the throttling label.
-
-**Standard move.** Structural replacement, not optimisation. Pause the throttled keyword, create a new keyword variant in a new or reorganised ad group with dedicated ad copy and a landing page matched to the query intent. A fresh keyword gives Google a clean quality signal with no prior history.
-
-**Do not move when.** Only one or two components are BELOW_AVERAGE, or QS is 3 to 6: that is an ordinary QS problem and standard optimisation still works (PB-25, PB-19). The keyword has impressions. The zero impressions are explained by low search volume in a small market, which is a targeting reality, not throttling.
-
-**Expected result and verification.** The replacement keyword accrues impressions within 14 days and holds a QS above the throttle band. Verify at 14 and 30 days: GAQL 3.1 for the new keyword's QS and impressions.
-
-**Card line.**
-
-```text
-playbook PB-15 (Westhollow - Custody, ag Legal Custody): standard move for QS 2 with all three components below average and zero impressions is pause and rebuild in a new ad group. accept/reject
-```
-
-**Related.** SKILL.md "QS Throttling: All-BELOW_AVERAGE + Zero Impressions" (consolidated here in full); diagnosis trees Sub-tree B; audit checklist Section 2. Cross-refs PB-19, PB-25.
+**Related.** SKILL.md "Search-term data" negative-precision rules; learnings P10 and P11; negative keyword library Section 6. Cross-refs PB-13, PB-28.
 
 ---
 
@@ -605,16 +620,16 @@ playbook PB-15 (Westhollow - Custody, ag Legal Custody): standard move for QS 2 
 
 **Pre-flight green.** Keyword query filtered for `negative = FALSE` and `ad_group.status = 'ENABLED'`. Duplicates across an ENABLED and a PAUSED ad group are not duplicates.
 
-**Standard move.** Keep the instance in the ad group whose ad copy and landing page match the keyword's intent most tightly, and pause the other. Where both ad groups are legitimate but serve different intents, the fix is tighter negatives between them (each ad group negatives the other's distinguishing token), not a pause.
+**Standard move.** Keep the instance that CONVERTS and pause the other. Conversion is the deciding consideration: if one instance converts and the other does not, the converter is kept, whatever the ad copy or landing page suggests about intent match. Intent breaks ties only, when neither instance has a conversion record or both convert at comparable rates: then keep the instance in the ad group whose ad copy and landing page match the keyword's intent most tightly. Where both ad groups are legitimate but serve different intents, the fix is tighter negatives between them (each ad group negatives the other's distinguishing token), not a pause.
 
-**Do not move when.** The duplication is deliberate structure (a SKAG isolation test, a brand and non-brand split). The two instances sit in different campaigns with different budgets or geographies, which is segmentation, not cannibalisation. One instance carries the campaign's conversion history and the other does not: pausing the history costs smart-bidding signal, so pause the newer one.
+**Do not move when.** The duplication is deliberate structure (a SKAG isolation test, a brand and non-brand split). The two instances sit in different campaigns with different budgets or geographies, which is segmentation, not cannibalisation. Neither instance has enough data to say which converts: read longer rather than choosing on intent alone. Never pause the instance carrying the conversions in order to keep the one with the tighter intent match.
 
-**Expected result and verification.** Impressions consolidate into the kept ad group, CTR and QS on the kept instance hold or improve, campaign conversions unchanged. Verify at 30 days: GAQL 3.4 for both instances, GAQL 6.1 for campaign totals.
+**Expected result and verification.** Impressions consolidate into the kept ad group and campaign conversions hold. Conversion volume is the metric that decides whether the consolidation worked; CTR and quality score on the kept instance are supporting detail. Verify at 30 days: GAQL 3.4 for both instances, GAQL 6.1 for campaign totals.
 
 **Card line.**
 
 ```text
-playbook PB-16 (Westhollow - Divorce): standard move for the same keyword serving in two ad groups is keeping the tighter-matched instance, pausing the other. accept/reject
+playbook PB-16 (Westhollow - Divorce): standard move for the same keyword serving in two ad groups is keeping the instance that converts, pausing the other. accept/reject
 ```
 
 **Related.** Audit checklist Section 2 (no duplicate keywords across ad groups); knowledge base "Campaign Structure"; diagnosis trees Tree 5 Step 4. Cross-refs PB-11, PB-19.
@@ -649,7 +664,7 @@ playbook PB-17 (Westhollow - Probate, ag Estate Admin): standard move for a keyw
 
 **Evidence.** `validated in practice (1 outcome, six test groups against one control)`
 
-_What happened when we did it._ Six narrow ad groups were built inside working campaigns: four sub-type splits of a single practice area, one adjacent-service group, and one high-intent qualifier group. After roughly four weeks live, each sub-type group had accumulated 1 to 3 impressions per fortnight, the adjacent-service group had 18 impressions and zero spend, and the qualifier group had 7 impressions. Over the same fortnight the general group covering the whole practice area produced 7 conversions. The granular build did not underperform: it did not run at all, while the general group carried the practice area unchanged. Time to signal: four weeks of near-zero impressions is conclusive; two weeks is already suggestive.
+_What happened when we did it._ Six narrow ad groups were built inside working campaigns: four sub-type splits of a single practice area, one adjacent-service group, and one high-intent qualifier group. After roughly four weeks live, each sub-type group had accumulated 1 to 3 impressions per fortnight, the adjacent-service group had 18 impressions and zero spend, and the qualifier group had 7 impressions. Over the same fortnight the general group covering the whole practice area produced 7 conversions. The granular build did not underperform: it did not run at all, while the general group carried the practice area unchanged. Time to signal: four weeks of near-zero impressions is conclusive; that two weeks is already suggestive is unconfirmed.
 
 **Trigger.** New or existing ad groups built as narrow sub-type, qualifier, or intent splits of a practice area, in an account or geography whose whole-campaign volume runs in the low tens of conversions per month, showing near-zero impressions after 2 or more weeks live while a broader sibling group in the same campaign serves normally.
 
@@ -677,9 +692,11 @@ playbook PB-38 (Westhollow - Custody): standard move for sub-type ad groups at n
 
 **Evidence.** `partially validated`
 
+_Refresh 2026-09._ A removed ad group caused a false review-status flag, while two serving PMax asset groups became policy-limited. Filter to enabled serving groups and hold asset edits while an appeal is pending.
+
 _What happened when we did it._ The disapproval half is untested. The limited-ads half is contradicted by sustained observation: on an account in a sensitive practice area, every enabled ad has sat limited for months, 27 rising to 31 of 31, with new ads inheriting the same status on review and not one instance ever clearing. Zero disapprovals throughout. See the Contradiction note.
 
-**Trigger.** GAQL 7.3 returns any ad with `approval_status` in {`DISAPPROVED`, `APPROVED_LIMITED`} or `review_status` in {`UNDER_REVIEW`, `REVIEW_IN_PROGRESS`} on an ENABLED ad group in an ENABLED campaign.
+**Trigger.** GAQL 7.3 returns any ad with `approval_status` in {`DISAPPROVED`, `APPROVED_LIMITED`} or `review_status` in {`UNDER_REVIEW`, `REVIEW_IN_PROGRESS`} on an ENABLED ad group in an ENABLED campaign, or a serving PMax asset group reads policy-limited. Filter to enabled, serving ad groups first: a removed ad group produces a false review-status flag.
 
 **Pre-flight green.** This is PF-2 itself. A campaign reading `serving_status = SERVING` does not clear ad-level policy: check the ad-level policy summary, do not default to a screenshot.
 
@@ -688,8 +705,9 @@ _What happened when we did it._ The disapproval half is untested. The limited-ad
 - `DISAPPROVED`: the ad is not serving. Get the human-readable reason (Policy Manager screenshot is the only route, the API does not expand it), edit the offending element, resubmit. Confirm at least one approved ad remains live in the ad group in the meantime.
 - `UNDER_REVIEW` / `REVIEW_IN_PROGRESS` on a new ad: wait. This is not a finding, it is a state.
 - `APPROVED_LIMITED`: the ad serves with restricted reach. Where the limitation is a chronic policy sensitivity attached to the practice area rather than to the copy, the standard move is to record it as a known reach ceiling and stop re-flagging it. Rewriting copy against a category-level sensitivity churns creative for nothing.
+- **PMax asset group policy-limited while its assets stay approved (fold, 2026-09).** This is a group-level limitation, not an asset-quality finding. Obtain the human-readable policy reason, appeal where appropriate, record the appeal date, and hold every asset edit until it resolves. Report serving separately from policy clearance: continued spend does not mean the limitation cleared. See PB-32.
 
-**Do not move when.** The limited status is already carried as a standing journal rule or known issue: report it as carried, do not re-raise it as new. The ads sit in a PAUSED campaign or ad group. The disapproval is on a variant that is not the ad group's only ad and a fix is already in review.
+**Do not move when.** The limited status is already carried as a standing rule or known issue: report it as carried, do not re-raise it as new. The ads sit in a PAUSED or REMOVED campaign or ad group. An asset-group appeal is pending: no asset edits until it resolves. The disapproval is on a variant that is not the ad group's only ad and a fix is already in review.
 
 **Contradiction: in sensitive practice areas, limited is the steady state, not a defect.** The entry reads as though a limited ad is a fixable problem. On one account in a sensitive category, the count went 27 to 30 to 31 of 31 enabled ads limited, across months, with every newly built ad inheriting the same status on review and not one instance ever clearing. Zero disapprovals throughout. Two consequences the check must respect: (1) a new limited ad on such an account is not news, and re-flagging it weekly produced months of noise and no action; (2) part of that account's rank-lost impression share is a policy reach ceiling, so do not attribute rank-lost movement there to Quality Score work (PB-02).
 
@@ -703,13 +721,15 @@ The corollary is a real finding when it happens: on such an account, a DISAPPROV
 playbook PB-18 (Westhollow - Custody): standard move for a DISAPPROVED ad on a serving ad group is pulling the policy reason, editing, resubmitting, with an approved ad kept live meanwhile. accept/reject
 ```
 
-**Related.** SKILL.md PF-2 and "RED FLAGS FIRST"; diagnosis trees PF-2 and Tree 3 Step 1; audit checklist PF-2. Cross-refs PB-02, PB-09.
+**Related.** SKILL.md PF-2; diagnosis trees PF-2 and Tree 3 Step 1; audit checklist PF-2. Cross-refs PB-02, PB-09, PB-32.
 
 ---
 
 ## PB-19: RSA hygiene
 
-**Evidence.** `textbook only`. One account has carried POOR ad strength on 8 of 8 scored enabled ads for weeks without the fix being applied. Detection is easy here and has never converted into a move.
+**Evidence.** `textbook only`. The low-RSA-hygiene pattern has been detected and repeatedly held, but no rewrite has been made and measured.
+
+_Refresh 2026-09._ A later weekly improvement without a rewrite does not validate the rewrite.
 
 **Trigger.** An ENABLED ad group with no active RSA, or an RSA below the hygiene floor (`PROPOSED`: fewer than 8 headlines, fewer than 3 descriptions, or more than 2 pinned headlines), or an ad group whose only ads are paused or removed. An ad group running exactly one RSA at or above the hygiene floor is a config item under agency-defaults.md Sec 6.4 (standard is 2 to 3 RSAs per ad group), not a playbook trigger on its own.
 
@@ -727,7 +747,7 @@ playbook PB-18 (Westhollow - Custody): standard move for a DISAPPROVED ad on a s
 playbook PB-19 (Westhollow - Custody, ag Physical Custody): standard move for an ad group under the RSA floor is building to 2 to 3 RSAs, each at 8+ headlines and 3+ descriptions, unpinned. accept/reject
 ```
 
-**Related.** Knowledge base "Ad Copy" (RSAs, ad strength, extensions); audit checklist Section 4; SKILL.md "RSA builder" adjunct; diagnosis trees Sub-tree B. Cross-refs PB-15, PB-20, PB-25.
+**Related.** Knowledge base "Ad Copy" (RSAs, ad strength, extensions); audit checklist Section 4; SKILL.md "Responsive search ad construction"; diagnosis trees Sub-tree B. Cross-refs PB-20, PB-25.
 
 ---
 
@@ -739,13 +759,13 @@ _What happened when we did it._ A long-standing CPA gap, with a problem ad group
 
 **Trigger.** Gradual CTR decline over 3 or more months on stable impression share, with no meaningful ad edit in the last 6 months (checklist rule) and CTR down >= 15% over that window (`PROPOSED`).
 
-**Pre-flight green.** PF-3 (the decline is not explained by a structural change). Ad rotation checked (GAQL 1.3): rotation set to OPTIMIZE suppresses variants and manufactures an apparent aggregate decline, which is a settings fix first.
+**Pre-flight green.** PF-3 (the decline is not explained by a structural change). Ad rotation checked (GAQL 1.3): rotation set to OPTIMIZE suppresses variants and manufactures an apparent aggregate decline, which is a settings fix first (unconfirmed).
 
-**Standard move.** Creative refresh: new headlines on a different angle, intent-matched and near-me variants where the practice area supports them, contrast language against the generic competitor set. Set rotation to `ROTATE_INDEFINITELY` before measuring, so the new variants actually accrue data.
+**Standard move.** Creative refresh: new headlines on a different angle, intent-matched and near-me variants where the practice area supports them, contrast language against the generic competitor set. Set rotation to `ROTATE_INDEFINITELY` before measuring, so the new variants actually accrue data (unconfirmed).
 
 **Do not move when.** The decline is abrupt over 1 to 2 weeks rather than gradual: that is an external change (new entrants, SERP layout) and creative refresh is not the first answer. Impression share is falling alongside CTR, which is a reach problem (PB-01, PB-02). Volume is too thin for a CTR read.
 
-**Expected result and verification.** CTR recovers toward its prior band within 30 to 60 days; `search_predicted_ctr` moves off BELOW_AVERAGE if it had slipped. Verify at 30 and 60 days: GAQL 7.1, GAQL 6.3, GAQL 3.1.
+**Expected result and verification.** CTR recovers toward its prior band within 30 to 60 days (unconfirmed); `search_predicted_ctr` moves off BELOW_AVERAGE if it had slipped. Verify at 30 and 60 days: GAQL 7.1, GAQL 6.3, GAQL 3.1.
 
 Note the corollary: a CPA gap long attributed to a structural or landing-page ceiling can close on creative alone. Re-pull before re-asserting a standing structural flag, and retire it when the data shows it no longer binds.
 
@@ -763,23 +783,23 @@ playbook PB-20 (Westhollow - Divorce): standard move for a 3-month CTR slide on 
 
 **Evidence.** `textbook only`. No account we run currently serves image assets on the Google side, so this has zero outcomes.
 
-**Trigger.** An ENABLED image-serving campaign (Display, PMax, Demand Gen) with zero image assets attached, or thin coverage (`PROPOSED`: fewer than 3 assets or fewer than 2 aspect ratios), derived from `get_image_assets` plus `get_asset_usage` cross-referenced against the ENABLED campaign list.
+**Trigger.** An ENABLED Performance Max asset group with zero image assets attached, or thin coverage (`PROPOSED`: fewer than 3 assets or fewer than 2 aspect ratios), derived from the account's image-asset inventory plus asset usage, cross-referenced against the ENABLED PMax campaign list. Scope is PMax. Search image extensions are in scope as a Search asset check but do not trigger this playbook.
 
-**Pre-flight green.** Campaign type confirmed. A Search-only campaign without image assets is expected and never flagged.
+**Pre-flight green.** Campaign type confirmed as Performance Max. A Search campaign without image assets is expected and never flagged.
 
-**Standard move.** Two different fixes depending on which gap it is. If suitable assets already exist in the account but are attached to nothing, attach them: that is a usage gap. If no suitable asset exists, the move is a production request, with the required aspect ratios named. Missing coverage on an image-serving campaign is the highest-priority creative finding, because the campaign cannot fill its inventory.
+**Standard move.** Two different fixes depending on which gap it is. If suitable assets already exist in the account but are attached to nothing, attach them: that is a usage gap. If no suitable asset exists, the move is a production request, with the required aspect ratios named. Missing coverage on a PMax asset group is the highest-priority creative finding, because the asset group cannot fill its inventory. (unconfirmed)
 
-**Do not move when.** The campaign is a Search campaign. The campaign is paused or in a deliberate hold. The asset that would be attached fails the brand, legibility, or message-match bar: attaching a wrong-brand image to a legal client is worse than leaving the gap, and the brand call is a human review, not a vision verdict.
+**Do not move when.** The campaign is a Search campaign. The campaign is paused or in a deliberate hold. The asset group is policy-limited and an appeal is pending: hold asset edits until it resolves (PB-18). The asset that would be attached fails the brand, legibility, or message-match bar: attaching a wrong-brand image to a legal client is worse than leaving the gap, and the brand call is a human review, not a vision verdict.
 
 **Expected result and verification.** Impressions appear on image inventory for the campaign within 14 days. Verify at 14 days: `get_asset_usage` for attachment, campaign impressions by network for serving.
 
 **Card line.**
 
 ```text
-playbook PB-21 (Westhollow - PMax Mediation): standard move for an image-serving campaign with no image assets attached is attaching existing on-brand assets, or a production request if none fit. accept/reject
+playbook PB-21 (Westhollow - PMax Mediation): standard move for a PMax asset group with no image assets attached is attaching existing on-brand assets, or a production request if none fit. accept/reject
 ```
 
-**Related.** SKILL.md "Creative / Image-Asset Audit" and Step 4b; `references/creative-audit.md` sections (a) and (c) and the source-tier table. Cross-refs PB-22, PB-32.
+**Related.** SKILL.md "Creative and asset audit" and Step 4b; `references/creative-audit.md` sections (a) and (c) and the source-tier table. Cross-refs PB-22, PB-32.
 
 ---
 
@@ -787,7 +807,7 @@ playbook PB-21 (Westhollow - PMax Mediation): standard move for an image-serving
 
 **Evidence.** `textbook only`. Same gap as PB-21. Zero image outcomes across every account.
 
-**Trigger.** An in-use image asset live and unchanged for a long stretch (cross-referenced against change history) with declining signals on meaningful volume: falling CTR or rising cost per result where per-asset metrics exist, otherwise ad-group or campaign CTR decline on stable creative, explicitly labelled a proxy.
+**Trigger.** An in-use Performance Max image asset live and unchanged for a long stretch (cross-referenced against change history) with declining signals on meaningful volume: falling CTR or rising cost per result where per-asset metrics exist, otherwise ad-group or campaign CTR decline on stable creative, explicitly labelled a proxy.
 
 **Pre-flight green.** Volume is meaningful. Change history (GAQL 8.1) confirms when creative last changed.
 
@@ -800,10 +820,10 @@ playbook PB-21 (Westhollow - PMax Mediation): standard move for an image-serving
 **Card line.**
 
 ```text
-playbook PB-22 (Westhollow - Display Probate): standard move for a long-running image asset with declining CTR on real volume is a same-message refresh at the needed ratios. accept/reject
+playbook PB-22 (Westhollow - PMax Probate): standard move for a long-running PMax image asset with declining CTR on real volume is a same-message refresh at the needed ratios. accept/reject
 ```
 
-**Related.** `references/creative-audit.md` section (d) and the prioritisation list; SKILL.md "Creative / Image-Asset Audit"; audit checklist Section 4. Cross-refs PB-20, PB-21.
+**Related.** `references/creative-audit.md` section (d) and the prioritisation list; SKILL.md "Creative and asset audit"; audit checklist Section 4. Cross-refs PB-20, PB-21.
 
 ---
 
@@ -813,9 +833,11 @@ playbook PB-22 (Westhollow - Display Probate): standard move for a long-running 
 
 **Evidence.** `partially validated`
 
+_Refresh 2026-09._ Per-lead matching proved that a thank-you-page import and a CRM import counted the same submission. The noisier action was demoted, but the final volume and bidding impact remain pending. A secondary action continuing in `all_conversions` is not a tracking failure.
+
 _What happened when we did it._ Detection is validated across two accounts and the real-world state is worse than this entry implies: one account carries 44 enabled primary actions with 38 silent over 30 days, junk page-view actions counted in the Conversions column and firing, a legacy phone-vendor action still primary at zero volume, and five of six live campaigns bidding Maximize Conversions on the account-default goal set, so any junk that fires steers the bidding. Remediation has never been applied, so the FIX has zero outcomes. Separately validated as a gate: a primary that goes silent by vendor design is not drift. See the do-not-move block.
 
-**Trigger.** Any of: a primary action that previously fired weekly goes silent for 14+ days with meaningful clicks (`PROPOSED`); a primary action that has never fired; a soft or secondary-grade action carrying `include_in_conversions_metric = TRUE`; two primaries with matching non-integer conversion tails across multiple windows (the DDA decimal fingerprint for same-event double counting); a lead action left at `ONE_PER_CLICK` with no recorded override, against the house standard `MANY_PER_CLICK` (agency-defaults.md Sec 3.4; situational, not universally correct for legal PPC: an agency may choose `ONE_PER_CLICK` where repeat events are noise, recorded as an override): info severity, not a red flag.
+**Trigger.** Any of: a primary action that previously fired weekly goes silent for 14+ days with meaningful clicks (`PROPOSED`); a primary action that has never fired; two primaries proven by event-level matching to fire on the same lead; a lead action left at `ONE_PER_CLICK` with no recorded override, against the house standard `MANY_PER_CLICK` (agency-defaults.md Sec 3.4; situational, not universally correct for legal PPC: an agency may choose `ONE_PER_CLICK` where repeat events are noise, recorded as an override): info severity, not a red flag.
 
 **Pre-flight green.** This is PF-1 itself, and PF-1 is a configuration check: a scanner reporting conversion volume or conversion silence has verified none of it.
 
@@ -823,13 +845,15 @@ _What happened when we did it._ Detection is validated across two accounts and t
 
 - Silent primary that used to fire: treat as a break, diagnose by action type (page URL change for WEBPAGE, forwarding config for AD_CALL, lead rule and GCLID capture for UPLOAD_CLICKS), repair, then apply PB-06.
 - Never-fired primary: a standing configuration error, not an acute event. Report it separately from any current drop.
-- Soft action counted as primary: demote to secondary, then apply PB-06, because the bidding model was trained on it.
-- Duplicate pair: remove one from primaries, then apply PB-06.
+- **Ebook and guide downloads are PRIMARY.** They are never demotion candidates, in any account or campaign, whatever their volume or category looks like. A recommendation to demote, exclude, or discount an ebook conversion is wrong on its face. The same holds for the CRM-native and tag-manager or analytics versions of the same event.
+- Duplicate pair: demotion requires event-level proof. Matching totals, similar ratios, or matching non-integer conversion tails are a prompt to investigate, never grounds to demote. Match the two actions per lead across systems and show that the same submission produced both. Only then demote, and demote the noisier duplicate, not the canonical one.
+- **Canonical action and basis break (fold, 2026-09).** Once event-level matching proves two primaries fire on the same lead, keep the once-per-real-lead action canonical, demote the noisier duplicate, record the effective date, start PB-06, and reconstruct both sides of every comparison spanning that date from action-level data. A non-retroactive change means the two sides of a week-over-week or 30-day read use different definitions, which manufactures a false collapse. Do not fold on aggregate totals or similar decimal tails alone.
+- A secondary action still accumulating in `all_conversions` is not a tracking failure. It is a secondary action doing what secondary actions do.
 - `ONE_PER_CLICK` on a lead action with no recorded override: set `MANY_PER_CLICK`, the house standard. Info-level card line only, not a red flag. If an override is on file for that action (repeat events recorded as known noise), this is OVERRIDE-MATCH, not a finding.
 
-**Do not move when.** The zero is low-volume noise on a genuinely low-volume action while the account's other primaries are still firing: verify against the other primaries before calling a break. This is the measured case, twice: a scanner-flagged zero week on an action that runs one to three a week, with the sibling qualified-lead and lead-form primaries both still firing in the same week. **The silence is by vendor design.** Where a call-tracking platform pushes only qualified or quotable leads into Google Ads, or where tracking numbers have been deliberately retired at the vendor, the affected primary going quiet is the configuration working, not drift. Check the vendor's push rules and the account's standing rules before calling any silence a break: on one account this exact shape was raised as a tracking gap and resolved as working-as-designed, then recurred by design a month later. The window is immature. A scanner flag is the only evidence and the configuration itself has not been read. A lead action running `MANY_PER_CLICK` is the house standard, not a deviation: every touch is signal under data-driven attribution with automated bidding, so it is never a finding on its own. A lead action left at `ONE_PER_CLICK` under a recorded override (repeat events known to be noise for that specific action) is also not a finding, it is OVERRIDE-MATCH. Only an unrecorded `ONE_PER_CLICK` against the house standard is.
+**Do not move when.** The action is an ebook or guide download: it is primary by standing ruling and no demotion branch applies to it. The only duplicate evidence is aggregate totals or similar decimal tails, with no per-lead matching: investigate, do not demote. The zero is low-volume noise on a genuinely low-volume action while the account's other primaries are still firing: verify against the other primaries before calling a break. This is the measured case, twice: a scanner-flagged zero week on an action that runs one to three a week, with the sibling qualified-lead and lead-form primaries both still firing in the same week. **The silence is by vendor design.** Where a call-tracking platform pushes only qualified or quotable leads into Google Ads, or where tracking numbers have been deliberately retired at the vendor, the affected primary going quiet is the configuration working, not drift. Check the vendor's push rules and the account's standing rules before calling any silence a break: on one account this exact shape was raised as a tracking gap and resolved as working-as-designed, then recurred by design a month later. The window is immature. A scanner flag is the only evidence and the configuration itself has not been read. A lead action running `MANY_PER_CLICK` is the house standard, not a deviation: every touch is signal under data-driven attribution with automated bidding, so it is never a finding on its own. A lead action left at `ONE_PER_CLICK` under a recorded override (repeat events known to be noise for that specific action) is also not a finding, it is OVERRIDE-MATCH. Only an unrecorded `ONE_PER_CLICK` against the house standard is.
 
-**Expected result and verification.** The action resumes firing at its prior weekly rate, or the primaries set matches what the firm counts as a lead. Verify at 7 and 28 days: GAQL 2.1 for configuration, GAQL 2.2 for volume by action, weekly not just 30-day.
+**Expected result and verification.** The action resumes firing at its prior weekly rate, or the primaries set matches what the firm counts as a lead. Verify at 7 and 28 days (unconfirmed windows): GAQL 2.1 for configuration, GAQL 2.2 for volume by action, weekly not just 30-day.
 
 **Card line.**
 
@@ -853,7 +877,7 @@ _What happened when we did it._ Both measured instances were FALSE positives, co
 
 **Standard move.** Split by direction and integration type.
 
-- Drop, Google-native `AD_CALL`: query `call_view` over the window. Records present means calls are being captured and the drop is real demand; zero records over a normal-volume window means the forwarding or tracking configuration is the fault.
+- Drop, Google-native `AD_CALL`: query `call_view` over the window. Records present means calls are being captured, which points at demand rather than capture; zero records over a normal-volume window means the forwarding or tracking configuration is the fault. (unconfirmed: presence of records is a capture check, not proof that the drop is real demand.)
 - Drop, third-party (`UPLOAD_CLICKS`): check the two silent failure modes, a missing or changed lead rule in the platform's Google Ads integration, and GCLID capture on the landing page, with Enhanced Conversions as the phone-match fallback.
 - Spike: check for a new tracker, a duplicated number, or a second integration uploading the same calls before treating the volume as real. A spike that is really double counting degrades smart bidding exactly as a duplicate action does (PB-23).
 
@@ -875,22 +899,24 @@ playbook PB-24 (account): standard move for a primary call action halving while 
 
 **Evidence.** `partially validated`
 
+_Refresh 2026-09._ No remediation outcome. The delta quantified a landing-page blocker across a large share of scored keywords, but third-party access still prevents execution.
+
 _What happened when we did it._ The DIAGNOSIS is validated over roughly three months on one account: rank-lost held at 52-67% with budget-lost near zero, ad strength POOR across the scored set, and the landing page confirmed as the binding constraint. The FIX has never been executable, because a third party owns the page and code access has been an open client ask throughout. That is the practical finding: when the page is not ours, this is not an in-account move, it is a client-relationship escalation with a multi-month clock, and re-presenting it as a move every week wastes checks. Separately validated as a detection gap: page AVAILABILITY, not only page quality. A monitored client site showed 18 of 21 nights down in a recurring late-night window, and nothing inside Google Ads reports a landing page that times out.
 
-**Trigger.** `post_click_quality_score` BELOW_AVERAGE on keywords carrying >= 25% of campaign spend (`PROPOSED`), or CVR that has never been strong across the life of the campaign on meaningful click volume, or high CPC with zero conversions over 14+ days while impression share is adequate (> 30%).
+**Trigger.** `post_click_quality_score` BELOW_AVERAGE on keywords carrying >= 25% of campaign spend (`PROPOSED`), or CVR that has never been strong across the life of the campaign on meaningful click volume, or high CPC with zero conversions over 14+ days while impression share is adequate (> 30%) (unconfirmed).
 
 **Pre-flight green.** PF-1 first: zero conversions with meaningful clicks is a tracking hypothesis before it is a landing-page one. Then PF-2 and PF-3.
 
 **Standard move.** Treat the landing page as the binding constraint and sequence around it: landing page first, then ad relevance, then ad copy. Do not optimise copy or bids on a page that does not convert. Because page quality is not API-assessable, the move includes the blind-spot request, phrased exactly:
 
 ```text
-BLIND SPOT — Landing page quality cannot be assessed via API.
+BLIND SPOT: Landing page quality cannot be assessed via API.
 → Please share a screenshot of the landing page receiving this campaign's traffic (clear CTA, message match to the ad, phone number above the fold, mobile behaviour).
 ```
 
 **Do not move when.** The landing page is controlled by a third party and the constraint is already recorded as a standing item. Even then, note that the flag is a hypothesis with a shelf life: re-pull before re-asserting it, because a creative refresh can close a gap long blamed on the page (PB-20). Retire the flag when the data shows it no longer binds.
 
-**Expected result and verification.** CVR and `post_click_quality_score` improve within 30 to 60 days of a page change. Verify at 30 and 60 days: GAQL 3.1 for the component, GAQL 6.1 for CVR. Nothing verifies faster than 30 days here.
+**Expected result and verification.** CVR and `post_click_quality_score` improve within 30 to 60 days of a page change (unconfirmed). Verify at 30 and 60 days: GAQL 3.1 for the component, GAQL 6.1 for CVR. Nothing verifies faster than 30 days here.
 
 **Card line.**
 
@@ -898,7 +924,7 @@ BLIND SPOT — Landing page quality cannot be assessed via API.
 playbook PB-25 (Westhollow - Divorce): standard move for post-click quality below average across a quarter of campaign spend is landing-page work before any bid or copy change. accept/reject
 ```
 
-**Related.** Diagnosis trees Tree 1 Step 4 and Sub-tree B (consolidated here); SKILL.md "Rendered Journal Notes vs. Live Data" (standing flags have a shelf life) and "Campaign-Level CPC Anomaly" high-CPC branch; knowledge base "Diagnosing Performance"; learnings P12. Cross-refs PB-02, PB-15, PB-20.
+**Related.** Diagnosis trees Tree 1 Step 4 and Sub-tree B (consolidated here); SKILL.md "Prior state versus live data" (standing flags have a shelf life) and "Campaign-Level CPC Anomaly" high-CPC branch; knowledge base "Diagnosing Performance"; learnings P12. Cross-refs PB-02, PB-20.
 
 ---
 
@@ -906,29 +932,31 @@ playbook PB-25 (Westhollow - Divorce): standard move for post-click quality belo
 
 ## PB-26: Search Partners CPA distortion
 
-**Evidence.** `textbook only`. Search Partners has never been segmented by network before a decision on an account we run. On the one occasion the network was turned off, the split was not pulled first.
+**Evidence.** `textbook only`. A network was switched off without a pre-decision split, and no isolated network outcome has been recorded.
 
-**Trigger.** A CPA figure is about to be used for a decision on a campaign running on both Search and Search Partners, and the network split has not been pulled.
+_Refresh 2026-09._ The delta confirms that the required segmentation was skipped, not that exclusion worked.
 
-**Pre-flight green.** PF-2 (network settings read). The blended CPA has not yet been reported as if it were a Search figure.
+**Trigger.** A campaign is running on both Search and Search Partners. Search Partners being enabled is itself the trigger: it is atypical for these accounts and it is not wanted.
 
-**Standard move.** Segment before deciding: pull performance by `segments.network`, clicks, conversions, cost and CPA per network, and report the split. Then:
+**Pre-flight green.** PF-2 (network settings read).
+
+**Standard move.** Report the blended CPA as the account's CPA, and flag Search Partners separately as an atypical, unwanted network setting with no reason on record. The blended figure is the most accurate statement of what the account actually paid per conversion: it is never withheld pending a split, never replaced by the Search-only number, and never described as invalid. Then pull performance by `segments.network`, clicks, conversions, cost and CPA per network, and report the split underneath the blended figure as supporting detail. The split informs an exclusion decision; it does not substitute for the reported CPA. Then:
 
 - Partners CPA above target and Partners conversion volume small relative to Search: exclusion is the reasonable move, signal loss minimal.
 - Partners CPA above target but Partners contributing significant conversion volume: exclusion carries real signal risk. Check whether blended CPA stays on target without it before deciding.
 - Search CPA already on target: the issue is contained to Partners and exclusion is the likely fix, after confirming volume contribution.
 
-**Do not move when.** The campaign is near the 15 to 20 conversion floor, where removing Partners can push it under and destabilise smart bidding. The network split has not actually been pulled: no exclusion decision on an unsegmented number. The conversions in the window are provisional.
+**Do not move when.** The campaign is near the 15 to 20 conversion floor, where removing Partners can push it under and destabilise smart bidding. The network split has not actually been pulled: no exclusion decision on an unsegmented number. Note that this gates the exclusion decision only. It never gates reporting the blended CPA, which ships either way. The conversions in the window are provisional.
 
-**Expected result and verification.** Blended CPA moves toward the Search-only figure; total conversion volume falls by no more than the Partners contribution. Verify at 28 days: GAQL 6.1 with `segments.network`, and conversion volume against the floor.
+**Expected result and verification.** If Partners is excluded, the blended CPA (still the reported number) moves toward the former Search-only figure, and total conversion volume falls by no more than the Partners contribution. Verify at 28 days: GAQL 6.1 with `segments.network`, and conversion volume against the floor.
 
 **Card line.**
 
 ```text
-playbook PB-26 (Westhollow - Custody): standard move before any CPA call on a Search plus Partners campaign is pulling the network split, exclusion only after the volume contribution is known. accept/reject
+playbook PB-26 (Westhollow - Custody): standard move for Search Partners enabled on a Search campaign is flagging the setting and pulling the network split beneath the reported blended CPA, exclusion only after the volume contribution is known. accept/reject
 ```
 
-**Related.** SKILL.md "Search Partners CPA Distortion: Network Segmentation Required" (consolidated here in full); knowledge base "Campaign Structure" (network settings); audit checklist PF-2. Cross-refs PB-07, PB-27.
+**Related.** SKILL.md "Search Partners and the blended CPA" (consolidated here in full); knowledge base "Campaign Structure" (network settings); audit checklist PF-2. Cross-refs PB-07, PB-27.
 
 ---
 
@@ -936,13 +964,15 @@ playbook PB-26 (Westhollow - Custody): standard move before any CPA call on a Se
 
 **Evidence.** `partially validated`
 
+_Refresh 2026-09._ No attributable outcome. Search Partners and rotation changed together, with the actor and exact change date unresolved.
+
 _What happened when we did it._ Applied once, on a campaign pair whose weekly CPL had risen over 150% on falling conversions and which carried the account's only Search-Partners-on configuration. The outcome had not been read when this file was last revised. The move was made together with an ad-rotation change in the same session, which will make attribution impossible: a live illustration of this entry's own one-change-at-a-time rule.
 
 **Trigger.** `network_settings.target_partner_search_network = TRUE` or `network_settings.target_content_network = TRUE` on a Search campaign with no documented justification on record.
 
 **Pre-flight green.** PF-2. Account notes and standing rules checked for a documented deliberate reason.
 
-**Standard move.** Turn the network off, one at a time, not both in the same week, and note the date so the change is attributable in the next read. Search network only is the default; partners and display deliver inferior traffic for legal at the same cost.
+**Standard move.** Turn the network off, one at a time, not both in the same week, and note the date so the change is attributable in the next read. Search network only is the default. That partners and display deliver inferior traffic for legal at the same cost is a general expectation, not a measured result on these accounts (unconfirmed).
 
 **Do not move when.** A documented reason is on record. The campaign is inside a learning period, where a network change resets the clock: sequence it after the window. The network is carrying a material share of conversions, where PB-26's volume test governs the Partners case. Both networks are on and someone proposes flipping both at once, which makes the result unattributable.
 
@@ -988,11 +1018,13 @@ playbook PB-28 (Westhollow - Divorce): standard move for out-of-area terms at 10
 
 **Evidence.** `partially validated`
 
+_Refresh 2026-09._ Held CPL gaps cooled, but one comparison crossed a counting-basis change and another omitted the required 30-day read. Weekly improvement cannot close a 30-day playbook.
+
 _What happened when we did it._ This pattern fires readily and was WRONG in the largest instance we have measured. During a deliberate spend ramp, an account's 30-day CPL read worse for about five weeks running, peaking near +68% on flat conversions, a textbook trigger for this entry, before crossing to flat and then about 9% better as the added spend matured into conversions. Firing at week three would have decomposed a defect that did not exist and argued for cutting a ramp that was working. See the Contradiction note; PB-34 now owns the ramp case.
 
-**Trigger.** 30-day CPL up >= 20% versus prior 30 days (`PROPOSED`) with conversions inside +/-10% (`PROPOSED`), holding across 2 consecutive checks (`PROPOSED`), on aligned complete windows, at or above the reliability floor. A CPL move over ~30% is a red-flag item and leads the card regardless of what this playbook does.
+**Trigger.** 30-day CPL up >= 20% versus prior 30 days (`PROPOSED`) with conversions inside +/-10% (`PROPOSED`), holding across 2 consecutive checks (`PROPOSED`), on aligned complete windows, at or above the reliability floor. A CPL move over ~30% is a red-flag item and leads the card regardless of what this playbook does (unconfirmed threshold).
 
-**Pre-flight green.** PF-1, PF-3. Windows aligned complete-to-complete. Conversions mature (outside the ~72-hour lag). Currency native, no cross-account comparison. **Plus the ramp gate: spend across the two windows is inside +/-15%.** If spend rose materially, this playbook does not fire and PB-34 owns it. Pull spend direction before CPL direction, every time.
+**Pre-flight green.** PF-1, PF-3. Windows aligned complete-to-complete. Conversions mature (outside the ~72-hour lag). Currency native, no cross-account comparison. **Plus the ramp gate: spend across the two windows is inside +/-15% (unconfirmed).** If spend rose materially, this playbook does not fire and PB-34 owns it. Pull spend direction before CPL direction, every time.
 
 **Contradiction: the biggest instance we measured was not a defect.** During a deliberate spend ramp, an account's 30-day CPL read worse for roughly five consecutive weekly checks, peaking near +68% on flat conversions, which is a clean trigger for this entry twice over. Nothing was wrong. The added spend had simply not matured into conversions yet: by week six the same 30-day window read flat, and shortly after about 9% better on spend up more than half. Decomposing CPC versus CVR at week three would have produced a confident, well-evidenced, wrong answer, and the natural recommendation from it (stop buying) would have killed a working ramp. CPL creep is only a defect when nothing structural changed, which is what the ramp gate above now enforces.
 
@@ -1020,6 +1052,8 @@ playbook PB-29 (account): standard move for a 20%+ 30-day CPL rise on flat conve
 
 **Evidence.** `partially validated`
 
+_Refresh 2026-09._ A three-week zero-conversion streak ended on one conversion, but the structural branch and keep-or-kill decision were never completed. A streak break is positive direction, not clearance.
+
 _What happened when we did it._ Zero-conversion streaks are common at legal volumes and have been observed repeatedly across accounts. Exactly one move has ever been made against one, a budget raise, and it made matters worse: spend up 44 to 74%, clicks flat or down, avg CPC up 68 to 74%, and the streak unbroken. That outcome is now a do-not-move condition on PB-01 and is the strongest evidence in this file for routing a zero-conversion streak to structure rather than to money.
 
 **Trigger.** 2 or more consecutive complete weeks with zero conversions and material spend on an ENABLED campaign (`PROPOSED`: material = at least 1x target CPL spent in the window). This is a red-flag item and leads the card.
@@ -1035,7 +1069,9 @@ _What happened when we did it._ Zero-conversion streaks are common at legal volu
 
 Whatever the route, the streak itself is not the fix: the move is to name the branch with data and pull the branch's query set.
 
-**Do not move when.** The campaign is genuinely low volume and the zero weeks alternate with converting weeks, which is lumpiness at low volume, not a streak. The window is provisional. A site outage covers the window. The campaign is new (PB-09).
+**A streak break ends the run, not the diagnosis (fold, 2026-09).** When a multi-week zero-conversion streak breaks on one provisional or sub-floor conversion, reset the streak count and record the positive direction, but keep the 30-day spend and CPL read and the structural branch open until reliable volume or an intake-quality review closes the decision. One conversion is not clearance. Equally, do not keep describing the streak as active once it has broken.
+
+**Do not move when.** The campaign is genuinely low volume and the zero weeks alternate with converting weeks, which is lumpiness at low volume, not a streak. The window is provisional. A site outage covers the window. The campaign is new (PB-09). One conversion is being used either to declare the campaign fixed or to keep the old streak alive.
 
 **Expected result and verification.** The branch is identified within the same check; after the branch's fix, conversions resume within its own verification window. Verify weekly until the streak breaks: GAQL 6.3.
 
@@ -1045,7 +1081,7 @@ Whatever the route, the streak itself is not the fix: the move is to name the br
 playbook PB-30 (Westhollow - Probate): standard move for 2+ weeks of material spend at zero conversions is PF-1 first, then routing on impression share and CPC. accept/reject
 ```
 
-**Related.** SKILL.md "RED FLAGS FIRST" and "Campaign-Level CPC Anomaly"; diagnosis trees Tree 1 and Tree 7. Cross-refs PB-08, PB-23, PB-25, PB-33.
+**Related.** SKILL.md "Campaign-level CPC anomaly"; diagnosis trees Tree 1 and Tree 7. Cross-refs PB-08, PB-23, PB-25, PB-33.
 
 ---
 
@@ -1075,7 +1111,9 @@ playbook PB-31 (account): standard move for a decline matching last year's same-
 
 ## PB-32: PMax post-launch, first 14 days
 
-**Evidence.** `textbook only`. Two campaigns have been built to this pattern. Both were still at zero spend when this file was last revised, so the cadence has never actually run.
+**Evidence.** `partially validated`
+
+_Refresh 2026-09._ Locked ruling applied. Two PMax launches reached day-3 serving reads and one reached a second weekly read, but the complete day-14 configuration and goals read is missing. Brand and final-URL overrides require measurement at the final test judgment.
 
 **Trigger.** A Performance Max campaign inside its first 14 days. The knowledge base position stands: PMax is avoided for law firms by default. This playbook governs one that is live by operator decision.
 
@@ -1083,14 +1121,20 @@ playbook PB-31 (account): standard move for a decline matching last year's same-
 
 **Standard move.** Two polls, then hold.
 
-- **Day 3 poll, serving and policy only:** status and serving state, budget pacing, bid strategy, conversion goals at campaign level, asset group review state, disapprovals, spend. Nothing else. No performance judgment.
-- **Day 14 read:** the same, plus first spend and conversions, plus what the campaign is actually optimising on (which goals are reachable, whether soft page-view style events are being counted as primaries).
+- **Day 3 poll, serving and policy only:** status and serving state, budget pacing, bid strategy, conversion goals at campaign level, asset group review state, disapprovals, spend, plus the cap block below. Nothing else. No performance judgment.
+- **Day 14 read:** the same, plus first spend and conversions, plus what the campaign is actually optimising on (which goals are reachable), plus the override block below.
 
-Structural corrections available in this window: brand exclusions applied so the campaign does not harvest branded queries as its easiest conversions, goals corrected if a soft action is primary, asset group named and scoped. Everything else waits.
+**Cap tracking, both polls (fold, 2026-09).** A PMax campaign launched with a fixed daily budget and a hard total-spend cap carries four extra fields at every poll: cumulative spend to date, recent pace, the estimated cap date derived from that pace, and the named cap-or-kill owner. A bounded test that reaches its cap without a decision on record becomes an unbounded park, which is the observed failure mode. Do not use short-term performance as the reason to move while the campaign is still inside its cap.
 
-**Do not move when.** Performance is the reason. A 14-day PMax read is not a performance verdict, and custom goals or target changes before performance data exist have nothing to calibrate against. Geographic overlap with an existing campaign is not automatically a defect: it may be accepted deliberately. The location setting is `PRESENCE_OR_INTEREST`, which is the house standard and never a flag.
+**Overrides require measurement at judgment (fold, 2026-09).** Brand exclusion and final-URL expansion are the two structural corrections available in this window: exclusions so the campaign does not harvest branded queries as its easiest conversions, and expansion off so it does not invent landing pages. Where either is deliberately overridden for a bounded test, brand-query share and landing-page distribution are required inputs at the final test judgment. Without them the campaign cannot be credited with new-client conversions. An override is a recorded decision, not an unconditional exclusion rule.
 
-**Expected result and verification.** Assets clear review and serve; goals match what the firm counts as a lead; branded queries are excluded. Verify at day 3 and day 14 against the poll list, then fold the campaign into the normal cadence.
+**A policy-limited asset group is handled, not rebuilt (fold, 2026-09).** When a serving asset group becomes policy-limited while its individual assets remain approved, obtain the human-readable policy reason, appeal where appropriate, record the appeal date, and hold asset edits until it resolves. Report serving separately from policy clearance: continued spend does not mean the limitation cleared. See PB-18.
+
+Goals are corrected if a soft action is primary, subject to the standing ruling that ebook and guide downloads are primary and are never the soft action in question. Everything else waits.
+
+**Do not move when.** Performance is the reason. A 14-day PMax read is not a performance verdict, and custom goals or target changes before performance data exist have nothing to calibrate against. The campaign is still inside its approved test cap. An asset-group appeal is pending: no asset edits until it resolves. Geographic overlap with an existing campaign is not automatically a defect: it may be accepted deliberately. The location setting is `PRESENCE_OR_INTEREST`, which is the house standard and never a flag.
+
+**Expected result and verification.** Assets clear review and serve; goals match what the firm counts as a lead; branded queries are excluded or the override is on record with its measurement attached; cumulative spend is tracked against the cap with a cap date and an owner. Verify at day 3 and day 14 against the poll list, then fold the campaign into the normal cadence.
 
 **Card line.**
 
@@ -1098,7 +1142,7 @@ Structural corrections available in this window: brand exclusions applied so the
 playbook PB-32 (Westhollow - PMax Mediation, day 3): standard move inside the first 14 days is the serving-and-policy poll plus brand exclusions, no performance read. accept/reject
 ```
 
-**Related.** SKILL.md PF-2 (PMax present is a flag) and "Account Macro Context"; knowledge base "Bidding" (Performance Max); learnings, presence-or-interest rule and the verify-poll scope note. Cross-refs PB-09, PB-21, PB-23.
+**Related.** SKILL.md PF-2 and "Account macro context"; knowledge base "Bidding" (Performance Max). Cross-refs PB-09, PB-18, PB-21, PB-23, PB-41.
 
 ---
 
@@ -1106,7 +1150,7 @@ playbook PB-32 (Westhollow - PMax Mediation, day 3): standard move inside the fi
 
 **Evidence.** `textbook only`. Never observed on an account we run.
 
-**Trigger.** Campaign-level avg CPC well below the practice-area band (family law $8 to 25, elder law $10 to 35, personal injury $20 to 80, partition and real estate $15 to 40, elder abuse $60 to 150+), read from campaign performance rather than search terms.
+**Trigger.** Campaign-level avg CPC well below the practice-area band, read from campaign performance rather than search terms. Bands (`PROPOSED`, unconfirmed): family law $8 to 25, elder law $10 to 35, elder abuse $60 to 150+. No band is recorded for immigration. A band is a prompt to look, never a threshold to act on.
 
 **Pre-flight green.** Currency confirmed as the account's own: a low number in a different currency is not a low CPC. PF-1.
 
@@ -1122,13 +1166,15 @@ playbook PB-32 (Westhollow - PMax Mediation, day 3): standard move inside the fi
 playbook PB-33 (Westhollow - Divorce): standard move for a campaign avg CPC far under the practice-area band is a tracking and history check before any keyword read. accept/reject
 ```
 
-**Related.** SKILL.md "Campaign-Level CPC Anomaly: Routing Protocol" (consolidated here in full) and "Auditing search term data you are handed"; learnings P8. Cross-refs PB-08, PB-23, PB-30.
+**Related.** SKILL.md "Campaign-level CPC anomaly: routing protocol" (consolidated here in full) and "Auditing search term data you are handed"; learnings P8. Cross-refs PB-08, PB-23, PB-30.
 
 ---
 
 ## PB-34: Spend ramp in progress, CPL reading worse
 
-**Evidence.** `validated in practice (1 outcome, seven sequential 30-day readings)`
+**Evidence.** `validated in practice (1 outcome, eight sequential 30-day readings)`
+
+_Refresh 2026-09._ The same ramp produced one additional clean-basis 30-day reading, about 25% better on substantially higher spend and conversion volume. This extends the sequence without incrementing the outcome count.
 
 _What happened when we did it._ An account ramped spend hard over about six weeks through expansion and new campaigns. Its 30-day CPL read WORSE at every check for roughly five weeks, peaking near +68% against the prior 30 days on conversions that were flat to slightly down. Then it crossed: 30-day CPL flat at week five, about 5% better at week six, about 9% better at week seven, on spend up 58 to 80% and conversions up 73 to 88%. The weekly CPL turned about two weeks before the 30-day did. Nothing was fixed in between; the added spend simply matured. Time to signal: expect the 30-day window to look wrong for four to six weeks after a material ramp starts.
 
@@ -1166,7 +1212,7 @@ _What happened when we did it._ Two campaigns were launched into a new county at
 
 **Standard move.** Launch small and capped rather than modelled. Set a deliberately small fixed daily budget, clone the structure and copy that already convert, and let the cap ration the spend while the market answers. Read at day 3 for direction and at week 1 for the go or no-go band (PB-09 governs what may and may not be concluded from that read). Then, if the band is good and budget-lost is high, step the cap up under PB-01, which is where the measured budget-raise evidence lives.
 
-Expect budget-lost impression share in the 50 to 80% range while capped. That is the cap working as designed, not a finding, and it is the reason the read is stable rather than noisy.
+Expect budget-lost impression share in the 50 to 80% range while capped (unconfirmed). That is the cap working as designed, not a finding, and it is the reason the read is stable rather than noisy.
 
 **Do not move when.** There is no proven copy or structure to clone, in which case this is a build, not a test, and the launch risk is different. The account cannot spare the cap without taking it from a campaign that is already converting, which makes it an allocation decision for the operator. The firm does not serve the market, which is a question to ask before building anything, not after. A prior test in the same market has been run and closed: check the account's standing rules before proposing it again.
 
@@ -1222,6 +1268,8 @@ playbook PB-36 (Westhollow - Probate, dormant 9 months): standard move on reacti
 
 **Evidence.** `validated in practice (2 outcomes, one with measured cost)`
 
+_Refresh 2026-09._ No increment. Another unexplained settings change was detected, but it lacks attribution and an isolated performance outcome.
+
 _What happened when we did it._ An outside party with account access paused every running campaign. It was caught about 36 hours later during unrelated verification, not by a performance signal. The measured cost of those 36 hours: the affected week ran roughly 3 conversions against a four-week average near 17, and its CPL came in about four times the prior week's, on roughly half the spend. Read without the change log, that week is a catastrophic performance collapse demanding a diagnosis. Read with it, it is 36 hours of darkness and needs no diagnosis at all. The same external party recurred three weeks later with a different edit, which is why the watch became standing rather than closed.
 
 **Trigger.** Any change event in the window that was not made by us or by the operator: an external user, an agency or vendor account, an automation, or the platform itself. Also fires on the reverse shape: a week whose numbers moved far more than any in-account explanation supports.
@@ -1249,6 +1297,32 @@ playbook PB-37 (account): standard move for an unexpected external change event 
 ```
 
 **Related.** SKILL.md PF-3 and change-history verification; audit checklist change-history section. Cross-refs PB-09, PB-29, PB-34, PB-36.
+
+---
+
+## PB-41: A PMax launch contaminates blended account metrics
+
+**Evidence.** `partially validated`
+
+_Refresh 2026-09._ Detection is confirmed on a live account where a new PMax campaign supplied most of the account's clicks at a much lower CPC than Search. No decision has yet been made and measured on the split.
+
+**Trigger.** A new Performance Max campaign supplies a material share of account clicks or conversions at a CPC or conversion mix unlike Search, and a blended CPC, CPL, or conversion rate is about to drive an account-level decision.
+
+**Pre-flight green.** PF-2 (campaign types read, PMax presence on record as deliberate). Currency confirmed. Windows aligned and complete.
+
+**Standard move.** Present blended, Search-only, and PMax-only results side by side. The blended figure remains the reported account number; the two splits sit underneath it. Treat the direction as robust only if it survives the Search-only split, or if the operator explicitly accepts the inventory-mix change as the thing being measured.
+
+**Do not move when.** PMax is inside day 14 and the proposed action is performance-driven: segmentation explains the number, it does not accelerate PB-32. The PMax campaign's share of clicks and conversions is immaterial. The conversions in the window are provisional.
+
+**Expected result and verification.** The account verdict is not an artefact of a cheap-click traffic class, and any recovery or decline is attributed to the campaign type that actually produced it. Verify within the same check: GAQL 6.1 segmented by campaign and campaign type, over the same window on both sides.
+
+**Card line.**
+
+```text
+playbook PB-41 (account): standard move when a new PMax campaign materially changes the traffic mix is splitting Search-only and PMax results before any blended account verdict. accept/reject
+```
+
+**Related.** SKILL.md "Campaign-level CPC anomaly" and "Account macro context". Cross-refs PB-26, PB-32, PB-33, PB-34, PB-40.
 
 ---
 

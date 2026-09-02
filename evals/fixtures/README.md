@@ -2,7 +2,7 @@
 
 Committed test fixtures for the legal-ppc eval suite. These exist so evals that
 assert "reads `account-notes/<account>.md`" are actually testable in a clean
-checkout — the real `account-notes/` directory is Toby-version-only and
+checkout: the real account-notes directory is operator-version only and
 git-ignored, so without these the notes-read step is untestable and shows up as
 a false failure.
 

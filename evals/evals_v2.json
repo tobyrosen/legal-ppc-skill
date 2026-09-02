@@ -13,7 +13,8 @@
         "Runs PF-1 (conversion tracking) before attributing any performance feeling to campaign causes",
         "Reads account-notes/apex-law.md before starting — checks prior pending actions and known context",
         "Does not produce a list of fixes for a vague brief — asks a clarifying question or explicitly defines what 'feels off' means based on data before recommending"
-      ]
+      ],
+      "retired": "Vague first-look and session behaviour only, no tactic content. Retired 2026-09; not carried into evals_v5.json."
     },
     {
       "id": 5,
@@ -37,7 +38,11 @@
         "Runs full pre-flight (PF-1, PF-2, PF-3) in sequence — same discipline as any prior account review despite no prior session history",
         "If conversion volume is low (fewer than 15-20/month per campaign), explicitly flags that tCPA or Maximize Conversions may be inappropriate and suggests manual or eCPC instead",
         "Does NOT apply Apex Law-specific patterns (family law search behavior, state-specific legal context) to Greenfield Legal — correctly treats this as a different practice area"
-      ]
+      ],
+      "unconfirmed": [
+        "Recommending manual or enhanced CPC below 15 to 20 conversions a month is unconfirmed and is superseded by Maximize Clicks with a CPC cap (PB-08)."
+      ],
+      "superseded_by": "evals_v5.json case 501"
     },
     {
       "id": 7,
@@ -49,6 +54,9 @@
         "Checks whether the comparison is valid — practice area (elder law vs family law), market size (small market vs metro), and conversion volume differ; a direct CPA comparison may be meaningless",
         "If Greenfield Legal conversion volume is too low to produce a reliable CPA (fewer than 15-20 conversions), flags this explicitly and cites the 15-20 conversion threshold as the statistical reliability threshold — small sample CPA is not a meaningful signal",
         "Does not produce a definitive list of root causes for high CPA without first confirming CPA actually is high and the comparison is valid — conditional or hedged analysis pending live data is acceptable, but presenting reasons as confirmed without data verification is not"
+      ],
+      "unconfirmed": [
+        "The 15 to 20 conversion statistical reliability threshold used as the pass condition is unconfirmed."
       ]
     },
     {
@@ -98,6 +106,9 @@
         "Recommends a re-learning window of 2-4 weeks before evaluating bid strategy performance or changing targets",
         "Does NOT recommend changing the tCPA target immediately — the algorithm needs clean data to re-learn before a new target reflects reality",
         "Flags that the previously-reported CPA was artificially low due to double-counting — 'higher' CPA on clean data is expected and does not indicate the account is getting worse"
+      ],
+      "unconfirmed": [
+        "The 2 to 4 week post-tracking-fix relearn window used as the pass condition is unconfirmed."
       ]
     },
     {
@@ -139,5 +150,6 @@
         "[CONDITIONAL FRAMING] If a bid recommendation is given at all, it is conditioned on the macro investigation completing first ('after confirming tracking is intact and no recent structural change caused the conversion drop, then...')"
       ]
     }
-  ]
+  ],
+  "unconfirmed_note": "Suite-level note added 2026-09-02 with the drift correction: several pass conditions in this suite rest on thresholds that are unconfirmed, meaning general practice not yet confirmed by the operator. Per-case unconfirmed claims are listed in each case's `unconfirmed` field. Where a case is superseded by the refresh, evals_v5.json carries the corrected version and governs."
 }

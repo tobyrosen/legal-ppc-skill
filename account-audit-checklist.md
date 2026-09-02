@@ -50,7 +50,7 @@ Macro context that is steady, expected, or supportive of the recommendation is N
 _GAQL: 2.1 (all conversion actions), 2.2 (recent conversion volume)_
 
 - [ ] At least one conversion action is enabled and active
-- [ ] Primary conversion actions (`include_in_conversions_metric = TRUE`) measure real leads — not page views, sessions, or soft engagements
+- [ ] Primary conversion actions (`include_in_conversions_metric = TRUE`) measure real leads: not generic page views, sessions, or engagement events. Ebook and guide downloads ARE real leads by standing operator ruling and are primary; never flag one here
 - [ ] Every enabled primary action has recorded at least one conversion in the last 30 days — flag any that have never fired or have been silent for 30+ days despite meaningful click volume
 - [ ] Conversion volume is plausible given click volume (not zero with >100 clicks/month)
 - [ ] No duplicate primary actions tracking the same event (check for DDA decimal fingerprint: identical fractional conversion tails across two actions)
@@ -70,13 +70,13 @@ _GAQL: 2.1 (all conversion actions), 2.2 (recent conversion volume)_
 _GAQL: 1.1 (all campaigns), 1.3 (ad rotation), 7.3 (ad policy / approval status)_
 
 - [ ] Ad policy checked via GAQL 7.3 (`ad_group_ad.policy_summary.approval_status` / `.review_status`) — flag any ad with `approval_status` in {`DISAPPROVED`, `APPROVED_LIMITED`} or `review_status` in {`UNDER_REVIEW`, `REVIEW_IN_PROGRESS`}. A campaign reading `serving_status = SERVING` does not clear ad-level policy issues; screenshot is the fallback only for the human-readable disapproval reason.
-- [ ] No Performance Max campaigns (PMax is almost always wrong for law firms)
-- [ ] Display/content network disabled on all search campaigns (`target_content_network = FALSE`)
+- [ ] Any Performance Max campaign is on record as a deliberate decision. PMax is avoided for law firms by default; a PMax campaign present with no recorded decision is the finding, not PMax itself. Where one is live, PB-32 governs it
+- [ ] Content network disabled on all Search campaigns (`target_content_network = FALSE`)
 - [ ] Search Partners disabled on all campaigns (`target_partner_search_network = FALSE`) — or documented reason it's enabled
 - [ ] Ad rotation set to `ROTATE_INDEFINITELY` on all campaigns (not OPTIMIZE or CONVERSION_OPTIMIZE)
 - [ ] Brand campaign is isolated in its own campaign — no brand keywords mixed with non-brand
 - [ ] No broad match keywords in active campaigns (except deliberately named test campaigns)
-- [ ] No active Performance Max or Display campaigns without explicit brief
+- [ ] No campaign type outside Search and Performance Max is running without an explicit brief
 
 ---
 
@@ -102,7 +102,6 @@ _GAQL: 1.1 (campaigns), 1.2 (ad groups)_
 - [ ] Ad group structure aligns with keyword themes — not one large ad group per campaign
 - [ ] Budget allocation reflects account priorities (highest-value practice areas receive appropriate share)
 - [ ] Paused campaigns reviewed: are they paused for a known reason, or abandoned?
-- [ ] Local Services Ads (LSA) campaign status noted if present
 
 **Structural observations:** Note anything surprising about the architecture that doesn't fit the above pattern. Some accounts have deliberate exceptions — document the reason, not just the exception.
 
@@ -213,7 +212,7 @@ Format each item for the running action list:
 
 ## Account Notes Update
 
-After the audit, update `account-notes/[account].md` with:
+After the audit, record the following in the account's own context store, which lives outside this skill:
 
 - Account structure summary (campaigns, ad groups, active/paused state)
 - Any permanent market-specific context discovered (e.g., practice area nuances, seasonality, client brief preferences)
