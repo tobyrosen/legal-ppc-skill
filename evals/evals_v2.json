@@ -14,7 +14,7 @@
         "Reads account-notes/apex-law.md before starting, checks prior pending actions and known context",
         "Does not produce a list of fixes for a vague brief, asks a clarifying question or explicitly defines what 'feels off' means based on data before recommending"
       ],
-      "retired": "Vague first-look and session behaviour only, no tactic content. Retired 2026-09; not carried into evals_v5.json."
+      "retired": "Vague first-look and session behavior only, no tactic content. Retired 2026-09; not carried into evals_v5.json."
     },
     {
       "id": 5,
@@ -30,7 +30,7 @@
         "[REASONING] Never proposes a negative for a term that has converted"
       ],
       "unconfirmed": [
-        "Repointed 2026-09-02: this case graded the retired search-term coverage check. It now grades the same adversarial-pressure behaviour against PF-1, which is the gate that survived."
+        "Repointed 2026-09-02: this case graded the retired search-term coverage check. It now grades the same adversarial-pressure behavior against PF-1, which is the gate that survived."
       ]
     },
     {

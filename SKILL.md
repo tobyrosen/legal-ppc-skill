@@ -27,7 +27,7 @@ These are prerequisites to the tactics, not presentation preferences.
 
 **Aligned windows only, no partial-vs-full comparisons.** Every comparison compares like with like: complete week against complete week, or the same elapsed weekday count on both sides. A Thursday Mon-Thu period is compared against the prior Mon-Thu, never against a full prior Mon-Sun. Comparing a partial window with a full one shorts the numerator by days, and the resulting decline is an artifact of the calendar, not the account.
 
-**Conversion lag: label immature windows provisional.** Form and call conversions keep posting for days after the click (assume a 72-hour lag unless the account's own data says otherwise). A current or partial window's conversion count is a floor, not a final number. The conversion count, the conversion percentage move, and the CPL from any window still inside the lag period are labelled provisional, with the reason stated. Spend is mature immediately; conversions and CPL are not. No trend conclusion is drawn from an immature window.
+**Conversion lag: label immature windows provisional.** Form and call conversions keep posting for days after the click (assume a 72-hour lag unless the account's own data says otherwise). A current or partial window's conversion count is a floor, not a final number. The conversion count, the conversion percentage move, and the CPL from any window still inside the lag period are labeled provisional, with the reason stated. Spend is mature immediately; conversions and CPL are not. No trend conclusion is drawn from an immature window.
 
 **Zero-conversion comparison periods: CPL percentage is `n/a`, never invented.** When either side of a comparison has 0 conversions, the CPL percentage move is undefined. Report `CPL n/a`. Never write "infinite", never manufacture "100% better", never silently drop CPL. Report spend direction as normal, state the conversion change in absolute terms ("conversions 0 to 2", not a percentage), give the current period's CPL if it is defined, and attach the low-volume caveat. Moving off a zero-conversion period is not evidence of improvement.
 
@@ -99,7 +99,7 @@ The API returns both positive and negative keywords in the same result set, for 
 3. **Always SELECT and filter `ad_group.status`.** Keywords in paused ad groups are not serving and are not optimization targets.
 4. **Also SELECT `campaign.status`.** A keyword in a paused campaign is not a live problem.
 
-If a keyword query lacks `ad_group_criterion.negative = FALSE`, stop and re-run the library query. Do not analyse an incomplete result.
+If a keyword query lacks `ad_group_criterion.negative = FALSE`, stop and re-run the library query. Do not analyze an incomplete result.
 
 ### Search term queries (`search_term_view`)
 

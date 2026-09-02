@@ -16,7 +16,7 @@ These are diagnostic frameworks, not flowcharts. They guide judgment. They don't
 - **Operator version:** reads the account's recorded context at session start, so it carries account history. The operating steps for that live outside this skill.
 - **Public version**: reads skill reference files only. No historical context. No session logging.
 
-Sections marked _[operator version]_ describe behaviour that applies only where recorded account context exists.
+Sections marked _[operator version]_ describe behavior that applies only where recorded account context exists.
 
 ---
 
@@ -730,7 +730,7 @@ Read change history for bid strategy changes. Count the days since the last chan
 Look at 30-day conversion count per campaign (GAQL 2.3).
 
 - **tCPA running below the account's reliability floor**, which is volume-dependent judgment rather than a fixed count: insufficient. The algorithm cannot learn effectively. Recommendation: switch to Maximize Conversions (no tCPA target) until volume builds. Maximize Conversions is more forgiving at low volume because it's optimizing direction rather than a specific target.
-- **Maximize Conversions still below the account's reliability floor**: even this strategy struggles. Where average CPC is also high against the campaign's own trailing 30-day median, route to PB-08: switch to Maximize Clicks with a CPC cap to buy volume and rebuild conversion signal while capping runaway auctions, with a 3 to 4 week revisit and conversion rate watched, because Max Clicks optimises for clicks. Enhanced CPC and manual CPC are not the low-volume fallback; enhanced CPC does not appear in the bidding hierarchy at all.
+- **Maximize Conversions still below the account's reliability floor**: even this strategy struggles. Where average CPC is also high against the campaign's own trailing 30-day median, route to PB-08: switch to Maximize Clicks with a CPC cap to buy volume and rebuild conversion signal while capping runaway auctions, with a 3 to 4 week revisit and conversion rate watched, because Max Clicks optimizes for clicks. Enhanced CPC and manual CPC are not the low-volume fallback; enhanced CPC does not appear in the bidding hierarchy at all.
 
 ---
 

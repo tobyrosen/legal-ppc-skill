@@ -178,13 +178,13 @@
       "id": 301,
       "category": "card_format",
       "prompt": "Account westhollow (fictional). Two findings this check: (1) a red flag -- primary conversion action 'Contact form lead' on campaign 'Westhollow - Custody' has fired 0 times in 21 days against a 30-day prior average of 6/week, with unchanged click volume (tracking-break red flag). Silence is scoped to Custody; Divorce primaries are firing. (2) a PB-01 budget-lost pattern on 'Westhollow - Divorce' with all gates green on that campaign (budget-lost IS 28% for 2 weeks, converting at target, $5,900/30d, no recent budget/bid change, Divorce primaries firing). Produce the walk card for this account.",
-      "expected_output": "RED FLAGS block appears first, naming the conversion-silence break on 'Westhollow - Custody'. Exactly one playbook line for PB-01 follows, after the red-flags block, under PLAYBOOKS:. Metrics are reported as separate labelled lines (or short clauses), not as a single comma-chained run of numbers.",
-      "trap": "Puts the playbook line before or interleaved with the red flag, omits the red-flags block entirely, writes the metrics as one long comma-separated run (e.g. '28%, 2 weeks, $5,900, 22 conv, $291 CPL, no changes' all in a single unlabelled clause), omits the playbook line entirely, or renders the accept-reject decision instead of handing it back.",
+      "expected_output": "RED FLAGS block appears first, naming the conversion-silence break on 'Westhollow - Custody'. Exactly one playbook line for PB-01 follows, after the red-flags block, under PLAYBOOKS:. Metrics are reported as separate labeled lines (or short clauses), not as a single comma-chained run of numbers.",
+      "trap": "Puts the playbook line before or interleaved with the red flag, omits the red-flags block entirely, writes the metrics as one long comma-separated run (e.g. '28%, 2 weeks, $5,900, 22 conv, $291 CPL, no changes' all in a single unlabeled clause), omits the playbook line entirely, or renders the accept-reject decision instead of handing it back.",
       "assertions": [
-        "[FORMAT] RED FLAGS block appears first and is clearly labelled",
+        "[FORMAT] RED FLAGS block appears first and is clearly labeled",
         "[FORMAT] The PB-01 playbook line appears after the RED FLAGS block, not before or mixed into it, under a PLAYBOOKS: header",
         "[FORMAT] Exactly one playbook line appears, and it is identified as PB-01",
-        "[FORMAT] Metrics are presented as labelled lines/clauses rather than a single unlabelled comma-chained run of numbers",
+        "[FORMAT] Metrics are presented as labeled lines/clauses rather than a single unlabeled comma-chained run of numbers",
         "[OUTPUT DISCIPLINE] The playbook line ends 'accept/reject' and does not characterize the account"
       ],
       "notes": "Card-format case: red-flags-first ordering plus the ban on comma-chained metric runs, using a genuine red flag paired with a genuine playbook trigger.",
@@ -195,7 +195,7 @@
       "category": "card_format",
       "prompt": "Account westhollow (fictional), no red flags this check ('RED FLAGS: none'). Four playbook patterns trigger with all gates green: PB-02 on 'Westhollow - Divorce' (rank-lost IS 44%, 2 weeks), PB-15 on 'Westhollow - Custody' (3 keywords all-BELOW_AVERAGE QS components, near-zero impressions, system_serving_status=ELIGIBLE), PB-20 on 'Westhollow - Display Probate' (no ad edit in 7 months, CTR down 19% over 3 months), and PB-29 on 'Westhollow - Brand' (30d CPL up 24% vs prior 30d, conversions within +/-10%, held for 2 consecutive checks). Produce the walk card.",
       "expected_output": "The card opens with a RED FLAGS block stating none (literal 'RED FLAGS: none' as the lead). Playbook lines sit under the PLAYBOOKS: group header. Exactly 3 of the 4 triggered playbook lines are carded (evidence tier first, then impact within tier), the 4th is left out of the card with 'surplus journaled: PB-nn' (or 'PLAYBOOKS: 4 triggered, 3 carded' plus that surplus line). No playbook line is phrased as a verdict, and no line is written as a comma-chained metric run.",
-      "trap": "Cards all 4 lines (exceeds the cap), omits the explicit 'RED FLAGS: none' statement as the lead, omits the PLAYBOOKS: group header, or writes any line as an unlabelled comma-chained metric dump instead of the fixed card-line grammar.",
+      "trap": "Cards all 4 lines (exceeds the cap), omits the explicit 'RED FLAGS: none' statement as the lead, omits the PLAYBOOKS: group header, or writes any line as an unlabeled comma-chained metric dump instead of the fixed card-line grammar.",
       "assertions": [
         "[FORMAT] The card opens with a RED FLAGS block, stating none (literal 'RED FLAGS: none' as the lead, not a later memo-style 'Red flags this check: None.')",
         "[FORMAT] Playbook lines sit under the literal group header PLAYBOOKS: (or 'PLAYBOOKS: 4 triggered, 3 carded')",
@@ -214,7 +214,7 @@
       "expected_output": "Reports spend direction, weekly-conversion direction, and 30-day CPL direction as three separate data points. Adds one playbook line: PB-34 hold, naming that the ramp is about three weeks old and the 30-day window has not yet absorbed it, with a review point set around four to six weeks from the raise. States that the 30-day CPL figure is immature relative to the ramp rather than a stable read, and points to the rising weekly-conversion trend as the leading indicator to watch instead.",
       "trap": "Fires a PB-29 CPL-creep line off the +60% 30-day figure and proposes decomposing CPC versus CVR, proposes cutting or holding down the budget, treats the 30-day CPL as a stable/current read, or characterizes the campaign as underperforming.",
       "assertions": [
-        "[PLAYBOOK-LABEL] Emits a labelled PB-34 card line (playbook PB-34 ... accept/reject)",
+        "[PLAYBOOK-LABEL] Emits a labeled PB-34 card line (playbook PB-34 ... accept/reject)",
         "[PLAYBOOK-SUBSTANCE] Holds: names the ramp as about three weeks old, and sets a review point around four to six weeks from the raise, with no immediate action",
         "[DO-NOT-MOVE] Does NOT add a PB-29 CPL-creep line, because the ramp gate (spend moved well outside +/-15%) is not satisfied",
         "[DO-NOT-MOVE] Does NOT propose decomposing CPC versus CVR while the ramp is live (a deferred 'after the ramp window' mention is compliant)",
@@ -290,7 +290,7 @@
       "expected_output": "Reports the flip as data: the rank-lost jump, the impression-share fall, and the spend direction, set against the established multi-week pattern. Adds one PB-39 line: hold, naming the contradiction that rank-lost rising while spend fell in the same week is internally inconsistent with a genuine shift, stating that one week is not a pattern on a sub-floor campaign, and setting re-read at the next check with an explicit expiry -- it becomes a real PB-01 or PB-02 trigger only if the flip persists through a second consecutive complete week.",
       "trap": "Proposes a bid or budget change (raising budget to 'chase' the rank loss, or cutting spend because impression share fell), treats the single week as confirmed and routes straight to PB-02, or omits naming the spend-direction contradiction that is the actual trigger condition for PB-39.",
       "assertions": [
-        "[PLAYBOOK-LABEL] Emits a labelled PB-39 card line (playbook PB-39 ... accept/reject)",
+        "[PLAYBOOK-LABEL] Emits a labeled PB-39 card line (playbook PB-39 ... accept/reject)",
         "[PLAYBOOK-SUBSTANCE] Reaches hold and re-read at the next check, with no immediate action",
         "[DO-NOT-MOVE] Does NOT propose any bid, budget, or targeting change off this single week's data",
         "[FALSE-FIRE] Does NOT route directly to PB-02 (rank-lost ceiling) or PB-01 based on one week's flip",

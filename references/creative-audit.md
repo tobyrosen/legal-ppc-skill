@@ -54,7 +54,7 @@ Use `analyze_image_assets` (and `download_image_asset` for manual confirmation) 
 
 The three bars below are `PROPOSED` as stated standards.
 
-- **On-brand:** colours, logo presence and treatment, and overall look match the firm's brand. A wrong palette or a stretched logo reads as low-trust.
+- **On-brand:** colors, logo presence and treatment, and overall look match the firm's brand. A wrong palette or a stretched logo reads as low-trust.
 - **Legible:** text on the image is readable at the size it serves, not clipped by safe-area cropping, not low-contrast. PMax crops to many aspect ratios, so text near the edge fails.
 - **Message-matched to the asset group's intent:** the image matches the practice area it serves. A probate asset group running a generic stock image of a young couple is a mismatch that depresses relevance and trust. Match the visual to the family, immigration, or elder intent the group targets.
 

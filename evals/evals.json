@@ -12,7 +12,7 @@
         "Findings are prioritized by impact (P1/P2/P3 or equivalent), not a flat list",
         "Session log is written or explicitly referenced as the next step"
       ],
-      "retired": "Session-log and full-review behaviour only, no tactic content. Retired 2026-09 with the drift correction; not carried into evals_v5.json."
+      "retired": "Session-log and full-review behavior only, no tactic content. Retired 2026-09 with the drift correction; not carried into evals_v5.json."
     },
     {
       "id": 2,

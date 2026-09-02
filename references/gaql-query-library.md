@@ -895,7 +895,7 @@ Structure queries: no date segmentation, no metrics.
 3. **`campaign.url_expansion_opt_out` is gone.** Final URL expansion is read from
    `campaign.asset_automation_settings`.
 
-Two more API behaviours to expect in the results:
+Two more API behaviors to expect in the results:
 
 - **Boolean fields are omitted, not returned as `false`.** `campaign_conversion_goal.biddable` and
   `customer_conversion_goal.biddable` are absent when not true. Absence is the negative case, not
@@ -1217,7 +1217,7 @@ FROM custom_conversion_goal
    someone select one.
 
 The biddable map names _categories_, not actions. Translate it into actions by joining the biddable
-category and origin pairs against the §14.6 result: the actions the campaign can optimise toward
+category and origin pairs against the §14.6 result: the actions the campaign can optimize toward
 are the ENABLED, `include_in_conversions_metric = true` actions whose category and origin are
 biddable. That join is the check, and it is where a page-view or content-download category
 quietly widens the goal set (§3.2).
