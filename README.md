@@ -48,7 +48,7 @@ The public skill ships the methodology, query library, config baseline, and play
 
 Operator mode configuration: set `PPC_JOURNAL_ROOT` to the directory holding the journal and rendered views, and `PPC_JOURNAL_TZ` to your IANA timezone. With no `PPC_JOURNAL_ROOT` set, the data root is this repo and journals are written to `./journal`. Anyone holding real account data should point `PPC_JOURNAL_ROOT` at a private directory outside this repo.
 
-Journal commands: `append`, `due`, `render`, `validate`, `stats`, and `migrate`. The entry schema is v2; a journal written under v1 carries retired `platform` values (`meta`, `callrail`, `ga4`, `hubspot`). `journal.py migrate <slug>` (or `--all`) rewrites those in place after copying the file to `<slug>.jsonl.bak`, and `journal.py validate` names the command with a count per value rather than failing on the enum. See `NOTATION.md` §3a. Entry ids and "today" are computed in that zone.
+Journal commands: `append`, `due`, `render`, `validate`, `stats`, and `migrate`. The entry schema is v2; a journal written under v1 carries retired `platform` values (`meta`, `callrail`, `ga4`, `hubspot`). `journal.py migrate <slug>` (or `--all`) rewrites those four in place after copying the file to `<slug>.jsonl.bak`, and `journal.py validate` names the command with a count per value rather than failing on the enum. Any other value outside the enum is left alone and stays a plain validation error. See `NOTATION.md` §3a. Entry ids and "today" are computed in that zone.
 
 ---
 

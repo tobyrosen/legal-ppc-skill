@@ -73,15 +73,18 @@ One JSON object per line. Required: `id`, `ts`, `account`, `platform`, `type`, `
 `schema.json` is **v2**. The v1 `platform` values (`meta`, `callrail`, `ga4`, `hubspot`) are no
 longer accepted, and they are never coming back to the enum.
 
-`journal.py migrate <slug>` (or `--all`) carries an old journal forward in place: `callrail` to
-`call-tracking`, `ga4` to `analytics`, `hubspot` to `crm`, and any other value outside the enum
-to `other`. It copies the journal to `<slug>.jsonl.bak` before writing, and it does nothing at
-all to a journal that has no legacy values.
+`journal.py migrate <slug>` (or `--all`) carries an old journal forward in place, and it moves
+only the four known v1 values: `meta` to `other`, `callrail` to `call-tracking`, `ga4` to
+`analytics`, `hubspot` to `crm`. Any other value outside the enum is left exactly as it is. An
+unrecognized platform is a mistake to look at, not something to rewrite silently, so validate
+keeps reporting it as an ordinary enum error. Migrate copies the journal to `<slug>.jsonl.bak`
+before writing, and it does nothing at all to a journal that has no legacy values.
 
 Because append, render and validate all read the whole file, one v1 record would otherwise block
 every operation on that account. So `journal.py validate` does not fail with a bare enum error on
-these: it reports `legacy platform values found: run journal.py migrate` with a count per value,
-and the fix is one command.
+the four known values: it reports `legacy platform values found: run journal.py migrate` with a
+count per value, and the fix is one command. That hint is never offered for a value migrate
+cannot handle, which fails on the enum like any other bad field.
 
 ## 4. The outcome loop (why this beats prose notes)
 

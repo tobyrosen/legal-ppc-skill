@@ -59,9 +59,15 @@ TYPE_ORDER = ("obs", "flag", "decision", "change", "outcome", "rule", "context")
 VERDICT_ORDER = ("met", "not_met", "mixed", "unclear")
 
 # Schema v1 platform values. They are not valid under schema v2 and are kept
-# here only so `migrate` can carry an old journal forward.
-LEGACY_PLATFORMS = {"callrail": "call-tracking", "ga4": "analytics", "hubspot": "crm"}
-LEGACY_PLATFORM_FALLBACK = "other"
+# here only so `migrate` can carry an old journal forward. This map is the
+# complete set migrate will touch: any other out-of-enum value is a mistake to
+# look at, not something to rewrite silently.
+LEGACY_PLATFORMS = {
+    "meta": "other",
+    "callrail": "call-tracking",
+    "ga4": "analytics",
+    "hubspot": "crm",
+}
 
 
 class JournalError(Exception):
@@ -278,7 +284,11 @@ def validate_records(
         prefix = f"{path}:line {line_number}"
         entry_platform = entry.get("platform")
         is_legacy_platform = False
-        if isinstance(entry_platform, str) and entry_platform not in platforms:
+        if (
+            isinstance(entry_platform, str)
+            and entry_platform not in platforms
+            and entry_platform in LEGACY_PLATFORMS
+        ):
             is_legacy_platform = True
             legacy_platforms[entry_platform] += 1
         for error in _schema_errors(entry, schema):
@@ -386,8 +396,10 @@ def validate_paths(paths: Iterable[Path]) -> tuple[list[str], int]:
 def migrate_journal(path: Path) -> Counter[str]:
     """Rewrite schema v1 platform values in place, writing <name>.bak first.
 
-    Returns a count per rewrite, keyed 'old -> new'. A journal with nothing to
-    migrate is left untouched and no backup is written.
+    Only the values named in LEGACY_PLATFORMS are rewritten. Any other value
+    outside the enum is left alone so that validate keeps reporting it as an
+    ordinary schema error. Returns a count per rewrite, keyed 'old -> new'. A
+    journal with nothing to migrate is left untouched and no backup is written.
     """
     records, parse_errors = read_journal(path)
     if parse_errors:
@@ -398,7 +410,9 @@ def migrate_journal(path: Path) -> Counter[str]:
         platform = entry.get("platform")
         if not isinstance(platform, str) or platform in platforms:
             continue
-        replacement = LEGACY_PLATFORMS.get(platform, LEGACY_PLATFORM_FALLBACK)
+        replacement = LEGACY_PLATFORMS.get(platform)
+        if replacement is None:
+            continue
         entry["platform"] = replacement
         changed[f"{platform} -> {replacement}"] += 1
     if not changed:

@@ -237,6 +237,48 @@ class JournalTests(unittest.TestCase):
             ["call-tracking", "analytics", "crm", "other", "google"],
         )
 
+    def test_unknown_platform_stays_a_plain_validation_error(self):
+        """migrate handles the four v1 values only; anything else is a real error."""
+        path = journal.DATA_ROOT / "journal" / "example-family-law.jsonl"
+        entries = [
+            self.entry(id="example-family-law-20260701-01", platform="sms"),
+            self.entry(id="example-family-law-20260701-02", platform="callrail"),
+            self.entry(id="example-family-law-20260701-03", platform="google"),
+        ]
+        path.write_text(
+            "".join(json.dumps(entry, sort_keys=True) + "\n" for entry in entries),
+            encoding="utf-8",
+        )
+
+        records, _ = journal.read_journal(path)
+        errors = journal.validate_records(path, records)
+        self.assertTrue(
+            any("$.platform: must be one of" in error for error in errors),
+            "an unknown platform keeps its ordinary enum error",
+        )
+        hints = [error for error in errors if "run journal.py migrate" in error]
+        self.assertEqual(len(hints), 1)
+        self.assertIn("callrail=1", hints[0])
+        self.assertNotIn("sms", hints[0])
+
+        changed = journal.migrate_journal(path)
+        self.assertEqual(dict(changed), {"callrail -> call-tracking": 1})
+
+        records, _ = journal.read_journal(path)
+        self.assertEqual(
+            [entry["platform"] for entry, _ in records],
+            ["sms", "call-tracking", "google"],
+        )
+        remaining = journal.validate_records(path, records)
+        self.assertTrue(
+            any("$.platform: must be one of" in error for error in remaining),
+            "migrate must not silently make the unknown value valid",
+        )
+        self.assertFalse(
+            any("run journal.py migrate" in error for error in remaining),
+            "no migrate hint once the known values are gone",
+        )
+
     def test_migrate_leaves_a_clean_journal_untouched(self):
         journal.append_entry("example-family-law", self.entry())
         path = journal.DATA_ROOT / "journal" / "example-family-law.jsonl"
