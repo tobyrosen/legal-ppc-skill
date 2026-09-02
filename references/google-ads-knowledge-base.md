@@ -14,11 +14,11 @@ Understanding this is not optional. It is the lens through which every decision 
 
 Google makes money when you spend money. Its recommendations are designed to increase spend, not improve the quality of that spend. This doesn't mean every recommendation is wrong — some optimization features and suggestions do genuinely improve performance — but the fundamental objectives are opposed, and Google's ability to understand the specific goals of a law firm is far more limited than most people assume. In legal accounts this conflict is especially pronounced because:
 
-- **Legal keywords are among the most expensive in Google Ads.** Competitive family law terms in major markets can run into the tens of dollars per click, and elder abuse higher still. (unconfirmed as a stated range.) Waste is catastrophic, not annoying.
+- **Legal keywords are among the most expensive in Google Ads.** No cost-per-click figure or band is stated: judge a campaign's cost per click against its own trailing median. Waste is catastrophic, not annoying.
 - **Google's automation optimizes toward conversions as defined in the account.** If conversion tracking is misconfigured — and it frequently is in inherited accounts — smart bidding is optimizing toward the wrong thing.
-- **Google's AI recommendations frequently work against a law firm's interest.** (unconfirmed as a universal claim.) Broad match expansion, auto-applied recommendations, and Performance Max are designed for accounts with high conversion volume and diverse catalogs. Law firms have neither. Judge each recommendation against the account rather than accepting or rejecting the whole class.
+- **Google's AI recommendations frequently work against a law firm's interest.** Broad match expansion, auto-applied recommendations, and Performance Max are designed for accounts with high conversion volume and diverse catalogs. Law firms have neither. Judge each recommendation against the account rather than accepting or rejecting the whole class.
 
-The change history of an inherited account tells you immediately how much the previous manager understood this. Managers who follow Google's recommendations leave a trail of auto-applied changes, broad match experiments, and PMax campaigns. Read that pattern as a prompt to check the underlying configuration, not as a verdict on its own. (unconfirmed)
+The change history of an inherited account tells you immediately how much the previous manager understood this. Managers who follow Google's recommendations leave a trail of auto-applied changes, broad match experiments, and PMax campaigns. Read that pattern as a prompt to check the underlying configuration, not as a verdict on the prior manager.
 
 ---
 
@@ -26,9 +26,9 @@ The change history of an inherited account tells you immediately how much the pr
 
 ### Buyer Psychology
 
-Legal clients are generally not in a buying mindset; they are in a crisis mindset. (unconfirmed) There are practice areas where clients arrive ready to engage immediately, but those firms are the exception. For most legal clients, the decision to hire an attorney is slow, emotional, and non-linear. Multiple touchpoints are almost always involved before someone picks up the phone — this is the rule, not the exception, any time a client isn't making an immediate purchase decision.
+Legal clients are generally not in a buying mindset; they are in a crisis mindset. That is the operating lens and it is unconfirmed; the part that binds is the operator's not-waste list. There are practice areas where clients arrive ready to engage immediately, but those firms are the exception. For most legal clients, the decision to hire an attorney is slow, emotional, and non-linear. Multiple touchpoints are almost always involved before someone picks up the phone. This is the rule, not the exception, any time a client isn't making an immediate purchase decision.
 
-Ad copy that communicates authority and empathy is expected to outperform copy that communicates features or price. (unconfirmed: no measured copy test on these accounts.) Authority in legal advertising is best established through demonstrated expertise — clear, specific knowledge of the client's situation — not through credentials, years in practice, or badges. Clients respond to evidence that you understand their problem, not to a list of qualifications.
+The one creative lever measured on these accounts is intent-matched and near-me headlines, which closed a long-standing cost-per-acquisition gap on their own. That authority and empathy copy outperforms features or price copy is a general expectation, unmeasured here. Authority in legal advertising is best established through demonstrated expertise, clear and specific knowledge of the client's situation, not through credentials, years in practice, or badges. Clients respond to evidence that you understand their problem, not to a list of qualifications.
 
 ### Search Intent Complexity
 
@@ -36,19 +36,21 @@ Legal search intent is layered and often misread. Someone searching "how to get 
 
 **What looks like waste in legal but often isn't:**
 
-Informational and research queries in legal carry higher buyer intent than they do in most verticals. (unconfirmed as stated; the operator's not-waste list confirms the specific terms it names.) The research phase precedes hiring an attorney — it does not substitute for it. Someone searching "how much does a divorce cost in [state]" or "how long does a green card take" has a real problem, is actively researching it, and may be a week away from calling. These are buyers in the early stage of their decision process, not DIY researchers who will never hire anyone.
+Informational and research queries in legal carry higher buyer intent than they do in most verticals. That is unconfirmed as a vertical-wide statement; what is confirmed is the operator's not-waste list for the specific terms it names. The research phase precedes hiring an attorney: it does not substitute for it. Someone searching "how much does a divorce cost in [state]" or "how long does a green card take" has a real problem, is actively researching it, and may be a week away from calling. These are buyers in the early stage of their decision process, not DIY researchers who will never hire anyone.
 
 Specific query patterns that should NOT be flagged as waste by default:
 
-- **Cost and fee queries** ("how much does X cost", "attorney fees for X"): comparison shopping before hiring. (unconfirmed)
-- **Procedural questions** ("can I file for X", "how do I start X"): people determining whether they have a case and whether they need an attorney. (unconfirmed)
-- **Outcome and liability queries** ("who pays for X", "what happens if X"): people in active decision mode. Keep unless confirmed non-converting over substantial volume. (unconfirmed)
+Each of these is a candidate to check against the account's own conversion data. None of them is a category that is waste or not waste by default.
+
+- **Cost and fee queries** ("how much does X cost", "attorney fees for X"): comparison shopping before hiring.
+- **Procedural questions** ("can I file for X", "how do I start X"): people determining whether they have a case and whether they need an attorney.
+- **Outcome and liability queries** ("who pays for X", "what happens if X"): people in active decision mode. Keep unless confirmed non-converting over substantial volume.
 
 The instinct to block research queries because they're not transactional is correct in e-commerce and wrong in legal. Apply it cautiously.
 
 **Lead magnets and e-book downloads as real leads:** In legal, free guides, e-books, and checklists are genuine lead capture mechanisms. A person who downloads a divorce guide and submits their contact information has self-identified as someone with a divorce problem — they are a lead, not a content consumer. If a client uses resource downloads as primary conversions in an account, this is intentional strategy. Do not suggest moving them to secondary conversions or question their value without strong evidence they are not being followed up on.
 
-**Practice-area-dependent intent:** Relevance is practice-area-specific. A query that is unambiguously waste for one firm is often a core lead source for another. A guardianship query is waste for a firm that only takes divorce work; it is a core lead source for an elder practice. Before flagging a term category as waste, verify that the firm does not handle that case type, and check it against the operator's not-waste list. (unconfirmed) If the firm's practice list is unknown, ask before recommending a negative.
+**Practice-area-dependent intent:** Relevance is practice-area-specific. A query that is unambiguously waste for one firm is often a core lead source for another. A guardianship query is waste for a firm that only takes divorce work; it is a core lead source for an elder practice. Before flagging a term category as waste, verify that the firm does not handle that case type, and check it against the operator's not-waste list. If the firm's practice list is unknown, ask before recommending a negative.
 
 ### Geography and Topic as Strategy
 
@@ -66,9 +68,9 @@ Google increasingly pushes consolidation. Resist it. When you merge a divorce ca
 
 **Brand must be isolated.** Brand and non-brand traffic have fundamentally different economics and different conversion paths. Mixing them corrupts CPL data for non-brand keywords. In legal, branded search volume is often low enough that it barely affects account-wide metrics — but when mixed with non-brand, it flatters performance in a way that masks what's actually happening.
 
-**Brand campaign pause risk — cannibalization.** Pausing a brand campaign does not simply save its spend. When brand campaigns go dark, competitors bidding on your brand terms fill the vacuum — they appear at the top of searches for your firm's name. Users who would have clicked your branded ad now see a competitor's ad first. The result: branded query traffic falls, and non-brand CPL rises across the account as the competitor captures bottom-of-funnel traffic you were previously protecting cheaply. This is the cannibalization mechanism. The net effect of pausing brand is often worse economics overall, even when the brand CPA looks high in isolation. Before recommending a pause, verify: (1) is the $CPA based on reliable conversion volume (15-20+ conversions over the period), and (2) what is competitor presence on branded queries? A high brand CPA with low conversion volume and active competitor bidding is usually better managed by reducing brand spend, not eliminating it.
+**Brand campaign pause risk: cannibalization.** Pausing a brand campaign does not simply save its spend. When brand campaigns go dark, competitors bidding on your brand terms fill the vacuum: they appear at the top of searches for your firm's name. Users who would have clicked your branded ad now see a competitor's ad first. The result: branded query traffic falls, and non-brand CPL rises across the account as the competitor captures bottom-of-funnel traffic you were previously protecting cheaply. This is the cannibalization mechanism. The net effect of pausing brand is often worse economics overall, even when the brand CPA looks high in isolation. Before recommending a pause, verify: (1) is the CPA based on reliable conversion volume for that account, the floor being volume-dependent judgment rather than a fixed count, and (2) what is competitor presence on branded queries? A high brand CPA with low conversion volume and active competitor bidding is usually better managed by reducing brand spend, not eliminating it.
 
-**Network settings:** Search network only is the default. That search partners and the display network deliver inferior traffic for legal at the same cost is a general expectation, not a measured result on these accounts. (unconfirmed) Include them only with specific justification and close monitoring, and segment before deciding (PB-26).
+**Network settings:** Search network only is the default. That search partners and the display network deliver inferior traffic for legal at the same cost is a general expectation, not a measured result on these accounts. Search Partners being enabled is flagged as atypical unless a note on the account or campaign explains it. Segment before any exclusion decision (PB-26).
 
 **Competitor targeting:** Bidding on a competitor's brand name is a legitimate strategy in legal PPC — not an oversight. A firm may deliberately appear on searches for a specific rival to intercept comparison shoppers or suppress a competitor's budget. Before flagging competitor brand clicks as waste, distinguish:
 
@@ -77,25 +79,25 @@ Google increasingly pushes consolidation. Resist it. When you merge a divorce ca
 
 When competitor brand clicks appear in search term data, check account notes for context before drawing conclusions. If no notes exist, ask whether these clicks are intentional before recommending them as negatives.
 
-**Ad rotation:** Never use "optimize." Google's optimize setting identifies the best-performing ad early and deprioritizes everything else, killing relearning. Google tests ad combinations in the first 2 to 12 weeks and then largely stops re-evaluating. (unconfirmed) New variants never get enough data to prove themselves. Rotate evenly ("Do Not Optimize") and make decisions based on actual data — especially important in low-traffic accounts where optimization can kick in before you have statistically relevant data.
+**Ad rotation:** Never use "optimize." Google's optimize setting identifies the best-performing ad early and deprioritizes everything else, killing relearning. That Google tests ad combinations in the first 2 to 12 weeks and then largely stops re-evaluating is unconfirmed. What is our practice: rotate evenly ("Do Not Optimize") and make decisions on actual data. This matters most in low-traffic accounts, where optimization can kick in before there is enough data to mean anything.
 
 ---
 
 ## Match Type Philosophy
 
-Broad match is not a tool for legal PPC. The argument for broad match — that it captures intent signals beyond exact keyword matching — falls apart in legal because the cost of an irrelevant click is too high. Legal search is full of queries that look adjacent but represent entirely different intent: "divorce lawyer" and "divorce process" are not the same. Broad match cannot reliably distinguish them, and the cost of the mistake is high. (unconfirmed as a stated CPC range.)
+Broad match is not a tool for legal PPC. The argument for broad match, that it captures intent signals beyond exact keyword matching, falls apart in legal because the cost of an irrelevant click is too high. Legal search is full of queries that look adjacent but represent entirely different intent: "divorce lawyer" and "divorce process" are not the same. Broad match cannot reliably distinguish them, and the cost of the mistake is high. No cost-per-click range is stated.
 
-Phrase and exact match are the defaults, roughly 99% of the time. (unconfirmed as a stated proportion.) Broad is not banned: it is tested deliberately, in an isolated structure, with the remediation path in PB-11 ready.
+Phrase and exact match are the defaults. Broad is not banned: it is tested deliberately, in an isolated structure, with the remediation path in PB-11 ready.
 
 Broad match is only tested in rare cases, often in SKAG (single keyword ad group) structure to isolate its behavior.
 
-**Negative keyword structure:** An account-level shared negative keyword list is a useful piece of infrastructure where the account's own search-term data supports one. (unconfirmed as essential; the absence of a shared list is not a red flag on its own.) They block irrelevant traffic categories at scale — job seekers, people looking for DIY legal resources, people in the wrong geography. The hierarchy follows scope of the exclusion:
+**Negative keyword structure:** An account-level shared negative keyword list is useful where the account's own search-term data supports one. Its absence is not a red flag on its own. Such a list blocks irrelevant traffic categories at scale: job seekers, people looking for DIY legal resources, people in the wrong geography. The hierarchy follows scope of the exclusion:
 
 - Irrelevant to the entire account → account-level negative
 - Irrelevant to a campaign → campaign-level negative
 - Irrelevant to an ad group → ad group-level negative
 
-When reviewing search terms, high spend + high clicks + irrelevant = priority exclusion. Relevance is judgment-based, not metric-based — it requires knowing what the firm actually does and what kinds of clients they serve.
+Every candidate on such a list comes from the account's own search terms, checked against the not-waste list and the term's own conversion record. The categories in `references/negative-keyword-library.md` seed a new campaign; they are never applied to a live account wholesale. When reviewing search terms, high spend + high clicks + irrelevant = priority exclusion. Relevance is judgment-based, not metric-based: it requires knowing what the firm actually does and what kinds of clients they serve.
 
 ---
 
@@ -105,7 +107,7 @@ All recommended bidding strategies rely on properly configured conversion tracki
 
 **The recommended bidding hierarchy:**
 
-The hierarchy below is unconfirmed as a fixed ordering. The target itself always comes from firm economics (PB-05), never from the account's own trailing CPA.
+The ordering below is unconfirmed as a fixed hierarchy. The one measured rung is Maximize Clicks with a CPC cap for a sub-floor campaign carrying a high average CPC (PB-08). The target itself always comes from firm economics (PB-05), never from the account's own trailing CPA.
 
 1. **Target CPA.** Primary where conversion data supports it. Set from lead value, close rate, and case value.
 2. **Maximize Conversions.** The starting point for a new campaign, or where no economics-derived target exists yet. Good for building conversion data before moving to tCPA.
@@ -113,16 +115,16 @@ The hierarchy below is unconfirmed as a fixed ordering. The target itself always
 4. **Maximize Clicks with a CPC cap.** The move for a campaign already on Maximize Conversions, below the reliability floor, and carrying a high average CPC: buy volume and rebuild conversion signal while capping runaway auctions (PB-08).
 5. **Manual CPC.** Only in a genuine crisis. Almost never appropriate for an active account.
 
-Enhanced CPC is not a recommended fallback here: it is unconfirmed as a low-volume tool on these accounts, and the sub-floor case routes to Maximize Clicks with a cap instead.
+Enhanced CPC does not appear in the hierarchy. The sub-floor case routes to Maximize Clicks with a cap.
 
 **Bidding principles:**
 
-- Smart bidding requires a learning phase of at least 14 days. (unconfirmed) Do not change bid strategy, budgets, or targeting during that window: each change resets the clock.
+- Smart bidding requires a learning phase of at least 14 days (`PROPOSED`: taken from platform guidance, never verified against current documentation). Do not change bid strategy, budgets, or targeting during that window: each change resets the clock.
 - Smart bidding on low-conversion-volume accounts will oscillate and overspend during learning phases. Ensure there's sufficient data before switching to tCPA.
 - The pattern in mismanaged inherited accounts: smart bidding turned on without data → bad performance → repeated manual adjustments → algorithm never learns → continued poor performance → more adjustments. Breaking this cycle requires patience.
-- Position-based bidding (target impression share) is treated as a vanity metric here. Being first does not guarantee a better conversion rate, and position 2 or 3 can outperform the top slot. (unconfirmed)
+- Target impression share is not used on these accounts. Treat a position-based bidding strategy as a deviation from the baseline, not as a proven-inferior strategy: no position data has ever been read on any account here.
 
-**Conversion volume and CPA reliability:** CPA figures derived from fewer than 15–20 conversions in a given period are directional, not decisive. In legal accounts, where monthly conversion volume per campaign is often in the single digits, a single outlier conversion, or its absence, can swing CPA substantially (unconfirmed as a stated percentage). Always note the conversion count alongside any CPA figure — "$188 CPA based on 23 conversions" is meaningful; "$322 CPA based on 3 conversions" is noise. Flag low-volume CPAs explicitly rather than presenting them with the same confidence as high-volume data. When a tCPA campaign reports CPA near its target on low volume, that's expected behavior — the algorithm is on target, but the target itself may need evaluation over a longer window.
+**Conversion volume and CPA reliability:** a CPA figure derived from too few conversions is directional, not decisive, and how few is too few is a judgment against the account's own volume rather than a fixed number. In legal accounts, where monthly conversion volume per campaign is often in the single digits, a single outlier conversion, or its absence, can swing CPA substantially. Always note the conversion count alongside any CPA figure. "$188 CPA based on 23 conversions" is meaningful; "$322 CPA based on 3 conversions" is noise. Flag low-volume CPAs explicitly rather than presenting them with the same confidence as high-volume data. When a tCPA campaign reports CPA near its target on low volume, that's expected behavior: the algorithm is on target, but the target itself may need evaluation over a longer window.
 
 **Performance Max is avoided for law firms by default.** It is an autonomous system controlling placements, creative, and bidding at once. Without substantial conversion data and deliberate training it defaults to the easiest conversions, typically branded queries, rather than new clients. Where a PMax campaign is live by operator decision, PB-32 governs it: brand exclusions, goal correction, cap tracking, and no performance verdict inside day 14.
 
@@ -200,7 +202,7 @@ A well-run legal account has:
 - Negatives placed at the narrowest sufficient scope, checked against the operator's not-waste list
 - Brand isolated from non-brand
 - Search network only, no display bleed
-- Active human management in change history — auto-applied recommendations used selectively and strategically, not as a default
+- Active human management in change history, with auto-apply off and any deliberately enabled recommendation type recorded by name
 - Conversion tracking configured appropriately for the firm's intake process and aligned with actual business objectives
 - Smart bidding only where conversion volume supports it, with adequate learning windows respected
 - Ad rotation set to "Do Not Optimize"

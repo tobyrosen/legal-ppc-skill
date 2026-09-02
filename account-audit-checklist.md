@@ -173,7 +173,7 @@ _GAQL: 10.1 (geographic — targeting view), 10.2 (user location — actual phys
 
 _GAQL: 11.1 (budget utilization), 11.2 (shared bidding strategies), 2.3 (conversion volume by campaign)_
 
-- [ ] Campaigns with smart bidding (tCPA, Maximize Conversions) have at least 15–20 conversions/month — if not, flag bid strategy mismatch
+- [ ] Campaigns with smart bidding (tCPA, Maximize Conversions) clear the reliability floor for their own volume, which is judgment rather than a fixed count. If not, flag bid strategy mismatch
 - [ ] tCPA targets are realistic — not set significantly below the account's historical CPA (causes oscillation)
 - [ ] No shared bidding strategies pooling campaigns with different economics (brand + non-brand, different practice areas)
 - [ ] Budget-constrained campaigns (`search_budget_lost_impression_share` high) reviewed — determine whether more budget is warranted given CPA

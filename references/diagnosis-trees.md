@@ -55,11 +55,12 @@ Flag if the primary conversion action (`include_in_conversions_metric = TRUE`) i
 An ebook or guide download is none of these. Do not route it to the soft-action branch.
 
 Flag a suspected duplicate only with event-level proof that two primaries fire on the same lead.
-Identical settings, matching totals, or similar decimal tails are a prompt to match the actions per
-lead across systems, never grounds to demote on their own (PB-23).
+Duplicate detection is done at the lead level. Identical settings, matching totals, and similar
+decimal tails are at most a prompt to go and match the actions per lead across systems. They are
+never evidence and never grounds to demote (PB-23).
 
 **Is conversion volume plausible given clicks?**
-If there are 500 clicks in 30 days but 0 conversions, tracking is the leading hypothesis: even low-converting legal accounts convert at some rate with that much traffic. (unconfirmed threshold.) Check the sibling primaries before calling it a break, and note that a call tracker forwarding only qualified leads can produce a legitimate zero.
+If there are 500 clicks in 30 days but 0 conversions, tracking is the leading hypothesis: even low-converting legal accounts convert at some rate with that much traffic. (`PROPOSED` click count.) Check the sibling primaries before calling it a break, and note that a call tracker forwarding only qualified leads can produce a legitimate zero.
 
 > ⚠️ **BLIND SPOT — Tag firing cannot be verified via API**
 > The API shows conversion action configuration. It cannot confirm whether the tag is actually firing on the correct page events.
@@ -216,8 +217,8 @@ Pull: GAQL 3.3 or 3.4 (keyword performance) for the affected campaigns. Look at 
 
 Pull: GAQL 1.1 (bid strategy by campaign), GAQL 2.3 (conversion volume by campaign)
 
-- **tCPA campaigns with fewer than ~15–20 conversions/month**: the algorithm lacks sufficient data. It will oscillate, overspend in learning phases, and produce inconsistent CPA. See Sub-tree D.
-- **tCPA target set below the account's historical CPA**: this is a common mistake. The target is aspirational rather than achievable, and the algorithm oscillates trying to hit it. Compare tCPA target against actual 90-day CPA from GAQL 6.2.
+- **tCPA campaigns running below the account's reliability floor**, which is volume-dependent judgment rather than a fixed count: the algorithm lacks sufficient data. It will oscillate, overspend in learning phases, and produce inconsistent CPA. See Sub-tree D.
+- **tCPA target set far below the account's historical CPA**: the target may be aspirational rather than achievable, and the algorithm oscillates trying to hit it. Compare the live tCPA target against the actual 90-day CPA from GAQL 6.2 as a feasibility check only. The target itself comes from firm economics and is never derived from the account's own history (PB-05).
 - **Shared bidding strategy pooling multiple campaigns**: check GAQL 11.2. Shared strategies average signals across campaigns with different economics (branded and non-branded, different practice areas). The shared strategy may be optimizing against a blended target that makes neither campaign's performance meaningful.
 
 ---
@@ -293,7 +294,7 @@ In some accounts, ad scheduling restrictions are too aggressive — campaigns ar
 
 **Entry:** The brief is "something is wrong" — performance was acceptable and now isn't. The most common brief. The most variable tree.
 
-**Pre-flight ordering exception:** If the drop is sudden or large in magnitude (40%+ decline within a 1–2 week window), run PF-3 (change history) before PF-1 and PF-2. The standard pre-flight order prioritizes tracking integrity — but when a drop is abrupt, a bid strategy change, budget change, or auto-applied update is far more likely to be the cause than a tag failure. Running PF-3 first answers the "did something change?" question before spending time on tag debugging. If nothing changed, proceed to PF-1 normally. If a structural change is found, that discovery shapes every downstream step.
+**Pre-flight ordering exception:** If the drop is sudden or large in magnitude (40%+ decline within a one to two week window, the magnitude being a threshold and the reordering being evidenced), run PF-3 (change history) before PF-1 and PF-2. The standard pre-flight order prioritizes tracking integrity, but when a drop is abrupt, a bid strategy change, budget change, or auto-applied update is far more likely to be the cause than a tag failure. Running PF-3 first answers the "did something change?" question before spending time on tag debugging. If nothing changed, proceed to PF-1 normally. If a structural change is found, that discovery shapes every downstream step.
 
 ---
 
@@ -301,7 +302,7 @@ In some accounts, ad scheduling restrictions are too aggressive — campaigns ar
 
 Pull: GAQL 6.2 (90-day campaign performance), GAQL 6.3 (weekly segmented performance)
 
-Compare the current period (last 14–30 days) to the 90-day baseline. State the verdict explicitly before proceeding:
+Compare aligned complete windows, the last 30 days against the prior 30, and use the 90-day series as context only, never as the comparison basis. State the verdict explicitly before proceeding:
 
 - **CPA and CVR are materially worse than baseline**: performance is genuinely down. Continue.
 - **Metrics are within normal week-to-week variance**: the "feels off" perception may reflect a single bad week or a volatile metric, not a real trend. Report this finding first. Don't run a full diagnostic on normal variance.
@@ -449,15 +450,14 @@ _[operator version]: Record the session even when no action was taken. A first r
 
 ---
 
-**Step 0 (Mandatory): Establish coverage ratio before touching search term data**
+**Step 0 (Mandatory): every negative in this tree comes from this account's own search terms**
 
-Pull: GAQL 13.1 (actual campaign spend), then GAQL 13.2 per active campaign (visible STV spend)
+This tree derives negatives from the terms this account actually served, checked against the
+operator's not-waste list and against each term's own conversion record. It never applies a section
+of the negative-keyword library wholesale: that library seeds new campaigns.
 
-Compute coverage ratio. State it before proceeding:
-
-> "Search term data covers $X of $Y actual spend (Z%). The hidden ~[100-Z]% is the Google Ads API ceiling — not fixable through query splitting."
-
-Do not present any findings, waste estimates, or negative keyword recommendations until this ratio is on the table. Scale all dollar estimates by the coverage ratio.
+No figure is estimated, extrapolated, or scaled to stand for spend the pull did not return. Report
+what the data shows.
 
 ---
 
@@ -670,8 +670,8 @@ _[operator version]: Check the account's recorded context. If landing-page quali
 **Multiple components are BELOW_AVERAGE:**
 Address in order: landing page first (highest impact, foundational), then ad relevance (structural fix), then CTR (copy optimization). Don't optimize ad copy on a broken landing page.
 
-**QS is 7+ but CPC is still inflating:**
-QS is not the primary cause. This is competitive pressure — other advertisers are bidding more for these keywords. Refer to Tree 2 Step 4 (CPC spike diagnosis).
+**Quality score is healthy across the spending keywords but CPC is still inflating:**
+Quality score is not the primary cause. This is competitive pressure: other advertisers are bidding more for these keywords. Refer to Tree 2 Step 4 (CPC spike diagnosis). No quality-score cutoff is asserted here; there is no confirmed number that separates a quality problem from competition.
 
 ---
 
@@ -689,7 +689,7 @@ Pull: GAQL 6.3 (weekly trend), GAQL 7.1 (RSA performance), GAQL 8.1 (change hist
 
   - Action: creative refresh. New headlines that address a different angle, new emotional hooks, test contrast language.
 
-- **Abrupt drop over 1–2 weeks**: external change. New competitors, competitor creative improvement, or SERP layout change.
+- **Abrupt drop over one to two weeks**: route to the change log first (PF-3, PB-37). The one abrupt drop we measured was internal, an outside actor pausing every campaign. Only once no change is found does external competition become the leading hypothesis: new competitors, competitor creative improvement, or SERP layout change.
 
 > ⚠️ **BLIND SPOT — Competitor ad copy and SERP layout changes are not visible via API**
 > → Please share a screenshot of the Google SERP for 2–3 of the most important keywords in the affected campaigns. Look at how many ads appear, whether competitor ads have improved, and whether any new high-visibility features (Local Service Ads, featured snippets, etc.) are pushing paid ads down the page.
@@ -729,7 +729,7 @@ Read change history for bid strategy changes. Count the days since the last chan
 
 Look at 30-day conversion count per campaign (GAQL 2.3).
 
-- **tCPA with fewer than ~15–20 conversions/month**: insufficient. The algorithm cannot learn effectively. Recommendation: switch to Maximize Conversions (no tCPA target) until volume builds. Maximize Conversions is more forgiving at low volume because it's optimizing direction rather than a specific target.
+- **tCPA running below the account's reliability floor**, which is volume-dependent judgment rather than a fixed count: insufficient. The algorithm cannot learn effectively. Recommendation: switch to Maximize Conversions (no tCPA target) until volume builds. Maximize Conversions is more forgiving at low volume because it's optimizing direction rather than a specific target.
 - **Maximize Conversions with very low conversions (< 5/month)**: even this strategy struggles. Consider whether eCPC (manual with bid adjustments) is more appropriate until the account builds enough history.
 
 ---
@@ -740,19 +740,19 @@ The target comes from firm economics: average case value, lead-to-signed rate, a
 
 Compare the current live target against the economics target, and compare actual CPA (GAQL 6.2) against both. A live target set far below the economics target forces the algorithm to oscillate: it bids low to hit the target, loses auctions, produces no conversions, then overspends to compensate.
 
-Action: move the live target toward the economics target in steps of no more than 10 to 15% at a time, with 14-day stabilization windows between adjustments (unconfirmed step size and window). Where no economics target exists, ask for the firm's numbers rather than inventing one from account history. Where the current target is unusable and the economics number is not yet available, remove the target and run Maximize Conversions until it is, rather than setting the historical average as a target.
+Action: move the live target toward the economics target in steps of no more than 10 to 15% at a time, with 14-day stabilization windows between adjustments (`PROPOSED` step size and window). Where no economics target exists, ask for the firm's numbers rather than inventing one from account history. Where the current target is unusable and the economics number is not yet available, remove the target and run Maximize Conversions until it is, rather than setting the historical average as a target.
 
 ---
 
 **Question 4: Is the learning phase disruption pattern chronic?**
 
-If change history shows repeated bid strategy changes at one to two week intervals, often with manual bid adjustments in between, the account has likely never completed a learning phase. (unconfirmed: churn has not been observed on the accounts in scope, per PB-10.)
+If change history shows repeated bid strategy changes at one to two week intervals, often with manual bid adjustments in between, the account has likely never completed a learning phase. (`PROPOSED`: churn has not been observed on the accounts in scope, per PB-10.)
 
 Breaking the cycle requires patience — and a hard rule: **do not change the tCPA target at the start of the freeze window.** Setting a "better" number still resets the learning clock. The freeze must start from the current live value, whatever it is.
 
 Two valid approaches:
 
-1. **Hold the current tCPA target.** Commit to no changes for a minimum of 4 full weeks (28 days), not 21 days. The learning phase requires at least 14 days of clean data and 28 days provides a buffer above that floor. (unconfirmed: both windows are carried over, not measured here.) Do not lower the target, do not raise it, do not pause the campaign. Hold.
+1. **Hold the current tCPA target.** Commit to no changes for a minimum of 4 full weeks (28 days), not 21 days. The learning phase requires at least 14 days of clean data and 28 days provides a buffer above that floor. (`PROPOSED`: both windows are carried over, not measured here.) Do not lower the target, do not raise it, do not pause the campaign. Hold.
 
 2. **Switch to Maximize Conversions (no target).** If the current tCPA is far from any achievable baseline — as often happens after a staircase of raises — removing the target entirely allows the algorithm to optimize direction rather than hit an arbitrary number. This is often the correct call when the tCPA has been raised multiple times without completing a learning cycle, because no single "current" value reflects real performance data.
 

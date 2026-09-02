@@ -24,7 +24,7 @@ Load it in Claude Code alongside a Google Ads MCP. Give it a brief, or say the a
 - **Config ground truth.** A configuration finding is a departure from a stated baseline (`references/agency-defaults.md`), not from Google's defaults and not from nothing. Matching settings are silent. Recorded overrides are one summary line. Only an unrecorded departure becomes a flag.
 - **Optimization playbooks.** 40 pattern-to-standard-move entries in `references/playbooks.md`. Each carries a trigger, the standard move, the do-not-move conditions, the verification window, and an evidence tier. The agent never executes a move.
 
-**Evidence tiers.** Every playbook carries one of `validated in practice`, `partially validated`, `textbook only`, or `unconfirmed`. Unconfirmed means general practice not yet confirmed by the operator: a candidate, never a house tactic. As of the 2026-09 refresh: 13 validated, 12 partially validated, 15 textbook only, with unconfirmed markers on individual claims and thresholds throughout.
+**Evidence tiers.** Every playbook carries one of `validated in practice`, `partially validated`, `textbook only`, or `unconfirmed`. Unconfirmed means general practice not yet confirmed by the operator: a candidate, never a house tactic. As of the 2026-09 refresh and the evidence-verdict pass that followed it: 40 playbooks, 13 validated, 12 partially validated, 15 textbook only. 14 `unconfirmed` markers remain across the reference files, 11 of them in the playbook library, all on windows and thresholds nobody has yet run to completion.
 
 **What it gets right that a general model does not:**
 
@@ -36,7 +36,7 @@ Load it in Claude Code alongside a Google Ads MCP. Give it a brief, or say the a
 | High rank-lost impression share    | Recommends raising budget                 | Separates rank-lost from budget-lost; budget does not fix a rank problem                  |
 | tCPA above target                  | Recommends lowering tCPA to tighten up    | Applies the direction rule: lowering when above target restricts volume, not cost         |
 | CPA from a handful of conversions  | Treats it as a reliable signal            | Flags the reliability floor; below it, CPA is noise                                       |
-| Search term waste estimates        | Reports face-value numbers                | Discloses the coverage ratio and refuses to extrapolate the hidden portion                |
+| Search term waste estimates        | Reports face-value numbers                | Reports the measured figure and never extrapolates or scales it                           |
 | Config that matches house standard | Flags it against Google's defaults        | Classifies against the baseline; a MATCH is silent                                        |
 | Ebook and guide downloads          | Demotes them as soft conversions          | Treats them as PRIMARY conversions by standing operator ruling, never demotion candidates |
 
@@ -145,7 +145,7 @@ No other practice area is in scope, and no other advertising platform is.
 
 ## Known limitations
 
-**Search-term coverage ceiling.** The Google Ads API caps search-term rows per query and withholds low-volume terms, so a pull covers only part of actual campaign spend. The skill computes and discloses the coverage ratio, refuses to extrapolate the hidden portion, and never recommends blocking a term category on search-term data alone.
+**Search-term negative precision.** The skill reports what the search-term pull returns and never estimates, extrapolates, or scales a figure to stand for spend it did not see. Negatives come from the account's own search terms, checked against the operator's not-waste list and each term's conversion record, and a term category is never blocked on search-term data alone.
 
 **Conversion tracking configuration is read-only through GAQL.** There is no structured API object for conversion action settings. The skill reconstructs them from `conversion_action` queries. For complex setups, UI verification is faster.
 
@@ -153,7 +153,7 @@ No other practice area is in scope, and no other advertising platform is.
 
 **Immigration doctrine is absent.** See the practice areas note above.
 
-**Many claims are unconfirmed.** A large share of thresholds and windows in this repo are general practice rather than measured outcomes on live accounts. They carry an `(unconfirmed)` marker or a `PROPOSED` tag. Treat them as candidates and confirm them against your own outcomes.
+**Some windows and thresholds are unconfirmed.** After the 2026-09-02 verdict pass, the claims that survive unmarked are either operator rulings or measured outcomes. What still carries an `(unconfirmed)` marker or a `PROPOSED` tag is a window or a threshold nobody has run to completion. Treat those as candidates and confirm them against your own outcomes.
 
 ---
 

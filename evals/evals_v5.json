@@ -1,15 +1,15 @@
 {
   "skill_name": "google-ads-analysis",
   "version": "5",
-  "description": "The 2026-09 refresh eval suite. It supersedes the v1 to v4 cases that encoded content removed or corrected by the monthly outcome-mining refresh and the drift correction: the retired PB-15 rebuild, the enhanced-CPC sub-floor fallback, linear extrapolation of hidden search-term spend, the historical-CPA target reset, the soft-action demotion branch that caught ebook downloads, and the Display-scoped creative cases. It adds coverage for the two new playbooks (PB-40, PB-41) and the three standing operator rulings that the refresh wrote into the library: PB-16 conversion beats intent, PB-26 the blended CPA is always the reported number, and PB-32 bounded-test cap tracking with override measurement. Scope is Google Ads Search and Performance Max for family, immigration, and elder law only. Each case names the playbook id it exercises where one applies, and the `supersedes` field names the earlier case or source it replaces.",
+  "description": "The 2026-09 refresh eval suite. It supersedes the v1 to v4 cases that encoded content removed or corrected by the monthly outcome-mining refresh and the drift correction: the retired PB-15 rebuild, the enhanced-CPC sub-floor fallback, the search-term coverage ceiling and every extrapolation built on it, the historical-CPA target reset, the soft-action demotion branch that caught ebook downloads, and the Display-scoped creative cases. It adds coverage for the two new playbooks (PB-40, PB-41) and the three standing operator rulings that the refresh wrote into the library: PB-16 conversion beats intent, PB-26 the blended CPA is always the reported number, and PB-32 bounded-test cap tracking with override measurement. Scope is Google Ads Search and Performance Max for family, immigration, and elder law only. Each case names the playbook id it exercises where one applies, and the `supersedes` field names the earlier case or source it replaces.",
   "schema_note": "Cases use the assertion form: a flat `assertions` array, each entry a single pass or fail check. Assertions prefixed [NEGATIVE] must NOT be present in the output; [FALSE-FLAG] marks a known false-flag regression; [VERDICT] checks the data-not-verdicts boundary. Run each prompt with the skill loaded and without it, then score against the assertions. The Westhollow, Apex Law, and Greenfield Legal accounts are fictional fixtures; fixtures live in evals/fixtures/.",
   "fixtures": "evals/fixtures/ (Westhollow, Apex Law, Greenfield Legal are fictional)",
   "evals": [
     {
       "id": 501,
       "category": "bidding_sub_floor",
-      "prompt": "Account Greenfield Legal (fictional), campaign 'Westhollow - Elder Planning', already on Maximize Conversions. 30-day conversions = 4, well below the reliability floor. Avg CPC = $62 against an elder-law band topping out around $35. Budget-lost impression share = 21%. Tracking verified (PF-1 clean), no bid or budget change in 14 days. What is the standard move?",
-      "expected_output": "Routes to PB-08: Maximize Clicks with a CPC cap, to buy volume and rebuild conversion signal while capping runaway auctions, with a 3 to 4 week revisit and conversion rate watched because Max Clicks optimizes for clicks. Names the reliability floor as unconfirmed rather than as a settled number. Does not propose enhanced CPC or manual CPC as the low-volume fallback. Does not derive a target from the account's own historical CPA. Stops short of a go/no-go verdict.",
+      "prompt": "Account Greenfield Legal (fictional), campaign 'Westhollow - Elder Planning', already on Maximize Conversions. 30-day conversions = 4, well below the reliability floor for this campaign's volume. Avg CPC = $62 against the campaign's own trailing 30-day median of about $35. Budget-lost impression share = 21%. Tracking verified (PF-1 clean), no bid or budget change in 14 days. What is the standard move?",
+      "expected_output": "Routes to PB-08: Maximize Clicks with a CPC cap, to buy volume and rebuild conversion signal while capping runaway auctions, with a 3 to 4 week revisit and conversion rate watched because Max Clicks optimizes for clicks. Names the reliability floor as volume-dependent judgment rather than a settled number. Does not propose enhanced CPC or manual CPC as the low-volume fallback. Does not derive a target from the account's own historical CPA. Stops short of a go/no-go verdict.",
       "trap": "Recommends enhanced CPC or manual CPC as the sub-floor fallback (the pre-refresh doctrine, now withdrawn), or lowers a target, or raises budget into a sub-floor campaign, or issues a verdict on the campaign.",
       "assertions": [
         "Recommends Maximize Clicks with a CPC cap as the standard move for a sub-floor Maximize Conversions campaign carrying a high avg CPC.",
@@ -17,26 +17,28 @@
         "[NEGATIVE] Does NOT recommend enhanced CPC or manual CPC as the low-volume fallback.",
         "[NEGATIVE] Does NOT derive a bidding target from the account's own historical CPA.",
         "States a revisit window and names conversion rate as the metric to watch under Max Clicks.",
-        "Flags the reliability floor as unconfirmed or PROPOSED rather than as a settled house number.",
-        "[VERDICT] Stops short of a go/no-go call on the campaign."
+        "Names the reliability floor as volume-dependent judgment for this account rather than a settled house number.",
+        "[VERDICT] Stops short of a go/no-go call on the campaign.",
+        "[NEGATIVE] Does NOT judge the CPC against a published practice-area CPC band; there are none."
       ],
       "supersedes": "evals.json case 9; evals_v2.json case 6"
     },
     {
       "id": 502,
-      "category": "search_term_coverage",
-      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Divorce'. A search-term pull returns $1,240 of visible spend across 180 terms. The campaign's actual 30-day spend from FROM campaign is $2,300. Visible clearly-irrelevant spend inside that pull is $244. Report the search-term findings.",
-      "expected_output": "Computes and states the coverage ratio (about 54%) before presenting any finding. Reports the visible waste figure as visible only. Explicitly declines to scale the visible waste up by the coverage ratio into an estimate of total waste, and says the behaviour of the hidden portion is unconfirmed. Checks any proposed negative against the operator's not-waste list and the never-negate-a-converter rule. Stops short of a verdict.",
-      "trap": "Multiplies visible waste by the inverse coverage ratio and presents the product as estimated total waste (the pre-refresh instruction, now withdrawn), or asserts that the hidden portion is randomly distributed, or presents the pull as full coverage.",
+      "category": "search_term_negatives",
+      "prompt": "Account westhollow (fictional), campaign 'Westhollow - Divorce'. A search-term pull returns $1,240 of spend across 180 terms. Clearly-irrelevant spend inside that pull is $244, concentrated in one recurring n-gram with zero conversions over 60 days. Report the search-term findings.",
+      "expected_output": "Reports the $244 as the measured figure it is, next to the campaign's actual CPL. Proposes the n-gram negative from this account's own search terms, checked against the operator's not-waste list and against the term's own conversion record. Places the negative at the narrowest sufficient scope. Names PB-13 and states its thresholds as PROPOSED. Stops short of a verdict.",
+      "trap": "Estimates, extrapolates, or scales any figure to stand for spend the pull did not return; asserts that the Google Ads API under-reports search terms or caps rows; states a coverage ratio; applies a section of the negative-keyword library wholesale; or negates a term the account has converted on.",
       "assertions": [
-        "Computes and states the coverage ratio before presenting any search-term finding.",
-        "Reports the $244 as visible waste only.",
-        "[NEGATIVE] Does NOT scale visible waste by the coverage ratio and present the result as total estimated waste.",
-        "[NEGATIVE] Does NOT claim the hidden portion is randomly distributed or otherwise representative.",
-        "States that the behaviour of the hidden portion is unconfirmed.",
-        "Checks proposed negatives against the not-waste list and the never-negate-a-converter rule.",
-        "[VERDICT] Stops short of a go/no-go call.",
-        "States that the coverage gate is a required-green gate on PB-12, PB-13, PB-14, and PB-28 rather than a playbook itself."
+        "Reports the $244 as the measured irrelevant spend, not as an estimate of anything larger.",
+        "[NEGATIVE] Does NOT compute or state a search-term coverage ratio.",
+        "[NEGATIVE] Does NOT estimate, extrapolate, or scale any figure to stand for spend the pull did not return.",
+        "[NEGATIVE] Does NOT claim that the Google Ads API under-reports search terms or caps rows.",
+        "Proposes the negative from this account's own search terms, checked against the not-waste list and the never-negate-a-converter rule.",
+        "Places the proposed negative at the narrowest sufficient scope (account shared list, campaign, or ad group).",
+        "[NEGATIVE] Does NOT apply a section of the negative-keyword library wholesale.",
+        "Names PB-13 and states its 3% and 60-day thresholds as PROPOSED.",
+        "[VERDICT] Stops short of a go/no-go call."
       ],
       "supersedes": "evals.json cases 2 and 14"
     },

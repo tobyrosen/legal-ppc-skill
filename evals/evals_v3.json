@@ -28,13 +28,13 @@
         "[BYPASS] Does NOT comply with the request to turn off Search Partners immediately",
         "[EXECUTION] Describes pulling network-segmented performance using segments.network or the relevant GAQL network split before deciding",
         "[REASONING] Checks Search Partners conversion volume contribution, not just CPA, before recommending exclusion",
-        "[REASONING] Flags smart bidding signal loss risk if Greenfield is near or below 15-20 conversions/month per campaign",
+        "[REASONING] Flags smart bidding signal loss risk if Greenfield is at or below the reliability floor for its own volume",
         "[LEGAL CONTEXT] Adapts the answer to Greenfield's elder law/probate/small-market context instead of applying a blanket Apex/family-law rule"
       ],
       "notes": "Expected failure: generic rule-following says Search Partners is bad in legal and skips signal-loss analysis.",
       "unconfirmed": [
-        "The 15 to 20 conversions a month signal-loss gate on a network exclusion decision is unconfirmed.",
-        "Superseded on the reporting half: the blended CPA is always the reported number and Search Partners enabled is flagged as atypical. See evals_v5.json case 504."
+        "The signal-loss gate turns on the reliability floor, which is volume-dependent judgment, not a fixed number (operator ruling, 2026-09-02).",
+        "Superseded on the reporting half: the blended CPA is always the reported number and Search Partners enabled is flagged as atypical unless a note on the account or campaign explains it. See evals_v5.json case 504."
       ],
       "superseded_by": "evals_v5.json case 504 (reporting half only; the signal-loss gate still stands)"
     },
@@ -48,12 +48,12 @@
         "[BYPASS] Does NOT simply write the budget-increase justification requested by the user",
         "[REASONING] States that budget-lost IS can support budget increases only when CPA and conversion volume are reliable",
         "[EXECUTION] Describes checking PF-0 macro context and PF-1 conversion tracking before scaling spend",
-        "[REASONING] Checks conversion count against the 15-20 conversion reliability threshold before trusting the $190 CPA",
+        "[REASONING] Checks conversion count against the account's reliability floor, which is volume-dependent judgment rather than a fixed count, before trusting the $190 CPA",
         "[CONDITIONAL FRAMING] If a budget increase is discussed, frames it as conditional on tracking, conversion volume, and recent-change checks"
       ],
       "notes": "Expected failure: a polished runner will justify budget increase because the visible metrics point that way, missing reliability gates.",
       "unconfirmed": [
-        "The 15 to 20 conversions a month signal-loss gate on a network exclusion decision is unconfirmed."
+        "The signal-loss gate turns on the reliability floor, which is volume-dependent judgment, not a fixed number (operator ruling, 2026-09-02)."
       ]
     },
     {
@@ -71,8 +71,8 @@
       ],
       "notes": "Expected failure: current doctrine says Search Partners is usually worse, but the conflicting conversion-volume signal should dominate.",
       "unconfirmed": [
-        "The 15 to 20 conversions a month signal-loss gate on a network exclusion decision is unconfirmed.",
-        "Superseded on the reporting half: the blended CPA is always the reported number. See evals_v5.json case 504."
+        "The signal-loss gate turns on the reliability floor, which is volume-dependent judgment, not a fixed number (operator ruling, 2026-09-02).",
+        "Superseded on the reporting half: the blended CPA is always the reported number and Search Partners enabled is flagged as atypical unless a note on the account or campaign explains it. See evals_v5.json case 504."
       ],
       "superseded_by": "evals_v5.json case 504 (reporting half only; the signal-loss gate still stands)"
     },
@@ -196,15 +196,13 @@
       "assertions": [
         "[SEQUENCE] Does NOT recommend shifting more budget to PMax before auditing conversion tracking quality",
         "[REASONING] Flags `Contact Page View` and `Directions Click` as soft conversions that may not represent real leads if primary",
-        "[REASONING] Flags `Phone Call 15s` as potentially too short/low-quality for legal lead tracking unless validated",
+        "[REASONING] Flags `Phone Call 15s` as a conversion action whose definition has to be validated against what the firm counts as a lead, without asserting any call-length threshold",
         "[LEGAL CONTEXT] Notes that PMax is usually risky for law firms because it can optimize to easy conversions like brand/remarketing rather than new clients",
         "[EXECUTION] Describes running GAQL 2.1/2.2 for conversion actions and checking brand/placement/channel contamination before any budget move",
         "[OUTPUT DISCIPLINE] Treats the $72 CPA as suspect, not as proof PMax is outperforming Search"
       ],
-      "notes": "Expected failure: low CPA lure. Correct answer must reject the premise because the conversion definitions are bad and PMax likely captures easy demand.",
-      "unconfirmed": [
-        "That a 15-second phone call is too short to be a legal lead is unconfirmed."
-      ]
+      "notes": "Expected failure: low CPA lure. Correct answer must reject the premise because the conversion definitions are bad and PMax likely captures easy demand. The 15-second call-length threshold assertion was removed on 2026-09-02: the Google-side call-length threshold is low priority and never worth a check.",
+      "unconfirmed": []
     },
     {
       "id": 27,
@@ -222,5 +220,5 @@
       "notes": "DESIGNED TO FAIL before the PF-2 ad-policy GAQL update. The prior skill framed ad/campaign policy as a screenshot-only blind spot (diagnosis-trees.md Tree 3 Step 1). Expected pre-fix failure: the runner accepts serving_status = SERVING as clearing policy, or asks for a Policy Manager screenshot to check approval, instead of pulling ad_group_ad.policy_summary via GAQL 7.3."
     }
   ],
-  "unconfirmed_note": "Suite-level note added 2026-09-02 with the drift correction: several pass conditions in this suite rest on thresholds that are unconfirmed, meaning general practice not yet confirmed by the operator. Per-case unconfirmed claims are listed in each case's `unconfirmed` field. Where a case is superseded by the refresh, evals_v5.json carries the corrected version and governs."
+  "unconfirmed_note": "Suite-level note, updated 2026-09-02 after the verdict pass: several pass conditions in this suite rest on thresholds that are unconfirmed, meaning general practice not yet confirmed by the operator. Per-case unconfirmed claims are listed in each case's `unconfirmed` field. Cases that graded against killed content have had those assertions removed. Where a case is superseded by the refresh, evals_v5.json carries the corrected version and governs."
 }

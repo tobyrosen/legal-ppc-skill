@@ -158,7 +158,7 @@ WHERE segments.date DURING LAST_30_DAYS
 ORDER BY metrics.cost_micros DESC
 ```
 
-**Use:** Evaluate whether campaigns have enough conversion volume to support their current bid strategy. Smart bidding (tCPA, Maximize Conversions) is unreliable below ~15–20 conversions/month per campaign. For a longer (90-day) view, switch the date filter to `segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'` (start = today − 90) — `LAST_90_DAYS` is not a valid GAQL literal.
+**Use:** Evaluate whether campaigns have enough conversion volume to support their current bid strategy. Smart bidding (tCPA, Maximize Conversions) is unreliable below the account's reliability floor, which is volume-dependent judgment rather than a fixed count. For a longer (90-day) view, switch the date filter to `segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'` (start = today minus 90). `LAST_90_DAYS` is not a valid GAQL literal.
 
 ---
 
@@ -824,15 +824,13 @@ ORDER BY campaign.name
 
 ---
 
-## 13. Search Term Coverage Verification
+## 13. Search Term Spend Pulls
 
-**Run this before any search term analysis.** Establishes the coverage ratio (visible STV spend ÷ actual campaign spend) that must be stated before presenting any search term findings.
+Two pulls that sit under any search-term analysis: what the campaign actually spent, and what its
+search terms spent. Report what the data returns. Nothing here is estimated, extrapolated, or scaled
+to stand for spend the pull did not return.
 
-The Google Ads API has a hard row cap on `search_term_view` — typically returning ~50% of actual spend regardless of query granularity. This is not a privacy threshold; it cannot be bypassed with query splitting or pagination (GAQL has no OFFSET). Always disclose the ratio and scale waste estimates accordingly.
-
-### 13.1 Step 1 — Actual Campaign Spend
-
-Run first. This is the denominator.
+### 13.1 Actual Campaign Spend
 
 ```gaql
 SELECT
@@ -847,13 +845,15 @@ WHERE segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'
 ORDER BY metrics.cost_micros DESC
 ```
 
-Sum `cost_micros / 1e6` across all campaigns for total actual spend. Note per-campaign spend — needed for per-campaign STV pulls in Step 2.
+Sum `cost_micros / 1e6` across all campaigns for total spend. Note per-campaign spend: it is needed
+for the per-campaign search-term pulls in 13.2.
 
 ---
 
-### 13.2 Step 2 — Visible Search Term Spend (Per Campaign)
+### 13.2 Search Term Spend (Per Campaign)
 
-Run once per active campaign — NOT as an all-campaigns query (all-campaigns hits the 500-row cap immediately, giving far worse coverage). Use the date range from Step 1.
+Run once per active campaign, not as an all-campaigns query: a single all-campaigns pull returns a
+coarse, truncated result. Use the date range from 13.1.
 
 ```gaql
 SELECT
@@ -865,30 +865,15 @@ WHERE segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'
   AND campaign.id = CAMPAIGN_ID_HERE
 ```
 
-Sum `cost_micros / 1e6` across all per-campaign results for total visible spend.
+Sum `cost_micros / 1e6` across the per-campaign results.
 
 ---
 
-### 13.3 Compute and Report Coverage
+### 13.3 Reporting
 
-```text
-Coverage = (sum of visible STV cost) / (sum of actual campaign cost) × 100
-```
-
-**Mandatory reporting format before presenting any findings:**
-
-> Search term data covers **$[visible]** of **$[actual]** actual spend (**[Z]%** coverage). This is the Google Ads API ceiling — the hidden portion (~[100-Z]%) is randomly distributed, not systematically different.
-
-**Scale all waste estimates:**
-
-> Visible waste in identified categories: **$[waste_visible]**
-> Estimated total waste (scaled): **~$[waste_visible / coverage_pct]**
-
-Do not present findings, waste estimates, or negative keyword recommendations without this disclosure on the table.
-
----
-
-_Note: Per-ad-group query splitting beyond per-campaign will yield marginal additional coverage (a few percentage points at most) once the per-campaign ceiling is reached. The ~50% ceiling is a hard API limit, not improvable through query structure._
+Report the measured figures next to the campaign's actual CPL. A waste figure is the spend the pull
+shows in the categories named, and it is presented as exactly that. Never multiply it up, never
+present a derived total as a measurement, and never attribute a gap to an API row cap.
 
 ---
 

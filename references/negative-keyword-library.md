@@ -7,11 +7,11 @@ Candidate negative-keyword patterns for family, immigration, and elder law Googl
 1. **The operator's not-waste list wins.** The terms named in SKILL.md "Search terms that are NOT waste" are never negated, whatever category in this file would catch them. That list includes free-consultation variants, cheap divorce, uncontested divorce online, child support calculator, divorce mediator, how long does a divorce take, how to file for divorce without a lawyer, family law attorney jobs, divorce therapist, child support office, pay child support online, medicaid office phone number, and nursing homes near me.
 2. **Never negate a term that has converted.** Check the term's own conversion data before excluding it. A converting term is a client, not waste.
 
-Add negatives from observed search-term data at the narrowest sufficient scope. Do not paste a section wholesale onto an account.
+**This library seeds new campaigns. It is never applied to a live account.** On a live account, every negative comes from that account's own search terms, checked against the not-waste list above and against the term's own conversion record. Add at the narrowest sufficient scope. Do not paste a section wholesale onto anything.
 
 ## How to Use This Library
 
-**Account-level shared list (unconfirmed as a mandatory practice).** Sections 1 to 4 are candidate categories for an account-level shared list. Whether an account needs one at all, and which categories belong in it, is decided per account against that account's own search-term data. The absence of a shared list is not a red flag on its own.
+**Account-level shared list.** Sections 1 to 4 are candidate categories. Whether an account needs a shared list at all, and which categories belong in it, is decided against that account's own search-term data. The absence of a shared list is not a red flag on its own.
 
 **Campaign-level negatives.** Apply the practice-area cross-exclusions in section 5 at the campaign level, and only for practice areas the firm demonstrably does not handle. Never cross-exclude family, immigration, or elder work from one another without confirming the firm does not take those matters: a firm running all three would be blocking its own clients.
 
@@ -23,13 +23,17 @@ Add negatives from observed search-term data at the narrowest sufficient scope. 
 
 ## Section 1 — Price & Affordability Signals
 
-Candidates for blocking users who are explicitly seeking free or reduced-cost legal services. (unconfirmed) That price and affordability searchers rarely convert to paying clients is a general claim, not a measured result on these accounts, and the operator has ruled several money terms explicitly NOT waste: free consultation variants, cheap divorce, uncontested divorce online, child support calculator, divorce mediator, and how long does a divorce take. Check each candidate against that ruling and against the term's own conversion data before negating it. (unconfirmed)
+Price and affordability signals split two ways, and the split is ruled, not inferred.
+
+**Confirmed waste:** free divorce lawyer, pro bono divorce lawyer, legal aid divorce, free divorce papers, divorce lawyer salary, free elder law attorney, free will template, elder law attorney salary.
+
+**Money terms, never negated:** free consultation variants, cheap divorce, uncontested divorce online, child support calculator, divorce mediator, how long does a divorce take.
+
+That price and affordability searchers rarely convert to paying clients is a general claim, not a measured result on these accounts. Check every candidate against the ruling above and against the term's own conversion data before negating it.
 
 ### Broad Match (use cautiously — review for collateral blocking)
 
 ```text
-free
-cheap
 quick
 legal aid
 pro bono
@@ -37,33 +41,31 @@ assistance
 easy
 fast
 diy
-fees
-cost
-afford
 aid
 loan
 low cost
 ```
 
+`free`, `cheap`, `cost`, `fees` and `afford` are deliberately absent: as broad negatives they catch
+free consultation and cheap divorce, which are ruled money terms.
+
 ### Phrase Match
 
 ```text
-"afford"
 "aid"
 "assistance"
-"cheap"
-"cost"
 "diy"
 "easy"
 "fast"
-"fees"
-"free"
 "legal aid"
 "loan"
 "low cost"
 "pro bono"
 "quick"
 ```
+
+Same reason: `"afford"`, `"cheap"`, `"cost"`, `"fees"` and `"free"` are not on the phrase list.
+The named confirmed-waste strings above are negated as written, not as bare words.
 
 ### Exact Match
 
@@ -91,13 +93,11 @@ low cost
 
 ## Section 2 — Employment & Career Signals
 
-Candidates for blocking job seekers, law students, and people researching legal careers. (unconfirmed) Not wholesale: the operator has ruled `family law attorney jobs` explicitly NOT waste, so an attorney-jobs query is not automatically a job seeker. Retain only the job-seeker patterns proven in the account's own search-term data.
+Candidates for blocking job seekers, law students, and people researching legal careers. Not wholesale: the operator has ruled `family law attorney jobs` explicitly NOT waste, so an attorney-jobs query is not automatically a job seeker. `attorney jobs` and `lawyer jobs` are therefore absent from both lists below. Retain only the job-seeker patterns proven in the account's own search-term data.
 
 ### Phrase Match
 
 ```text
-"attorney jobs"
-"lawyer jobs"
 "legal jobs"
 "paralegal jobs"
 "law clerk"
@@ -127,8 +127,6 @@ Candidates for blocking job seekers, law students, and people researching legal 
 [bar exam]
 [paralegal]
 [law clerk]
-[attorney jobs]
-[lawyer jobs]
 [law degree]
 ```
 
@@ -136,12 +134,13 @@ Candidates for blocking job seekers, law students, and people researching legal 
 
 ## Section 3 — Self-Help & DIY Legal Resources
 
-Candidates for blocking people seeking forms or self-representation. (unconfirmed) Procedural family, immigration, and elder queries are frequently real prospects in these practice areas, and the operator has ruled `how to file for divorce without a lawyer` explicitly NOT waste. `free consultation` and `free case review` are ruled NOT waste and must be removed from this list on any account that offers a consult. Do not apply this section wholesale.
+Candidates for blocking people seeking forms or self-representation. Procedural family, immigration, and elder queries are frequently real prospects in these practice areas.
+
+Four strings are deliberately absent from the list below. `how to file` and `without a lawyer` both block `how to file for divorce without a lawyer`, which is a ruled not-waste term. `free consultation` and `free case review` are money terms and belong as keywords, not negatives. Do not apply this section wholesale.
 
 ### Phrase Match
 
 ```text
-"how to file"
 "how to represent"
 "self represent"
 "pro se"
@@ -153,7 +152,6 @@ Candidates for blocking people seeking forms or self-representation. (unconfirme
 "legal documents"
 "do it yourself"
 "represent myself"
-"without a lawyer"
 "without an attorney"
 "without hiring"
 "legal advice"
@@ -161,19 +159,15 @@ Candidates for blocking people seeking forms or self-representation. (unconfirme
 "online legal"
 "legal aid society"
 "free legal"
-"free consultation"
-"free case review"
 "free attorney"
 "free lawyer"
 ```
-
-**Note on "free consultation" and "free case review":** These are double-edged — some firms lead with free consultations as a CTA, and blocking these terms may reduce qualified traffic. Evaluate per account. If the firm offers a free consult, remove these from the negative list and use them as keywords instead.
 
 ---
 
 ## Section 4 — Research & Informational Intent
 
-Candidates only. (unconfirmed) Blanket informational negatives conflict with the long-consideration reality of these practice areas: informational queries can be genuine top-of-funnel here and have been observed converting. Check whether the pattern converts in this account before negating it. Use phrase match; exact is too narrow and broad risks catching too much.
+Candidates only. Blanket informational negatives conflict with the long-consideration reality of these practice areas: informational queries can be genuine top-of-funnel here and have been observed converting. `how long does` is absent from the list below because it blocks `how long does a divorce take`, a ruled money term. Check whether every remaining pattern converts in this account before negating it. Use phrase match; exact is too narrow and broad risks catching too much.
 
 ### Phrase Match
 
@@ -183,7 +177,6 @@ Candidates only. (unconfirmed) Blanket informational negatives conflict with the
 "what does"
 "what are"
 "how does"
-"how long does"
 "how much does"
 "what happens"
 "can i"
@@ -212,7 +205,7 @@ Candidates only. (unconfirmed) Blanket informational negatives conflict with the
 
 ## Section 5: practice-area cross-exclusions
 
-Apply at campaign level, never account level, and only for practice areas the firm demonstrably does not handle. Confirm the firm's actual practice list before applying any of it. (unconfirmed)
+Apply at campaign level, never account level, and only for practice areas the firm demonstrably does not handle. Confirm the firm's actual practice list before applying any of it. The default is no cross-exclusion unless the firm has declined the work, and that default is operator-confirmed.
 
 **Family, immigration, and elder work are never cross-excluded from one another by default.** All three are in scope for this skill, and a firm may run any combination of them. Excluding immigration terms from a family campaign, or estate and probate terms from an elder campaign, blocks the firm's own clients unless the firm has confirmed it does not take that work. Estate planning, wills, trusts, and probate overlap elder law and stay in scope.
 
@@ -250,7 +243,7 @@ No cross-exclusion set is recorded. Immigration has no vertical-specific tactics
 
 Managed at the campaign targeting level first. Where out-of-area queries persist in search terms, add the geo token as a campaign negative.
 
-**Negate the geo token only, never the service term.** Decompose the query first: for a city-mismatched query shaped `[core service term] [wrong city]`, negate the wrong city, so the campaign keeps serving the service term in its real geography. Negating whole city-plus-service phrases blocks the core service phrase and is the failure mode this rule exists to prevent. (unconfirmed as a pattern; the do-not-block-the-service-term half is an operator rule.)
+**Negate the geo token only, never the service term.** Decompose the query first: for a city-mismatched query shaped `[core service term] [wrong city]`, negate the wrong city, so the campaign keeps serving the service term in its real geography. Negating whole city-plus-service phrases blocks the core service phrase and is the failure mode this rule exists to prevent.
 
 ```text
 "[wrong city]"

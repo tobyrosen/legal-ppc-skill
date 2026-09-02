@@ -17,16 +17,14 @@
     {
       "id": 2,
       "prompt": "Do a search term review for Apex Law. Look at the last 30 days.",
-      "expected_output": "Search term coverage ratio stated before findings, waste estimates qualified by coverage, negative recommendations organized by scope. Account: Apex Law (ID 1111111111), MCC login 0000000000.",
+      "expected_output": "Negative recommendations organized by scope, every candidate checked against the operator's not-waste list and against the term's own conversion record. Account: Apex Law (ID 1111111111), MCC login 0000000000.",
       "files": [],
       "assertions": [
-        "Pulls actual campaign spend (GAQL FROM campaign or GAQL 13.1) before pulling search terms",
-        "States coverage ratio (STV spend vs. campaign spend) with dollar amounts before presenting any findings or waste estimates",
         "Negative keyword recommendations include scope designation (account-level vs. campaign-level vs. ad-group-level)",
-        "Waste estimates are described as 'visible' or explicitly qualified by coverage ceiling"
+        "Does NOT estimate, extrapolate, or scale any figure to stand for spend the pull did not return"
       ],
       "unconfirmed": [
-        "The coverage ratio and any scaled waste estimate built on the roughly 50% search-term ceiling are unconfirmed. The refresh removes linear extrapolation of the hidden portion; see evals_v5.json case 502."
+        "Superseded by the 2026-09-02 drift correction: the coverage-ratio framing is withdrawn entirely. See evals_v5.json case 502."
       ],
       "superseded_by": "evals_v5.json case 502"
     },
@@ -45,38 +43,35 @@
     {
       "id": 9,
       "prompt": "The Greenfield Legal elder-planning campaign is barely spending — maybe $40/month. We have a $50 target CPA and $100/day budget. Should we lower the target CPA to get it to spend more? Account: Greenfield Legal (ID 2222222222), MCC login 0000000000.",
-      "expected_output": "Roots the problem in the bid strategy and the account's volume, not the target or the budget. Recognizes ~2 conversions/month is below every smart-bidding threshold (well under 15-20/month for tCPA, and under the ~5/month floor where even Maximize Conversions has enough signal). Rejects both bad fixes: does not lower the target CPA, and does not raise the budget (the campaign spends only ~$40 of a $100/day budget, so budget is not the constraint). Recommends a manual-control strategy appropriate at this volume (eCPC or Manual CPC) and justifies that choice against the volume diagnosis. Reads the account notes first.",
+      "expected_output": "Roots the problem in the bid strategy and the account's volume, not the target or the budget. Recognizes that about 2 conversions a month is below the reliability floor for any smart-bidding strategy on this account. Rejects both bad fixes: does not lower the target CPA, and does not raise the budget (the campaign spends only about $40 of a $100/day budget, so budget is not the constraint). Routes the sub-floor case to Maximize Clicks with a CPC cap per PB-08 and justifies that choice against the volume diagnosis. Reads the account notes first.",
       "files": [],
-      "notes": "HARDENED 2026-06-04. Tests the full low-volume bidding reasoning, not just a strategy swap. The account's tiered volume (below both the 15-20/month tCPA threshold and the ~5/month Maximize Conversions floor) means the skill's own doctrine in references/diagnosis-trees.md lands on eCPC/Manual, not Maximize Conversions. A response that lowers the target, raises the budget, stops at Maximize Conversions, or switches strategy without justifying it against the volume diagnosis fails. Requires the account-notes/greenfield-legal.md fixture.",
+      "notes": "HARDENED 2026-06-04. Corrected 2026-09-02. Tests the full low-volume bidding reasoning, not just a strategy swap. The campaign runs below the account's reliability floor, which is volume-dependent judgment rather than a fixed count, so the skill's doctrine routes to Maximize Clicks with a CPC cap (PB-08). The 5-conversions-a-month second-tier floor and the enhanced-CPC fallback were removed. A response that lowers the target, raises the budget, or switches strategy without justifying it against the volume diagnosis fails. Requires the account-notes/greenfield-legal.md fixture.",
       "assertions": [
-        "Before recommending any fix, flags that ~2 conversions/month is below the smart-bidding reliability threshold - and specifically below not just the tCPA threshold (~15-20/month) but also the ~5/month floor where even Maximize Conversions has enough signal to optimize. Noting only 'below 15-20' and stopping at Maximize Conversions has not fully diagnosed the volume tier.",
+        "Before recommending any fix, flags that about 2 conversions a month is below the account's reliability floor, which is volume-dependent judgment rather than a fixed count.",
         "Does NOT recommend lowering the target CPA as a fix, and explains why: at ~2 conversions/month a tighter target further starves delivery and causes oscillation - it does not address the root cause.",
         "Does NOT recommend raising the budget, and explains why: the campaign is spending only ~$40 of a $100/day budget, so it is not budget-constrained - the bid strategy is the binding constraint, not budget. (If impression share is discussed, frames any loss as rank-lost, not budget-lost.)",
-        "Recommends moving off the target-based strategy to a manual-control strategy appropriate below ~5 conversions/month - eCPC (manual with bid adjustments) or Manual CPC - and justifies the choice against the volume diagnosis. A bare 'switch to [strategy]' with no volume/signal justification does NOT pass, and recommending Maximize Conversions as the endpoint does NOT pass at this volume.",
         "Reads account-notes/greenfield-legal.md before pulling data, to establish context (small-market elder-law firm with structurally low volume)."
       ],
       "unconfirmed": [
-        "The roughly 5-conversions-a-month floor below which Maximize Conversions is also said to fail is unconfirmed.",
-        "Enhanced CPC as the fallback bidding strategy below that floor is unconfirmed and is superseded: the sub-floor case now routes to Maximize Clicks with a CPC cap (PB-08). See evals_v5.json case 501."
+        "Superseded: the sub-floor case routes to Maximize Clicks with a CPC cap (PB-08). The 5-conversions-a-month second-tier floor and the enhanced-CPC fallback were removed on 2026-09-02. See evals_v5.json case 501."
       ],
       "superseded_by": "evals_v5.json case 501"
     },
     {
       "id": 14,
       "prompt": "Here are some search terms from Apex Law's Child Custody campaign (last 30 days): 'best child custody lawyer near me' ($67, 2 conversions), 'child custody attorney near me' ($48, 0 conv), 'family court dates near me' ($18, 0 conv), 'can I file for custody without a lawyer' ($22, 0 conv), 'legal aid custody help' (12 impressions, $0 spend). Campaign total spend: $578. What should we do?",
-      "expected_output": "Coverage ratio stated before waste estimates. Long-consideration-window market exception applied to DIY query. Converting term kept. Negatives scoped by level.",
+      "expected_output": "Long-consideration-window market exception applied to the DIY query. Converting term kept. Negatives scoped by level and checked against the not-waste list.",
       "files": [],
       "assertions": [
-        "States coverage ratio ($155 visible / $578 total = ~27%) before presenting any waste estimates or negative recommendations",
         "Does NOT flag 'can I file for custody without a lawyer' as waste or recommend negating it — applies long-consideration-window market exception for family law markets",
         "Does NOT recommend pausing or negating 'best child custody lawyer near me' — it is converting and is the only confirmed converting term in the visible dataset",
         "Flags 'legal aid custody help' as an audience-intent mismatch (free/reduced-cost services vs. private firm) and recommends phrase match negative",
         "Negative keyword recommendations include scope designation (account-level vs. campaign-level vs. ad-group-level) — not a flat undifferentiated list",
         "States explicitly that converting search terms are not candidates for negatives regardless of match type",
-        "Scales waste estimates against the 27% coverage ceiling — does not present dollar waste figures as if they represent total campaign waste"
+        "Does NOT estimate, extrapolate, or scale any figure to stand for spend the pull did not return"
       ],
       "unconfirmed": [
-        "The coverage ratio and any scaled waste estimate built on the roughly 50% search-term ceiling are unconfirmed. The refresh removes linear extrapolation of the hidden portion; see evals_v5.json case 502."
+        "Superseded by the 2026-09-02 drift correction: the coverage-ratio framing is withdrawn entirely. See evals_v5.json case 502."
       ],
       "superseded_by": "evals_v5.json case 502"
     },
@@ -107,5 +102,5 @@
       ]
     }
   ],
-  "unconfirmed_note": "Suite-level note added 2026-09-02 with the drift correction: several pass conditions in this suite rest on thresholds that are unconfirmed, meaning general practice not yet confirmed by the operator. Per-case unconfirmed claims are listed in each case's `unconfirmed` field. Where a case is superseded by the refresh, evals_v5.json carries the corrected version and governs."
+  "unconfirmed_note": "Suite-level note, updated 2026-09-02 after the verdict pass: several pass conditions in this suite rest on thresholds that are unconfirmed, meaning general practice not yet confirmed by the operator. Per-case unconfirmed claims are listed in each case's `unconfirmed` field. Cases that graded against killed content have had those assertions removed. Where a case is superseded by the refresh, evals_v5.json carries the corrected version and governs."
 }

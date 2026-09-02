@@ -121,8 +121,6 @@ The same logic applies to a pasted table, CSV, or screenshot: you did not run th
 
 Protocol: scan the CPC column before drawing conclusions; if the CPCs look implausibly low, say so and ask which ad groups the terms came from and whether the query filtered for enabled ad groups only. Do not present terms with suspicious CPCs as active waste until the source is confirmed. If the source is a paused ad group, the terms are historical and no action is needed.
 
-Handed data is subject to the same coverage ceiling as data you pull. Before presenting any finding from it, state that coverage is unknown and either request the campaign's actual total spend for the period so the ratio can be computed, or disclose that the findings cover only the visible portion and cannot be scaled.
-
 ---
 
 ## Search terms that are NOT waste (standing operator ruling)
@@ -165,17 +163,17 @@ Sequence:
 
 1. Fix the tracking and confirm it is clean.
 2. Hold the current tCPA target.
-3. Announce a 2 to 4 week lockdown: no bid strategy change, no target change, no budget change. (unconfirmed)
-4. Expect apparent CPA to rise and conversion volume to fall. That is the duplicate count disappearing, not the account getting worse. Do not react to it. (unconfirmed)
+3. Announce a 2 to 4 week lockdown (`PROPOSED` window): no bid strategy change, no target change, no budget change.
+4. Expect apparent CPA to rise and conversion volume to fall. That is the duplicate count disappearing, not the account getting worse. Do not react to it.
 5. After the lockdown, evaluate the target against a real baseline.
 
 Monitor during relearning: learning status, the 14-day rolling CPA (expect a rise then stabilization), impression share (may drop as the algorithm recalibrates), and absolute conversion volume.
 
 **Rebase every comparison that spans the change.** A non-retroactive conversion change means the two sides of a week-over-week or 30-day comparison use different definitions, which can manufacture a false collapse. Reconstruct both windows from action-level data on a consistent basis, and record the effective date. Verify both the 14-day and the 28-day window after the change.
 
-**Low-volume flag.** If the account was near the 15 to 20 conversion per month reliability threshold before the fix, the cleaned volume may fall below it; consider Maximize Conversions rather than tCPA until volume recovers. (unconfirmed)
+**Low-volume flag.** If the account was near its reliability floor before the fix, the cleaned volume may fall below it; consider Maximize Conversions rather than tCPA until volume recovers.
 
-**Low-volume flag, already on Maximize Conversions with high CPC.** When a campaign is already on Maximize Conversions, running below the reliability floor, and carrying a high average CPC for its practice area, the algorithm is bidding blind on thin signal. The move is Maximize Clicks with a CPC cap: buy volume and rebuild conversion signal while capping runaway auctions, not another target tweak. Set a 3 to 4 week revisit and watch conversion rate, because Max Clicks optimizes for clicks.
+**Low-volume flag, already on Maximize Conversions with high CPC.** When a campaign is already on Maximize Conversions, running below the reliability floor, and carrying a high average CPC against its own trailing median, the algorithm is bidding blind on thin signal. The move is Maximize Clicks with a CPC cap: buy volume and rebuild conversion signal while capping runaway auctions, not another target tweak. Set a 3 to 4 week revisit and watch conversion rate, because Max Clicks optimizes for clicks.
 
 ---
 
@@ -185,12 +183,12 @@ _Playbook: PB-04._
 
 **Only lower tCPA when actual cost per conversion is already comfortably below the current target.** Lowering it when CPA is at or above target restricts volume: it tells the algorithm to win fewer auctions, exactly when the account is struggling to generate conversions.
 
-- **Cost per conversion well below target** (target $150, actual $90): safe to lower to capture efficiency. Move in 10 to 15% increments, not all at once. (unconfirmed)
+- **Cost per conversion well below target** (target $150, actual $90): safe to lower to capture efficiency. Move in 10 to 15% increments (`PROPOSED`), not all at once.
 - **Near target** (target $150, actual $140): hold. Insufficient headroom.
 - **Above target** (target $150, actual $210): do not lower. Fix root causes first: quality score, ad relevance, landing-page conversion rate, negative-keyword gaps.
 - **Well above target with low impression share:** the root cause is usually bid quality, not budget. Adding budget does not fix a tCPA campaign losing impressions to rank. Diagnose rank-lost impression share.
 
-The instinct to tighten tCPA when CPA is high is a frequently observed bidding error in legal accounts. (unconfirmed) When the algorithm is already under pressure to find converting traffic, lowering the target means fewer auctions and fewer conversions, not cheaper ones.
+The instinct to tighten tCPA when CPA is high is a frequently observed bidding error in legal accounts, though not established as the most common one. When the algorithm is already under pressure to find converting traffic, lowering the target means fewer auctions and fewer conversions, not cheaper ones.
 
 **Exception:** if budget is clearly not the constraint (budget-lost impression share near zero) and rank-lost impression share is very high, the issue is bid quality, and tCPA can be raised to give the algorithm room to compete.
 
@@ -210,7 +208,7 @@ Where a target comes from, in priority order:
 
 **Never back-solve a target from the account's own current CPA or spend.** Averaging what the account currently pays per conversion and calling that the target is circular: the current CPA reflects whatever is broken about current performance, so the target merely ratifies the status quo. It is a loop that can never improve the account. This is the one forbidden move in target setting, and it applies equally to the high-CPA diagnosis tree and to any smart-bidding reset.
 
-**Worked logic:** average signed-case value $12,000 multiplied by a 15% acquisition budget share gives a $1,800 target cost per signed case; at a 30% lead-to-signed rate that is roughly a $540 target CPL. If the account's current CPL is $900, it is 67% over the external target, and that gap is the finding. The 15% acquisition share is an illustration, not a house default. (unconfirmed)
+**Worked logic:** average signed-case value $12,000 multiplied by a 15% acquisition budget share gives a $1,800 target cost per signed case; at a 30% lead-to-signed rate that is roughly a $540 target CPL. If the account's current CPL is $900, it is 67% over the external target, and that gap is the finding. The 15% acquisition share is an illustration (`PROPOSED`), not a house default.
 
 **When the external target sits well below current performance,** the gap is the finding, not a reason to abandon the target. Fix the drivers first, then step the live target toward the economics number in increments so the algorithm does not oscillate.
 
@@ -222,61 +220,53 @@ _Playbook: PB-33 (anomalously low CPC), PB-25 (high CPC with zero conversions), 
 
 When campaign-level average CPC looks anomalous (the campaign summary, not the search-term level), route by direction.
 
-**Anomalously LOW average CPC.** Observed bands, family law roughly $8 to $25 and elder law roughly $10 to $35, with elder abuse far higher. These bands are PROPOSED and unconfirmed; they are a prompt to look, never a threshold to act on.
+**Anomalously LOW average CPC.** There are no practice-area CPC bands. Judge a campaign's CPC against its own trailing 30-day median and against the account's other campaigns, never against a published band. A campaign reading well under its own trailing median is a prompt to look, never a threshold to act on.
 
-1. **First check: tracking integrity.** A low average CPC on competitive legal terms is a red flag for data contamination: historical data from paused ad groups, test periods when CPCs were lower, or a tracking issue inflating apparent traffic. (unconfirmed)
+1. **First check: tracking integrity.** A low average CPC on competitive legal terms is a red flag for data contamination: historical data from paused ad groups, test periods when CPCs were lower, or a tracking issue inflating apparent traffic. Routing low CPC to tracking integrity before keyword targeting has a real observed basis: paused ad-group history at $0.20 a click caused a confirmed misdiagnosis.
 2. **Do not route to keyword targeting first.** Explaining cheap clicks as wrong match type or low-intent keywords is the secondary frame.
 3. Pull change history and confirm the CPC trajectory. If it was historically normal and recently dropped, something changed.
 4. If search-term data confirms the clicks come from low-intent queries at low CPC, keyword and match-type diagnosis applies, but only after ruling out contamination.
 
 **A PMax launch can produce the same signal at the account level.** A new PMax campaign supplying a large share of clicks at a much lower CPC than Search will drag the blended CPC down without anything being wrong. Split Search-only from PMax before treating a blended CPC move as an anomaly (PB-41).
 
-**Anomalously HIGH average CPC.** In a high-value practice area a very high cost per click can still be rational: elder abuse case values are large enough that a three-figure CPC can be exceptional return. (unconfirmed) Flag it as potentially problematic only when high average CPC combines with (a) zero or near-zero conversions over 14 or more days and (b) adequate impression share above 30%. (unconfirmed) That combination suggests the algorithm is buying expensive clicks that do not convert: landing page, audience, or tracking.
+**Anomalously HIGH average CPC.** In a high-value practice area a very high cost per click can still be rational: an expensive click that acquires a large case is not a defect. No case-value figure is on record, so none is stated. Flag a high average CPC as potentially problematic only when it combines with (a) zero or near-zero conversions over 14 or more days and (b) adequate impression share above 30%. Both numbers are `PROPOSED`. That combination suggests the algorithm is buying expensive clicks that do not convert: landing page, audience, or tracking.
 
 **Third condition: high CPC plus sub-floor but non-zero conversions plus budget-lost impression share** routes to the bidding-strategy fix (Maximize Clicks with a CPC cap), not to the landing-page or tracking diagnosis. The zero-conversion branch points at the landing page and tracking; the thin-but-non-zero branch points at the bidding model.
 
 ---
 
-## Search-term data: coverage ceiling
+## Search-term data: negative precision
 
-`search_term_view` typically shows only part of actual campaign spend, in observed cases around half. The API withholds low-volume terms and caps rows per query, and this is not fixable through query splitting or pagination. The 50% figure is an observed ceiling, not a constant. (unconfirmed)
+The check reads the account's own search terms and works from what is there. It never estimates, extrapolates, or scales a figure to stand for spend it has not seen, and it never presents a derived total as though it were measured.
 
-**The coverage check is mandatory before presenting any search-term finding:**
+**Query per campaign, not per account.** One query across all campaigns returns a coarse, truncated result. Per-campaign or per-ad-group querying is the standard pull.
 
-1. Pull actual campaign spend for the period (`FROM campaign`).
-2. Sum total cost from the `search_term_view` results.
-3. Report the ratio: "search-term data covers $X of $Y actual spend (Z%)".
-
-Do not present findings, waste estimates, or negative-keyword recommendations before that ratio is on the table. Disclose coverage and proceed; do not ask permission to analyse incomplete data.
-
-**Query per campaign, not per account.** One query across all campaigns caps at a few hundred rows and gives far worse coverage. Per-campaign or per-ad-group querying still converges on the ceiling.
-
-**Do not extrapolate the hidden portion.** Whether the invisible spend behaves like the visible spend is unconfirmed. Do not state that the hidden portion is randomly distributed, and do not scale visible waste dollars up by the coverage ratio and present the result as an estimate of total waste. Report the visible figure, report the coverage ratio, and let the reader see both. (unconfirmed)
-
-**Never recommend blocking a term category solely on search-term data showing zero conversions.** Account-level conversion data is authoritative for spend; search-term data is a sample.
+**Never recommend blocking a term category solely on search-term data showing zero conversions.** Account-level conversion data is authoritative for spend. A term category is checked against what the account actually converted on before any negative ships.
 
 **Negative-keyword precision, two decision rules:**
 
 - **Never negate a term that has converted**, no matter how much it looks like junk, a referral or nonprofit name, or a geo or category mismatch. Check the term's conversion data first: a converting term is a client, not waste.
 - **On a geo-mismatched query containing the core service term, negate the geo token only.** For `[core service term] [wrong city]`, negate the wrong city, never the service term, so the campaign keeps serving in its real geography.
 
+**Negatives come from this account's own search terms.** A proposal is built from the terms the account actually served, checked against the not-waste list above and against each term's own conversion record. The categories in `references/negative-keyword-library.md` seed a new campaign; they are never applied wholesale to a live account.
+
 **A wasteful broad keyword that is also a major conversion source converts to phrase, it does not get paused.** When a broad-match positive keyword shows real waste but also drives a large share of the campaign's conversions, especially on a smart-bidding campaign where those conversions feed the model, pausing or deleting it throws away the volume and starves the bidding signal. The default is convert broad to phrase, add specific negatives for the irrelevant categories, and set a monitoring window before any further tightening. Pause only if the converting traffic does not survive that.
 
 **An above-average CPA is not on its own a reason to cut a unit that supplies a large share of conversions.** An expansion ad group running above sibling CPA while producing half the campaign's conversions can be worth keeping; lifetime CPA is distorted by early dead weeks. Judge marginal contribution, not the lifetime average.
 
-_The coverage rules above are a required-green gate on PB-12, PB-13, PB-14, and PB-28, not playbooks themselves._
+_The rules above are a required-green gate on PB-12, PB-13, PB-14, and PB-28, not playbooks themselves._
 
 ---
 
 ## Quality-score throttling: all components below average with zero impressions
 
-The UI shows a "limited by quality score" label for severely underperforming keywords. The API does not expose it: `system_serving_status` returns `ELIGIBLE` even for a throttled keyword. The heuristic below is a detection pattern only, and every claim in this section is unconfirmed: no rebuild has been executed and measured. The playbook that encoded this move (PB-15) was retired in 2026-09.
+Quality score is a watched signal. A falling quality score with impressions collapsing while ad rank and bid hold is a finding: it is the throttling shape, and it is reported.
 
-**Throttled keyword pattern (unconfirmed):** quality score of 2 or less, AND all three components below average (`search_predicted_ctr`, `creative_quality_score`, `post_click_quality_score`), AND zero or near-zero impressions over the most recent 7 to 14 days on an active campaign with available budget.
+The UI shows a "limited by quality score" label for severely underperforming keywords. The API does not expose it: `system_serving_status` returns `ELIGIBLE` even for a throttled keyword. This section is detection only.
 
-**Standard quality-score work may not recover a keyword in that state (unconfirmed).** Improving ad copy, landing page, or click-through rate applies to keywords still entering auctions. A keyword that is not entering auctions is a different case.
+**Throttled keyword pattern:** quality score of 2 or less, AND all three components below average (`search_predicted_ctr`, `creative_quality_score`, `post_click_quality_score`), AND zero or near-zero impressions over the most recent 7 to 14 days on an active campaign with available budget. This shape has a real observed case behind it: quality score 1, all three components below average, zero impressions.
 
-**Candidate intervention, structural replacement (unconfirmed):** pause the keyword, and build a new variant in a reorganized ad group with dedicated ad copy and a landing page matched to the query intent. Whether a fresh keyword actually gives a clean quality signal with no inherited history is unconfirmed and should not be stated as a guarantee.
+**No fix is prescribed.** The rebuild tactic that used to sit here, pausing the keyword and building a fresh variant to get a clean quality signal, was retired in 2026-09 along with the playbook that encoded it (PB-15). Report the detection and hand the decision back.
 
 State the heuristic explicitly when diagnosing. Do not present `system_serving_status = ELIGIBLE` as confirmation that the keyword is serving normally.
 
@@ -288,11 +278,11 @@ _Playbook: PB-11, with PB-12 when the keyword is also a major conversion source 
 
 When a broad-match keyword is flagged for cleanup, the default is **convert to phrase match first**: not delete, not pause, not a jump to exact.
 
-**Why phrase, not exact:** broad to exact skips the intermediate step that keeps near-intent variants while filtering the looser ones. Exact may lose reach unnecessarily. (unconfirmed)
+**Why phrase, not exact:** broad to exact skips the intermediate step that keeps near-intent variants while filtering the looser ones. Exact loses reach unnecessarily. Phrase before exact is the operator's own default.
 
 **Why not delete or pause:** a broad keyword with conversion history carries smart-bidding signal. Changing match type is the lower-risk path, though it should not be assumed to preserve the criterion's history intact; verify performance after the change rather than relying on continuity.
 
-**When a hard delete is appropriate:** for terms that are genuinely irrelevant to the firm, principally the wrong practice area or the wrong geography. (unconfirmed) Competitor brand terms are a judgment call, not an automatic delete: some firms bid competitor brands deliberately, so confirm intent before removing them.
+**When a hard delete is appropriate:** for terms that are genuinely irrelevant to the firm: the wrong practice area or the wrong geography. Competitor brand terms are not in that set, and they are not in the negate set either. No action is taken on a competitor name in either direction.
 
 Sequence: convert broad to phrase, monitor search terms for 2 to 4 weeks, then negate specific waste terms or tighten to exact if CPA is still above target.
 
@@ -304,19 +294,19 @@ _Playbook: PB-26 (segment and report), PB-27 (a network setting enabled with no 
 
 **The blended CPA is always the reported CPA.** It is the most accurate figure for what the account actually paid per conversion, and it is never withheld, never replaced by a Search-only number, and never presented as invalid. The network split is supporting detail underneath it, never a substitute for it.
 
-**Search Partners being enabled is flagged.** It is atypical for these accounts and it is not wanted. When it is on, report that as a flag on its own, separate from the CPA line, and record whether there is a reason on file.
+**Search Partners being enabled is flagged.** It is atypical for these accounts and it is not wanted. When it is on, report that as a flag on its own, separate from the CPA line. A specific note on the account or the campaign explaining it clears the flag; the absence of such a note does not make switching it off automatic.
 
 Pull `segments.network` to segment `SEARCH` against `SEARCH_PARTNERS`. If network data is unavailable, say so, keep reporting the blended figure, and name the split as the next pull rather than holding the number back.
 
-**Smart bidding signal risk.** Excluding Search Partners is not a free win: removing the network removes its conversions from the bidding signal. If the campaign is near the reliability floor, exclusion can push it below. Check the volume contribution before recommending exclusion.
+**Smart bidding signal risk.** Excluding Search Partners is not a free win: removing the network removes its conversions from the bidding signal. If the campaign is near the reliability floor for its volume, exclusion can push it below. Check the volume contribution before recommending exclusion.
 
-Decision framework after the split (unconfirmed):
+Decision framework after the split. This is an unconfirmed starting frame, not a decision rule:
 
 - Partners CPA above target and Partners volume small relative to Search: exclusion is reasonable and the signal loss is minimal.
 - Partners CPA above target but Partners contributing significant volume: exclusion risk is real; check whether the blended CPA stays on target without it.
 - Search CPA already on target: the issue is contained to Partners, and exclusion is the likely fix, but confirm the volume contribution first.
 
-Partners traffic converting at a lower rate and higher CPA in legal is a general expectation, not a measured result on these accounts. (unconfirmed)
+Partners traffic converting at a lower rate and higher CPA in legal is a general expectation, not a measured result on these accounts.
 
 ---
 
@@ -353,6 +343,8 @@ A configuration finding is a departure from **our** baseline, not from Google's 
 
 **PROPOSED entries are capped at config item.** Escalating one to a red flag asserts a standard the operator has not set.
 
+**An auto-applied Google recommendation is generally a red flag, and every one is checked.** Auto-apply is off in the baseline. Where the live account shows auto-applied changes, read every one of them against the account rather than accepting the class.
+
 **The baseline is not the verdict.** Classification is data. Whether a deviation gets changed, when, and at what cost is the operator's call.
 
 ---
@@ -373,9 +365,11 @@ _Card placement, the maximum per account, ordering, banned wording, and the acce
 
 When a question carries a stated premise ("why is X so high?", "X is at $284, should we pause it?", "X is performing worse than Y"), **verify the premise before diagnosing it.** Do not accept a stated CPA, comparison, or benchmark as given.
 
+At these volumes a single conversion can swing a low-volume CPL well beyond the usual rule of thumb: measured weekly swings reach +163% on conversion moves that are inside noise.
+
 **Cross-account comparisons require extra scrutiny.** A CPA comparison between two accounts is meaningful only if they are comparable: same practice area, same geography type, same conversion volume range, same conversion definition. Elder law against family law, small market against metro, 3 conversions a month against 30: these are not comparable even when both run Google Search.
 
-**Conversion volume threshold for a reliable CPA.** A CPA figure needs roughly 15 to 20 conversions to carry meaning; below that it is noise, and a single high-cost conversion in a low-volume account can move the reported CPA substantially. (unconfirmed) When volume is below that per campaign, flag explicitly that the CPA is not a reliable signal.
+**Conversion volume threshold for a reliable CPA.** A CPA figure needs enough conversions to carry meaning, and how many is a judgment against the account's own volume: sometimes 5 is enough, sometimes 20 is not. There is no house number and none is asserted. Below whatever the floor is for that account the figure is noise, and a single high-cost conversion in a low-volume account can move the reported CPA substantially. When volume is below it per campaign, flag explicitly that the CPA is not a reliable signal.
 
 **Reasons lists follow verification, they do not precede it.** Producing a list of reasons CPA is high before confirming CPA is high treats a premise as fact. If live data is unavailable, frame conditionally.
 
@@ -404,9 +398,9 @@ _Playbook: PB-01 (budget-lost on a converting campaign), PB-02 (rank-lost ceilin
 
 **Rule:** always pull both fields together. Never call a campaign budget-constrained on rank-lost impression share alone.
 
-**Rank-lost on Maximize Conversions usually points at quality, not at a bid ceiling.** The algorithm already bids what it calculates as optimal for each auction, so there is no manual bid to raise; the practical lever is quality score and landing-page quality. Treat this as the default reading rather than an absolute: a target-based strategy, a constrained budget, or an auction shift can produce the same metric. (unconfirmed)
+**Rank-lost on Maximize Conversions usually points at quality, not at a bid ceiling.** The algorithm already bids what it calculates as optimal for each auction, so there is no manual bid to raise; the practical lever is quality score and landing-page quality. Check quality first. Treat this as the default reading rather than an absolute: a target-based strategy, a constrained budget, or an auction shift can produce the same metric. Operator ruling, 2026-09-02.
 
-**Budget-lost impression share can occur without hitting the daily cap.** Broad-match keywords can consume budget disproportionately early in the day, serving high-volume lower-intent queries before more targeted phrase and exact keywords compete. In that case the fix is converting the broad keyword to phrase, not increasing budget, which just gives the broad keyword more to consume. (unconfirmed)
+**Budget-lost impression share can occur without hitting the daily cap.** Broad-match keywords can consume budget disproportionately early in the day, serving high-volume lower-intent queries before more targeted phrase and exact keywords compete. In that case the fix is converting the broad keyword to phrase, not increasing budget, which just gives the broad keyword more to consume. Observed case: a $75 daily cap at $53 average daily spend still showed budget-lost from early broad consumption.
 
 **A one-week impression-share anomaly is a hold, not a budget move.** Re-read the complete week before acting (PB-39).
 
@@ -418,12 +412,12 @@ _Playbook: PB-21 (PMax asset coverage gap), PB-22 (PMax asset fatigue), PB-19 (r
 
 Scope is Search ad assets and PMax asset groups. Display and Demand Gen are out of scope.
 
-A creative pass is a standing part of every periodic check, kept proportionate: a focused pass, not a forensic teardown. (unconfirmed)
+A creative pass is a standing part of every periodic check, kept proportionate: a focused pass, not a forensic teardown. Operator ruling, 2026-09-02: it runs on every check.
 
 What the pass covers, with full detail in `references/creative-audit.md`:
 
-- **Coverage.** Map every enabled PMax asset group against its asset inventory and flag groups thin on or missing image assets. Do not flag a pure Search campaign for lacking image assets it does not use.
-- **Quality and content.** Three bars: on-brand, legible, and message-matched to the ad group's intent. Vision analysis is a strong first read; the brand and compliance call on a legal client is a manual review.
+- **Coverage.** Map every enabled PMax asset group against its asset inventory and flag groups thin on or missing image assets, as a LOW finding: PMax can legitimately run without images. Do not flag a pure Search campaign for lacking image assets it does not use.
+- **Quality and content.** Three bars: on-brand, legible, and message-matched to the ad group's intent. Vision analysis is a strong first read; the brand and compliance call on a legal client is a manual review. Incorrect information or a compliance issue on a live ad is the highest-ranked creative finding there is.
 - **Usage gaps.** Assets uploaded but attached to nothing.
 - **Fatigue.** Long-running unchanged assets, cross-referenced against change history. Where per-asset performance is thin, fall back to ad-group or campaign click-through rate as a proxy and say so. Do not over-call fatigue on low volume.
 
@@ -490,36 +484,6 @@ Internal analysis is a prioritized findings list with context and the standard m
 
 ---
 
-## Audit mode and search-query mining
-
-A structured, one-off deep audit of an account, as distinct from the periodic check. The posture: no setting unchecked, no dollar unaccounted for; automated data pull first, analysis second; every finding mapped to business impact and graded by severity. (unconfirmed)
-
-### Forensic audit sections (unconfirmed as a fixed set)
-
-1. **Summary.** Account-health picture, top risks, top opportunities, expected business impact.
-2. **Account structure.** Taxonomy, granularity, naming, labels, geo, device, dayparting.
-3. **Bidding and budget.** Strategy fit for the campaign's maturity, learning-period violations, budget-constrained campaigns, floor and ceiling issues.
-4. **Keyword and targeting.** Match-type distribution, negative coverage, quality-score distribution, audience observation against targeting.
-5. **Competitive positioning.** Impression-share gaps and top-of-page metrics from GAQL. Auction insights and overlap rate are an API blind spot: request a screenshot and never present them as auto-pulled.
-6. **Landing-page fit.** Assessed from the rendered page and external tools, never from the Ads API. Never present landing-page findings as auto-pulled.
-7. **Compliance.** Legal-services policy, bar-advertising claim risk, prohibited and absolute claims.
-8. **Change-history forensics.** When degradation started and what changed before and after.
-9. **Recommendation roadmap.** Severity, expected impact, owner, and sequencing.
-
-### Search-query mining and n-gram waste (unconfirmed)
-
-Runs under PB-13 and the coverage gate above, and feeds `references/negative-keyword-library.md`:
-
-- Spend-weighted irrelevant-query detection and n-gram frequency analysis for recurring modifiers.
-- Zero-conversion and high-CPC low-value query flags, and query to ad to landing-page alignment scoring.
-- Tiered negatives (account, campaign, ad group, shared list) with conflict detection, placed at the narrowest sufficient scope.
-- Query sculpting to route searches to the right ad groups, and brand against non-brand leakage detection.
-- Output: the visible waste table, the n-gram table, recommended negatives by level, and conflicts and risks. Every negative proposal is checked against the not-waste list and the never-negate-a-converter rule before it ships.
-
-### Tracking-QA gate, before any audit result is trusted (unconfirmed)
-
-If conversion tracking is broken or suspicious, the whole analysis is provisional. Check the Ads figures against analytics, CRM, and call-tracking data where available, comparing like definitions: qualified answered calls against the qualified-upload action, not all source calls against native calls-from-ads. The output says "tracking unreliable" loudly when it applies. Bad tracking is worse than no tracking.
-
-### Responsive search ad construction
+## Responsive search ad construction
 
 Headline buckets, coherent combinations, and character limits, applied under PB-19's completeness and relevance requirements.

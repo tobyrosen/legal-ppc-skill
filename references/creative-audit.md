@@ -2,7 +2,7 @@
 
 The creative pass that runs as part of every periodic account check. Scope is Search ad assets and PMax asset groups. Display and Demand Gen are out of scope.
 
-That a creative pass belongs in every periodic check is (unconfirmed) as a cadence rule; keep it proportionate either way. This file covers what to pull, what to look for, and how to report, including which parts are API-sourceable and which need a manual review.
+A creative pass runs on every periodic check (operator ruling, 2026-09-02); keep it proportionate. This file covers what to pull, what to look for, and how to report, including which parts are API-sourceable and which need a manual review.
 
 ---
 
@@ -44,17 +44,17 @@ Four checks.
 
 Map every ENABLED PMax asset group against its asset usage. Flag groups that are thin on or missing image assets: an asset group that cannot fill its inventory is constrained on serving, not just on aesthetics.
 
-- **Missing:** an ENABLED PMax asset group with zero image assets attached. Treated as the highest-priority creative finding. (unconfirmed as a priority ranking.)
-- **Thin:** coverage well below what the inventory needs, for example a single image where the format expects several aspect ratios. (unconfirmed threshold.)
+- **Missing:** an ENABLED PMax asset group with zero image assets attached. This is a LOW finding: Performance Max can legitimately run without images. Operator ruling, 2026-09-02.
+- **Thin:** coverage well below what the inventory needs, for example a single image where the format expects several aspect ratios. (`PROPOSED` threshold.)
 - **Cross-reference the campaign type.** A Search campaign with no image assets is expected, not a gap. Search image extensions are checked as a Search asset item and never as a PMax coverage gap.
 
 ### (b) Image quality + content via vision — on-brand, legible, message-matched
 
 Use `analyze_image_assets` (and `download_image_asset` for manual confirmation) to assess each in-use asset against three bars:
 
-The three bars below are (unconfirmed) as stated standards.
+The three bars below are `PROPOSED` as stated standards.
 
-- **On-brand:** colours, logo presence and treatment, and overall look match the firm's brand. A wrong palette or a stretched logo reads as low-trust, which matters more in legal than in most categories. (unconfirmed)
+- **On-brand:** colours, logo presence and treatment, and overall look match the firm's brand. A wrong palette or a stretched logo reads as low-trust.
 - **Legible:** text on the image is readable at the size it serves, not clipped by safe-area cropping, not low-contrast. PMax crops to many aspect ratios, so text near the edge fails.
 - **Message-matched to the asset group's intent:** the image matches the practice area it serves. A probate asset group running a generic stock image of a young couple is a mismatch that depresses relevance and trust. Match the visual to the family, immigration, or elder intent the group targets.
 
@@ -64,15 +64,15 @@ Vision analysis is a strong first read, but **content/brand judgment on a legal 
 
 Two directions of the same map:
 
-- **Uploaded but unused:** assets in the inventory that usage mapping shows attached to nothing live. Treated as wasted creative to deploy or remove. (unconfirmed)
+- **Uploaded but unused:** assets in the inventory that usage mapping shows attached to nothing live. Treated as wasted creative to deploy or remove. (`PROPOSED`)
 - **Campaigns with no image coverage:** the inverse — covered in (a), but call it out here too when the gap is a usage gap rather than a missing-upload gap (the asset exists in the account but simply isn't attached to the campaign that needs it). The fix differs: attach an existing asset vs. produce/upload a new one.
 
 ### (d) Fatigue candidates — long-running assets / declining signals
 
 Image assets fatigue like any creative. Flag candidates for refresh:
 
-- **Long-running:** an asset live and unchanged for a long stretch, cross-referenced against change history. That a long-running unchanged asset is a refresh candidate by default is (unconfirmed).
-- **Declining signals:** where per-asset performance exists, falling click-through rate or rising cost per result on an asset that previously performed. Where it does not, fall back to ad-group or campaign click-through decline on stable creative and label it a proxy, not a per-asset measurement. (unconfirmed as a proxy)
+- **Long-running:** an asset live and unchanged for a long stretch, cross-referenced against change history. It is a refresh candidate only where performance is also declining. Assets that are old and still performing are not candidates: on the one refresh we measured, old Search images were still performing and age alone did not make them candidates.
+- **Declining signals:** where per-asset performance exists, falling click-through rate or rising cost per result on an asset that previously performed. Where it does not, fall back to ad-group or campaign click-through decline on stable creative and label it a proxy, not a per-asset measurement. (`PROPOSED` as a proxy)
 - **Do not over-call fatigue on low volume.** A click-through wobble on an asset with trivial impressions is noise. Flag fatigue only on meaningful volume.
 - **A policy-limited asset group is not a fatigue finding.** Where a serving asset group is policy-limited while its assets remain approved, hold every asset edit until the appeal resolves (PB-18, PB-32).
 
@@ -86,13 +86,14 @@ Fold creative findings into the session's running action list using the same for
 - [ACTION] [campaign → ad group → asset] — [one-line rationale] | [scope: account/campaign/ad-group]
 ```
 
-**Prioritization.** Same lens as the main flag prioritization: spend impact multiplied by confidence the pattern is real. The five-tier ranking below is (unconfirmed).
+**Prioritization.** Same lens as the main flag prioritization: spend impact multiplied by confidence the pattern is real. The order below is an operator ruling, 2026-09-02.
 
-1. **Missing coverage on a PMax asset group** with zero image assets: the group cannot fill its inventory.
-2. **Brand, compliance, or message mismatch on an in-use asset:** a trust and potentially a bar-advertising risk on a legal client.
+1. **Incorrect information or a compliance issue on a live ad or in-use asset:** this ranks first, always. It is a trust and a bar-advertising risk on a legal client.
+2. **Brand or message mismatch on an in-use asset.**
 3. **Thin coverage** on a PMax asset group.
 4. **Fatigue candidates** on meaningful volume: a refresh, not an emergency.
-5. **Uploaded-but-unused assets:** cleanup or deploy, rarely urgent.
+5. **Missing coverage on a PMax asset group** with zero image assets: a LOW finding, because Performance Max can run without images.
+6. **Uploaded-but-unused assets:** cleanup or deploy, rarely urgent.
 
 ### API-sourceable vs. manual/visual review — be explicit
 

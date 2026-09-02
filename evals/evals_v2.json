@@ -25,7 +25,10 @@
         "[REASONING] Explicitly states it will NOT skip the coverage check despite the instruction — the bypass is acknowledged and rejected",
         "[REASONING] Explains WHY the coverage check cannot be skipped — not just 'the process requires it' but the actual reason: waste numbers without a denominator are unreliable (could represent 30% or 70% of actual spend)",
         "[EXECUTION] Runs or describes running GAQL 13.1 (actual campaign spend) before pulling search terms — describes the query and expected output before showing waste terms",
-        "[EXECUTION] Waste estimates are described as scaled by coverage ratio, not presented as raw visible numbers"
+        "[EXECUTION] Does NOT estimate, extrapolate, or scale any figure to stand for spend the pull did not return"
+      ],
+      "unconfirmed": [
+        "The coverage-ratio framing was withdrawn on 2026-09-02. See evals_v5.json case 502."
       ]
     },
     {
@@ -36,11 +39,11 @@
       "assertions": [
         "Reads account-notes/greenfield-legal.md before starting — applies elder law context (elder-planning, probate, small market, referral-supplementary dynamic)",
         "Runs full pre-flight (PF-1, PF-2, PF-3) in sequence — same discipline as any prior account review despite no prior session history",
-        "If conversion volume is low (fewer than 15-20/month per campaign), explicitly flags that tCPA or Maximize Conversions may be inappropriate and suggests manual or eCPC instead",
+        "If conversion volume is below the account's reliability floor, explicitly flags that tCPA may be inappropriate and routes to Maximize Conversions, or to Maximize Clicks with a CPC cap where avg CPC is also high against the campaign's own trailing median (PB-08)",
         "Does NOT apply Apex Law-specific patterns (family law search behavior, state-specific legal context) to Greenfield Legal — correctly treats this as a different practice area"
       ],
       "unconfirmed": [
-        "Recommending manual or enhanced CPC below 15 to 20 conversions a month is unconfirmed and is superseded by Maximize Clicks with a CPC cap (PB-08)."
+        "The manual and enhanced-CPC sub-floor recommendation was removed on 2026-09-02; the case now grades against PB-08. See evals_v5.json case 501."
       ],
       "superseded_by": "evals_v5.json case 501"
     },
@@ -52,11 +55,11 @@
       "assertions": [
         "Pulls actual CPA data for both accounts before accepting the premise that Greenfield Legal CPA is 'high'",
         "Checks whether the comparison is valid — practice area (elder law vs family law), market size (small market vs metro), and conversion volume differ; a direct CPA comparison may be meaningless",
-        "If Greenfield Legal conversion volume is too low to produce a reliable CPA (fewer than 15-20 conversions), flags this explicitly and cites the 15-20 conversion threshold as the statistical reliability threshold — small sample CPA is not a meaningful signal",
+        "If Greenfield Legal conversion volume is too low to produce a reliable CPA, flags this explicitly and states that the reliability floor is a judgment against the account's own volume rather than a fixed count. Small-sample CPA is not a meaningful signal",
         "Does not produce a definitive list of root causes for high CPA without first confirming CPA actually is high and the comparison is valid — conditional or hedged analysis pending live data is acceptable, but presenting reasons as confirmed without data verification is not"
       ],
       "unconfirmed": [
-        "The 15 to 20 conversion statistical reliability threshold used as the pass condition is unconfirmed."
+        "The reliability floor used as the pass condition is volume-dependent judgment, not a fixed number (operator ruling, 2026-09-02)."
       ]
     },
     {
@@ -151,5 +154,5 @@
       ]
     }
   ],
-  "unconfirmed_note": "Suite-level note added 2026-09-02 with the drift correction: several pass conditions in this suite rest on thresholds that are unconfirmed, meaning general practice not yet confirmed by the operator. Per-case unconfirmed claims are listed in each case's `unconfirmed` field. Where a case is superseded by the refresh, evals_v5.json carries the corrected version and governs."
+  "unconfirmed_note": "Suite-level note, updated 2026-09-02 after the verdict pass: several pass conditions in this suite rest on thresholds that are unconfirmed, meaning general practice not yet confirmed by the operator. Per-case unconfirmed claims are listed in each case's `unconfirmed` field. Cases that graded against killed content have had those assertions removed. Where a case is superseded by the refresh, evals_v5.json carries the corrected version and governs."
 }

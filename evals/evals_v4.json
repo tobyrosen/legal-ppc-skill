@@ -75,7 +75,7 @@
         "Places the playbook line in the PLAYBOOKS: group after the RED FLAGS block (or after 'RED FLAGS: none' / 'playbooks: none fired' as applicable)",
         "Ends the line with 'accept/reject' and does not issue a go/no-go on the campaign itself",
         "Names budget-lost as the larger IS component (26%/24% vs rank-lost 9%/11%) before firing PB-01",
-        "Names the >=15 conversions / 15-20 reliability floor as cleared (22 conversions in trailing 30 days)"
+        "Names the reliability floor as cleared (22 conversions in trailing 30 days), the floor being volume-dependent judgment rather than a fixed count"
       ],
       "must_not": [
         "Does NOT phrase the line using 'should', 'needs', 'recommend', 'underperforming', or 'the problem is' anywhere in the response",
@@ -107,7 +107,7 @@
       "expected_behaviors": [
         "Reports the coverage statement (55%, $1,880 of $3,410) as data, using the campaign spend as the denominator, not an account total",
         "Reports the n-gram and its conversion as data, with no PB-nn move line and no accept/reject proposal (a 'playbooks: none fired' line is the empty form and is allowed; naming PB-13 as a gated candidate without a move is not a card line)",
-        "States that n=1 conversion is below the 15-20 reliability floor, so the term's $186 figure is not a CPA judgment"
+        "States that n=1 conversion is below the reliability floor for this campaign's volume, so the term's $186 figure is not a CPA judgment"
       ],
       "must_not": [
         "Does NOT add a PB-13 move line (pattern + standard move + accept/reject) or any negative-keyword proposal for 'estate paperwork help', because the n-gram has converted (the PB-13 do-not-move condition: negatives never block a term with conversion history)",
@@ -124,13 +124,14 @@
         "Reports the coverage statement as data",
         "Names PB-13 and uses the card-line grammar (playbook PB-13 (<scope>): standard move for ... is .... accept/reject)",
         "Ends the playbook line with accept/reject",
-        "States the caveat 'existing negatives not checked' (or equivalent) because the existing-negatives pull was not supplied, and the standard move starts with that pull"
+        "States the caveat 'existing negatives not checked' (or equivalent) because the existing-negatives pull was not supplied, and the standard move starts with that pull",
+        "Proposes the negative from the account's own search terms, checked against the not-waste list"
       ],
       "must_not": [
-        "Does NOT propose the negative before stating the coverage ratio",
+        "Does NOT propose a negative from a library category rather than from the account's own search terms",
         "Does NOT phrase the line as a verdict on the campaign or the keyword ('this term is junk')"
       ],
-      "trap": "Phrases the line as a verdict on the campaign or the keyword ('this term is junk'), proposes the negative before stating the coverage ratio, or omits PB-13 entirely.",
+      "trap": "Phrases the line as a verdict on the campaign or the keyword ('this term is junk'), proposes a negative from a library category rather than from the account's own search terms, or omits PB-13 entirely.",
       "notes": "Converted from SKILL-playbooks.section.md Part C, EV-PB-03 second variant (the fire case, contrasting with 203's gated case)."
     },
     {
@@ -258,23 +259,23 @@
     {
       "id": 210,
       "category": "playbook_validated",
-      "prompt": "Account Greenfield Legal (fictional), campaign 'Westhollow - Elder Abuse' on Maximize Conversions. 30-day conversions = 6 (below the 15-20 conversion floor). Avg CPC = $210 against a practice-area CPC band topping out around $105 (roughly 2x the top of band). Budget-lost impression share = 24%, present alongside the low conversion count. Tracking verified (PF-1 clean). Produce the walk card.",
-      "expected_output": "Reports the conversion count, avg CPC versus the practice-area band, and budget-lost as data, naming the sub-floor conversion count explicitly. Adds one PB-08 line proposing a switch from Maximize Conversions to Maximize Clicks with a CPC cap set at or slightly below the trailing 30-day median CPC, with an explicit 3-to-4-week revisit window watching CVR. Frames the move explicitly as a cost-control / signal-rebuilding move, not a conversion move, and states plainly that no conversion-count or CPL improvement should be expected or promised from the switch.",
-      "trap": "Frames the Max Clicks switch as a way to 'get more conversions' or 'improve CPL', promises a conversion or CPL improvement, or fires a PB-01 budget-raise line instead on the strength of the budget-lost figure.",
+      "prompt": "Account Greenfield Legal (fictional), campaign 'Westhollow - Elder Abuse' on Maximize Conversions. 30-day conversions = 6, below the reliability floor for this campaign's volume. Avg CPC = $210 against the campaign's own trailing 30-day median CPC of about $105 (roughly 2x its own median). Budget-lost impression share = 24%, present alongside the low conversion count. Tracking verified (PF-1 clean). Produce the walk card.",
+      "expected_output": "Reports the conversion count, avg CPC against the campaign's own trailing 30-day median, and budget-lost as data, naming the sub-floor conversion count explicitly. Adds one PB-08 line proposing a switch from Maximize Conversions to Maximize Clicks with a CPC cap set at or slightly below the trailing 30-day median CPC, with an explicit 3-to-4-week revisit window watching CVR. Frames the move explicitly as a cost-control and signal-rebuilding move, not a conversion move, and states plainly that no conversion-count or CPL improvement should be expected or promised from the switch.",
+      "trap": "Frames the Max Clicks switch as a way to get more conversions or improve CPL, promises a conversion or CPL improvement, judges the CPC against a published practice-area band rather than the campaign's own trailing median, or fires a PB-01 budget-raise line instead on the strength of the budget-lost figure.",
       "assertions": [
         "[PLAYBOOK] Adds one PB-08 line proposing Maximize Conversions to Maximize Clicks with a CPC cap, cap sized at or near the trailing 30-day median CPC",
         "[OUTPUT DISCIPLINE] Frames the move explicitly as cost-control / reach-rebuilding, not as a conversion or CPL-improvement move",
         "[FALSE-FIRE] Does NOT state or imply that conversions or CPL will improve as a result of the switch",
         "[DO-NOT-MOVE] Does NOT add a PB-01 budget-raise line for this campaign -- sub-floor conversions plus high CPC is not a budget-lost fix",
         "[FORMAT] States the 3-to-4-week revisit window with CVR named as the metric to watch",
-        "[REASONING] States the sub-floor conversion count (6, versus the 15-20 floor) explicitly as the reason no CPL judgment is being made on this campaign"
+        "[REASONING] States the sub-floor conversion count (6, against the reliability floor for this campaign's volume) explicitly as the reason no CPL judgment is being made on this campaign",
+        "[NEGATIVE] Does NOT judge the CPC against a published practice-area CPC band; there are none"
       ],
       "notes": "Pattern validated in practice per playbooks.md PB-08 Evidence field (validated in practice, 1 outcome, five monthly readings): conversions held flat then went to zero after the switch in the measured case, which is why the entry -- and this case -- bans promising a conversion or CPL improvement from the move. No client reference; fictional figures only.",
       "unconfirmed": [
-        "The CPC cap sized at the trailing 30-day median CPC is unconfirmed.",
-        "The practice-area CPC band the case leans on is PROPOSED and unconfirmed, and the personal-injury and real-estate bands were removed in the 2026-09 refresh."
-      ],
-      "superseded_by": "evals_v5.json case 501 (the practice-area CPC band it leans on lost its personal-injury and real-estate rows)"
+        "The CPC cap sized at the trailing 30-day median CPC is `PROPOSED`.",
+        "Practice-area CPC bands were deleted everywhere on 2026-09-02; every campaign is judged against its own trailing median CPC."
+      ]
     },
     {
       "id": 211,
@@ -295,5 +296,5 @@
       "notes": "Pattern validated in practice per playbooks.md PB-39 Evidence field (validated in practice, 2 outcomes): both measured flips reverted within three to four days with nothing touched, which is the direct basis for the hold-and-re-read line here. No client reference; fictional figures only."
     }
   ],
-  "unconfirmed_note": "Suite-level note added 2026-09-02 with the drift correction: several pass conditions in this suite rest on thresholds that are unconfirmed, meaning general practice not yet confirmed by the operator. Per-case unconfirmed claims are listed in each case's `unconfirmed` field. Where a case is superseded by the refresh, evals_v5.json carries the corrected version and governs."
+  "unconfirmed_note": "Suite-level note, updated 2026-09-02 after the verdict pass: several pass conditions in this suite rest on thresholds that are unconfirmed, meaning general practice not yet confirmed by the operator. Per-case unconfirmed claims are listed in each case's `unconfirmed` field. Cases that graded against killed content have had those assertions removed. Where a case is superseded by the refresh, evals_v5.json carries the corrected version and governs."
 }

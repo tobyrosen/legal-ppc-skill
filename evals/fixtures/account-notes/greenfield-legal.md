@@ -27,7 +27,7 @@ Targets come from the firm's economics, not from back-solving the account's curr
 
 ## Known Context (read before diagnosing)
 
-- LOW VOLUME IS STRUCTURAL: Elder-Planning runs ~1–2 conversions/month and Probate is similar — far below the ~15–20/month volume smart bidding needs to function. A CPA computed from one or two conversions is statistically meaningless; do not treat a 2-conversion CPA as a real signal.
+- LOW VOLUME IS STRUCTURAL: Elder-Planning runs about 1 to 2 conversions/month and Probate is similar, far below the volume smart bidding needs to function on this account. A CPA computed from one or two conversions is statistically meaningless; do not treat a 2-conversion CPA as a real signal.
 - RECENT CONVERSION-TRACKING CLEANUP: duplicate Elder-Planning intake-form conversion actions (two actions firing on a single submission, double-counting) were removed about two weeks ago. Reported Elder-Planning conversions previously ran ~8/month. Whether a post-cleanup drop reflects (A) correct removal of inflation or (B) a tag broken during the cleanup is NOT yet established — verify with change history and a tag/debug check before concluding.
 
 ## Pending Actions (check before any new analysis)
