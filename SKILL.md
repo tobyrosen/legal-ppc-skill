@@ -77,7 +77,6 @@ It is a gate on the recommendation, not an output section. Surface it only when 
 | `references/negative-keyword-library.md`  | Negative-keyword patterns by category, with the do-not-negate rules                  |
 | `references/creative-audit.md`            | Search image-asset and PMax asset audit procedure                                    |
 | `references/gaql-query-library.md`        | Pre-built GAQL queries by diagnostic task                                            |
-| `account-audit-checklist.md`              | First-review audit checklist                                                         |
 
 ---
 

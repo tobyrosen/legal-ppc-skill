@@ -47,7 +47,7 @@ Every threshold and every expected result below sits inside these five facts. An
 
 ## Needs operator confirmation (PROPOSED thresholds)
 
-Every threshold below was set by judgment while writing this file, not by an existing rule in `SKILL.md`, the knowledge base, the diagnosis trees, or the audit checklist. Each is marked `PROPOSED` at its point of use. Confirm, change, or drop them.
+Every threshold below was set by judgment while writing this file, not by an existing rule in `SKILL.md`, the knowledge base, or the diagnosis trees. Each is marked `PROPOSED` at its point of use. Confirm, change, or drop them.
 
 | #   | Playbook | Proposed threshold or step                                                                                                                                                                                                                        |
 | --- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -190,7 +190,7 @@ If conversions do not move at all while spend and avg CPC both rise, the raise h
 playbook PB-01 (Westhollow - Divorce): standard move for budget-lost IS 25%+ on a campaign converting at target is a single 20 to 30% daily budget step, then hold 14 days. accept/reject
 ```
 
-**Related.** SKILL.md "Impression share: two separate metrics"; diagnosis trees Sub-tree A; audit checklist Section 6; knowledge base "Bidding". Cross-refs PB-02, PB-03, PB-05.
+**Related.** SKILL.md "Impression share: two separate metrics"; diagnosis trees Sub-tree A; knowledge base "Bidding". Cross-refs PB-02, PB-03, PB-05.
 
 ---
 
@@ -222,7 +222,7 @@ _What happened when we did it._ A rank-lost ceiling held at 52-67% for over ten 
 playbook PB-02 (Westhollow - Custody): standard move for rank-lost IS 40%+ is QS and landing-page work, budget held flat, no bid change. accept/reject
 ```
 
-**Related.** SKILL.md "Impression share: two separate metrics" (on Maximize Conversions, rank-lost usually points at quality, check quality first); diagnosis trees Sub-tree A and Sub-tree B; audit checklist Section 7. Cross-refs PB-01, PB-18, PB-25.
+**Related.** SKILL.md "Impression share: two separate metrics" (on Maximize Conversions, rank-lost usually points at quality, check quality first); diagnosis trees Sub-tree A and Sub-tree B. Cross-refs PB-01, PB-18, PB-25.
 
 ---
 
@@ -632,7 +632,7 @@ playbook PB-14 (Westhollow - Divorce): standard move for a geo-mismatched query 
 playbook PB-16 (Westhollow - Divorce): standard move for the same keyword serving in two ad groups is keeping the instance that converts, pausing the other. accept/reject
 ```
 
-**Related.** Audit checklist Section 2 (no duplicate keywords across ad groups); knowledge base "Campaign Structure"; diagnosis trees Tree 5 Step 4. Cross-refs PB-11, PB-19.
+**Related.** Knowledge base "Campaign Structure"; diagnosis trees Tree 5 Step 4. Cross-refs PB-11, PB-19.
 
 ---
 
@@ -656,7 +656,7 @@ playbook PB-16 (Westhollow - Divorce): standard move for the same keyword servin
 playbook PB-17 (Westhollow - Probate, ag Estate Admin): standard move for a keyword at 90 days of spend and zero conversions is a pause, or a match-type tighten first if the term is on-practice. accept/reject
 ```
 
-**Related.** Knowledge base "Long-Term Keyword Management"; audit checklist Section 2; diagnosis trees Tree 5 Step 4. Cross-refs PB-05, PB-11, PB-13.
+**Related.** Knowledge base "Long-Term Keyword Management"; diagnosis trees Tree 5 Step 4. Cross-refs PB-05, PB-11, PB-13.
 
 ---
 
@@ -682,7 +682,7 @@ _What happened when we did it._ Six narrow ad groups were built inside working c
 playbook PB-38 (Westhollow - Custody): standard move for sub-type ad groups at near-zero impressions after 4 weeks, beside a serving general group, is folding them up into the general group. accept/reject
 ```
 
-**Related.** Legal PPC realities item 1 (low volume); the marginal-contribution rule for volume-driving ad groups; audit checklist account-structure section. Cross-refs PB-09, PB-13, PB-16, PB-35.
+**Related.** Legal PPC realities item 1 (low volume); the marginal-contribution rule for volume-driving ad groups. Cross-refs PB-09, PB-13, PB-16, PB-35.
 
 ---
 
@@ -721,7 +721,7 @@ The corollary is a real finding when it happens: on such an account, a DISAPPROV
 playbook PB-18 (Westhollow - Custody): standard move for a DISAPPROVED ad on a serving ad group is pulling the policy reason, editing, resubmitting, with an approved ad kept live meanwhile. accept/reject
 ```
 
-**Related.** SKILL.md PF-2; diagnosis trees PF-2 and Tree 3 Step 1; audit checklist PF-2. Cross-refs PB-02, PB-09, PB-32.
+**Related.** SKILL.md PF-2; diagnosis trees PF-2 and Tree 3 Step 1. Cross-refs PB-02, PB-09, PB-32.
 
 ---
 
@@ -747,7 +747,7 @@ _Refresh 2026-09._ A later weekly improvement without a rewrite does not validat
 playbook PB-19 (Westhollow - Custody, ag Physical Custody): standard move for an ad group under the RSA floor is building to 2 to 3 RSAs, each at 8+ headlines and 3+ descriptions, unpinned. accept/reject
 ```
 
-**Related.** Knowledge base "Ad Copy" (RSAs, ad strength, extensions); audit checklist Section 4; SKILL.md "Responsive search ad construction"; diagnosis trees Sub-tree B. Cross-refs PB-20, PB-25.
+**Related.** Knowledge base "Ad Copy" (RSAs, ad strength, extensions); SKILL.md "Responsive search ad construction"; diagnosis trees Sub-tree B. Cross-refs PB-20, PB-25.
 
 ---
 
@@ -775,7 +775,7 @@ Note the corollary: a CPA gap long attributed to a structural or landing-page ce
 playbook PB-20 (Westhollow - Divorce): standard move for a 3-month CTR slide on 6-month-old creative is a headline refresh with rotation set to rotate indefinitely. accept/reject
 ```
 
-**Related.** Diagnosis trees Sub-tree C (consolidated here); knowledge base "Ad Copy" and "Diagnosing Performance" (staleness); audit checklist Section 4. Cross-refs PB-19, PB-25, PB-31.
+**Related.** Diagnosis trees Sub-tree C (consolidated here); knowledge base "Ad Copy" and "Diagnosing Performance" (staleness). Cross-refs PB-19, PB-25, PB-31.
 
 ---
 
@@ -823,7 +823,7 @@ playbook PB-21 (Westhollow - PMax Mediation): standard move for a PMax asset gro
 playbook PB-22 (Westhollow - PMax Probate): standard move for a long-running PMax image asset with declining CTR on real volume is a same-message refresh at the needed ratios. accept/reject
 ```
 
-**Related.** `references/creative-audit.md` section (d) and the prioritisation list; SKILL.md "Creative and asset audit"; audit checklist Section 4. Cross-refs PB-20, PB-21.
+**Related.** `references/creative-audit.md` section (d) and the prioritisation list; SKILL.md "Creative and asset audit". Cross-refs PB-20, PB-21.
 
 ---
 
@@ -861,7 +861,7 @@ _What happened when we did it._ Detection is validated across two accounts and t
 playbook PB-23 (account): standard move for a primary conversion action silent 14+ days on live click volume is diagnose by action type, repair, then a 2 to 4 week bidding freeze. accept/reject
 ```
 
-**Related.** SKILL.md PF-1 and the `ppc_flags` input contract; diagnosis trees PF-1 and Tree 7 Steps 2 to 4; audit checklist PF-1. Cross-refs PB-06, PB-24, PB-30.
+**Related.** SKILL.md PF-1 and the `ppc_flags` input contract; diagnosis trees PF-1 and Tree 7 Steps 2 to 4. Cross-refs PB-06, PB-24, PB-30.
 
 ---
 
@@ -891,7 +891,7 @@ _What happened when we did it._ Both measured instances were FALSE positives, co
 playbook PB-24 (account): standard move for a primary call action halving while forms hold is a call_view and lead-rule check before treating the drop as demand. accept/reject
 ```
 
-**Related.** Diagnosis trees Tree 7 Step 4 (consolidated here); audit checklist PF-1 (third-party lead rule); SKILL.md "Conversion lag". Cross-refs PB-23, PB-30.
+**Related.** Diagnosis trees Tree 7 Step 4 (consolidated here); SKILL.md "Conversion lag". Cross-refs PB-23, PB-30.
 
 ---
 
@@ -956,7 +956,7 @@ _Refresh 2026-09._ The delta confirms that the required segmentation was skipped
 playbook PB-26 (Westhollow - Custody): standard move for Search Partners enabled on a Search campaign is flagging the setting and pulling the network split beneath the reported blended CPA, exclusion only after the volume contribution is known. accept/reject
 ```
 
-**Related.** SKILL.md "Search Partners and the blended CPA" (consolidated here in full); knowledge base "Campaign Structure" (network settings); audit checklist PF-2. Cross-refs PB-07, PB-27.
+**Related.** SKILL.md "Search Partners and the blended CPA" (consolidated here in full); knowledge base "Campaign Structure" (network settings). Cross-refs PB-07, PB-27.
 
 ---
 
@@ -984,7 +984,7 @@ _What happened when we did it._ Applied once, on a campaign pair whose weekly CP
 playbook PB-27 (Westhollow - Divorce): standard move for display network on a Search campaign with no reason on record is switching it off alone, dated, then reading 28 days. accept/reject
 ```
 
-**Related.** Diagnosis trees PF-2; audit checklist PF-2; knowledge base "Campaign Structure" (network settings) and "What Bad Looks Like". Cross-refs PB-26, PB-09.
+**Related.** Diagnosis trees PF-2; knowledge base "Campaign Structure" (network settings) and "What Bad Looks Like". Cross-refs PB-26, PB-09.
 
 ---
 
@@ -1008,7 +1008,7 @@ playbook PB-27 (Westhollow - Divorce): standard move for display network on a Se
 playbook PB-28 (Westhollow - Divorce): standard move for out-of-area terms at 10%+ of the campaign's search-term spend is geo-token negatives plus location exclusions, targeting setting unchanged. accept/reject
 ```
 
-**Related.** The presence-or-interest standing rule; knowledge base "Geography and Topic as Strategy"; audit checklist Section 5; negative keyword library Section 6. Cross-refs PB-13, PB-14.
+**Related.** The presence-or-interest standing rule; knowledge base "Geography and Topic as Strategy"; negative keyword library Section 6. Cross-refs PB-13, PB-14.
 
 ---
 
@@ -1044,7 +1044,7 @@ _What happened when we did it._ This pattern fires readily and was WRONG in the 
 playbook PB-29 (account): standard move for a 20%+ 30-day CPL rise on flat conversions is decomposing to CPC versus CVR before any bid or budget change. accept/reject
 ```
 
-**Related.** SKILL.md "Output Format" direction rules and "RED FLAGS FIRST"; diagnosis trees Tree 2 and Tree 4 Step 2; audit checklist PF-0. Cross-refs PB-02, PB-13, PB-25, PB-31.
+**Related.** SKILL.md "Output Format" direction rules and "RED FLAGS FIRST"; diagnosis trees Tree 2 and Tree 4 Step 2. Cross-refs PB-02, PB-13, PB-25, PB-31.
 
 ---
 
@@ -1296,7 +1296,7 @@ _What happened when we did it._ An outside party with account access paused ever
 playbook PB-37 (account): standard move for an unexpected external change event is attributing it, quantifying any dark window, and quarantining that window from trend comparisons. accept/reject
 ```
 
-**Related.** SKILL.md PF-3 and change-history verification; audit checklist change-history section. Cross-refs PB-09, PB-29, PB-34, PB-36.
+**Related.** SKILL.md PF-3 and change-history verification. Cross-refs PB-09, PB-29, PB-34, PB-36.
 
 ---
 

@@ -102,7 +102,6 @@ git clone https://github.com/tobyrosen/legal-ppc-skill
 ```text
 legal-ppc-skill/
 ├── SKILL.md                           # Main skill file, load this
-├── account-audit-checklist.md         # Structured first-review checklist
 ├── NOTATION.md                        # Journal notation standard (operator mode)
 ├── pyrightconfig.json                 # Type-check path for journal tests
 ├── account-notes/
