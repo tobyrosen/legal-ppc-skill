@@ -2,7 +2,7 @@
 """ci-generic-leak-check.py: public-safe, generic pre-publish PII check.
 
 Runs in CI on every push/PR to this public repo. It knows nothing about
-any specific client, firm, or account, it only looks for SHAPES that
+any specific client, firm, or account. It only looks for SHAPES that
 real account data tends to take:
 
   1. 10-digit numbers shaped like a Google Ads customer ID
@@ -11,7 +11,7 @@ real account data tends to take:
 
 A small ALLOWLIST below covers this repo's own documented placeholders
 (see SKILL.md's ID table and evals/fixtures/). Nothing in this file or
-its allowlist is client-specific, that pairing lives outside this repo
+its allowlist is client-specific. That pairing lives outside this repo
 in a private denylist run separately before any release
 (public-repo-leak-gate.py; see the internal wiki's Shared Capabilities
 page). This script is a coarse net, not the release gate.
@@ -106,8 +106,8 @@ def main() -> int:
     print(
         "\nIf this is a documented placeholder, add it to the allowlist in "
         "scripts/ci-generic-leak-check.py with a comment explaining why. "
-        "If this is real account data, remove it before merging, do not "
-        "widen the allowlist to make it pass."
+        "If this is real account data, remove it before merging. "
+        "Do not widen the allowlist to make it pass."
     )
     return 1
 

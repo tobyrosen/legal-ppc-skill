@@ -8,7 +8,7 @@ Queries are organized by diagnostic task. All queries are pure GAQL. Execute via
 - **Pull the currency before reporting any cost figure:** `SELECT customer.currency_code FROM customer`. Report each account in its native currency (symbol or ISO code). Cross-currency totals, averages, or rankings require an operator-approved FX source, with the rate and effective date stated in the output. Never sum, average, or rank raw numbers across currencies.
 - `metrics.average_cpc` is already in the account currency (not micros).
 - `cpc_bid_micros` on keywords/ad groups is in micros.
-- **Valid `DURING` date literals only:** `LAST_7_DAYS`, `LAST_14_DAYS`, `LAST_30_DAYS`, `THIS_MONTH`, `LAST_MONTH`, `THIS_WEEK_MON_TODAY`, `LAST_WEEK_MON_SUN`. **There is no `LAST_60_DAYS` or `LAST_90_DAYS`**. They error with `INVALID_VALUE_WITH_DURING_OPERATOR`. For a 90-day (or any custom) window, use `segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'` with explicit dates (end = today, start = today − N days).
+- **`DURING` date literals used by this library:** `LAST_7_DAYS`, `LAST_14_DAYS`, `LAST_30_DAYS`, `THIS_MONTH`, `LAST_MONTH`, `THIS_WEEK_MON_TODAY`, `LAST_WEEK_MON_SUN`. The API accepts more than these, including `TODAY`, `YESTERDAY`, `LAST_BUSINESS_WEEK`, `THIS_WEEK_SUN_TODAY` and `LAST_WEEK_SUN_SAT`. The list above is what the queries here use, not the limit of what is valid. **There is no `LAST_60_DAYS` or `LAST_90_DAYS`**. They error with `INVALID_VALUE_WITH_DURING_OPERATOR`. For a 90-day (or any custom) window, use `segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'` with explicit dates (end = today, start = today − N days). Literal set verified 2026-09-02 against the Google Ads API v25 date-ranges reference.
 - GAQL does not support subqueries or calculated fields. Do division (cost_micros/1e6) after retrieval.
 
 ---
@@ -121,6 +121,8 @@ ORDER BY conversion_action.name
 - `type` field: `WEBPAGE` actions should have verifiable tag sources; `AD_CALL` actions are auto-tracked; `UPLOAD_CLICKS` suggests offline import
 - Any action with a suspicious name (e.g., "All Web Site Visits" set as primary)
 
+**`include_in_conversions_metric` is a counting flag, not the campaign goal selector.** It says whether an action feeds the headline `conversions` metric at account level. What a given campaign actually bids toward is assembled from the goal wiring in 14.7: the campaign's `conversion_goal_campaign_config`, the custom conversion goal where one is set, and the campaign or customer goal map with its `biddable` flag. The two can disagree in both directions. An action can count in the account metric while a campaign's goals exclude it, and a campaign running a custom goal can bid toward an action the account-level default would not. Do not conclude from this query alone that an action is or is not driving a campaign's bidding: read 14.7 first.
+
 ---
 
 ### 2.2 Recent Conversion Volume by Action
@@ -137,7 +139,7 @@ ORDER BY metrics.conversions DESC
 ```
 
 **Why this segments off `customer`, not `conversion_action`:** `metrics.conversions` is PROHIBITED on the `conversion_action` resource (`PROHIBITED_METRIC_IN_SELECT_OR_WHERE_CLAUSE`, only `metrics.all_conversions` is allowed there). To get true `conversions` volume per action you must segment a metrics-bearing resource: `FROM customer` for account-wide per-action totals, or `FROM campaign` (add `campaign.name`) to also see which campaign drove each action. Cross-reference `segments.conversion_action_name` against the config from 2.1 (status, `include_in_conversions_metric`). Those config fields are not available alongside segmented metrics.
-**What to look for:** Actions with high `all_conversions` but low/zero `conversions` (e.g. an `ENGAGEMENT`-category action) are secondary/soft actions, not real leads. They should not be primary. An action that is `include_in_conversions_metric = TRUE` (per 2.1) but shows zero `conversions` over 30 days is either broken or misconfigured.
+**What to look for:** Actions with high `all_conversions` but low/zero `conversions` (e.g. an `ENGAGEMENT`-category action) are secondary/soft actions, not real leads. They should not be primary. An action that is `include_in_conversions_metric = TRUE` (per 2.1) but shows zero `conversions` over 30 days is either broken or misconfigured. Campaign-level biddability is not readable here either: that comes from the goal wiring in 14.7.
 
 ---
 
@@ -191,7 +193,7 @@ WHERE ad_group_criterion.type = 'KEYWORD'
 ORDER BY campaign.name, ad_group.name
 ```
 
-**What to look for:** the quality-score trend on the spending keywords rather than any cutoff. A falling quality score with impressions collapsing while ad rank and bid hold is the throttling shape and is a finding. Where the score is falling, check which QS component is below average (`BELOW_AVERAGE`): `search_predicted_ctr` = ad copy problem; `creative_quality_score` = ad relevance problem; `post_click_quality_score` = landing page problem.
+**What to look for:** the current quality-score picture on the spending keywords, with no cutoff applied. This query is a snapshot: `quality_info.*` carries today's value and no history, so it cannot show a trend on its own. Pull 3.5 for the week-by-week series, then come back here for the component labels. Where the score is falling, check which QS component is below average (`BELOW_AVERAGE`): `search_predicted_ctr` = ad copy problem; `creative_quality_score` = ad relevance problem; `post_click_quality_score` = landing page problem.
 
 **Required filter:** `ad_group_criterion.negative = FALSE` is mandatory. `ad_group_criterion` returns both positive and negative keywords. Omitting this filter causes ad-group-level negatives to appear as positive keywords, producing false BROAD match flags and misidentified waste (P6).
 
@@ -295,6 +297,60 @@ WHERE segments.date DURING LAST_30_DAYS
   AND ad_group_criterion.negative = FALSE
 ORDER BY metrics.cost_micros DESC
 ```
+
+---
+
+### 3.5 Keyword Quality-Score Trend (weekly series)
+
+The query behind the quality-score throttling read in SKILL.md. 3.1 gives today's
+score, this one gives the direction of travel.
+
+```gaql
+SELECT
+  campaign.name,
+  ad_group.name,
+  keyword_view.resource_name,
+  segments.week,
+  metrics.historical_quality_score,
+  metrics.historical_search_predicted_ctr,
+  metrics.historical_creative_quality_score,
+  metrics.historical_landing_page_quality_score,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.average_cpc
+FROM keyword_view
+WHERE segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'
+  AND campaign.status = 'ENABLED'
+  AND ad_group.status = 'ENABLED'
+ORDER BY campaign.name, ad_group.name, segments.week
+```
+
+**What to look for:** the throttling shape. `metrics.historical_quality_score`
+falling week over week while `metrics.impressions` collapses, on a campaign with
+available budget, and with the bid steady. That combination is a finding. No
+cutoff is applied to the score itself: the direction and the coincidence are what
+make the shape, and a low but flat score with steady impressions is not it.
+
+**Where each signal comes from.** Score and its three components: this query.
+Impressions: this query. Bid: `ad_group_criterion.effective_cpc_bid_micros` from
+3.1 for the current value, or `metrics.average_cpc` here as the paid proxy over
+the same weeks.
+
+> ⚠️ **BLIND SPOT: keyword-level Ad Rank is not exposed by the API**
+> There is no keyword Ad Rank metric. The nearest readable signal is
+> `metrics.search_rank_lost_impression_share` at campaign level (5.1), which tells
+> you whether the campaign as a whole is losing auctions on rank. Read it as
+> context for the keyword series, never as the keyword's own rank.
+> → Where the distinction decides the call, please share a screenshot of the
+> keyword's status and diagnostics from the Google Ads UI.
+
+**Field constraint (verified 2026-09-02 against the Google Ads API v25
+`keyword_view` field reference, not yet run live):** the four `historical_*`
+quality metrics are selectable only with `ad_group`, `campaign`, `customer` and
+`keyword_view` fields plus the date segments. `ad_group_criterion` fields are not
+selectable alongside them, so the keyword text cannot be pulled in this query.
+Join it back from 3.1 or 3.4 on the criterion id, which is the tail of
+`keyword_view.resource_name` (`.../keywordViews/{ad_group_id}~{criterion_id}`).
 
 ---
 

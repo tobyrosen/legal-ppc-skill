@@ -9,7 +9,7 @@ This file describes the operator-version session record. It is not needed to run
 Copy this template and fill it out at the end of every session. Save to `session-logs/YYYY-MM-DD-[account-name].md`.
 
 ```markdown
-# Session Log: [YYYY-MM-DD], [Account Name]
+# Session Log: [YYYY-MM-DD]-[account-slug]
 
 ## Brief
 
