@@ -4,7 +4,7 @@
 
 The standard move for a recognized data pattern, written down once so a check does not re-derive it.
 
-A playbook is not a verdict. The check presents DATA; the analytical calls belong to the operator. A triggered playbook adds exactly one labelled line to the walk card saying what the standard move for that pattern is. The operator accepts or rejects it. **The agent never executes a playbook move**, before or after acceptance.
+A playbook is not a verdict. The check presents DATA; the analytical calls belong to the operator. A triggered playbook adds exactly one labeled line to the walk card saying what the standard move for that pattern is. The operator accepts or rejects it. **The agent never executes a playbook move**, before or after acceptance.
 
 ---
 
@@ -116,7 +116,7 @@ The line names a pattern and the standard move for that pattern. It never charac
 PLAYBOOKS: 4 triggered, 3 carded
 playbook PB-02 (Northbridge - Estate Litigation): standard move for rank-lost IS 58% on a converting campaign with page ownership confirmed is a landing-page relevance pass before any bid change. accept/reject
 playbook PB-24 (account): standard move for call conversions down 61% vs the trailing 4-week average is a call-tracking route check before any bidding read. accept/reject
-playbook PB-11 (Northbridge - Trust Disputes): standard move for a BROAD keyword carrying 44% of spend at zero conversions over 30 days is pausing it and adding the phrase-match equivalent. accept/reject
+playbook PB-11 (Northbridge - Trust Disputes): standard move for a BROAD keyword carrying 44% of spend at zero conversions over 30 days is converting it to phrase match and monitoring search terms for 2 to 4 weeks. accept/reject
 surplus journaled: PB-21
 ```
 
@@ -142,7 +142,7 @@ The gates are enforced as written. Where a window or a number below is still a p
 Ordered by evidence within each theme: validated entries first, then partially validated, then textbook. `V` = validated in practice, `P` = partially validated, `T` = textbook only. This index carries the reading order. In the body each entry sits in its theme section and keeps its own number, so cross-references stay stable and new entries append rather than renumber (which is why PB-38 and PB-39 sit inside the keyword and budget sections rather than at the end).
 
 **Budget and impression share:** PB-01 `V`, PB-39 `V`, PB-02 `V`, PB-40 `P`, PB-03 `T`
-**Bidding:** PB-08 `V`, PB-09 `V`, PB-04 `T`, PB-05 `T`, PB-06 `T`, PB-07 `T`, PB-10 `T`
+**Bidding:** PB-08 `V`, PB-09 `V`, PB-06 `P`, PB-04 `T`, PB-05 `T`, PB-07 `T`, PB-10 `T`
 **Keywords and search terms:** PB-14 `V`, PB-38 `V`, PB-11 `P`, PB-13 `P`, PB-12 `T`, PB-16 `T`, PB-17 `T`
 **Ads and creative:** PB-20 `V`, PB-18 `P`, PB-19 `T`, PB-21 `T`, PB-22 `T`
 **Tracking and measurement:** PB-24 `V`, PB-25 `P`, PB-23 `P`
@@ -395,7 +395,7 @@ playbook PB-06 (Westhollow - Divorce): standard move after a tracking fix on a s
 
 **Pre-flight green.** PF-1 (the low count is real, not a tracking break: a silent primary produces the same shape, and that is PB-23). PF-3 (the erratic performance is not just a fresh learning period).
 
-**Standard move.** Remove the target: switch to Maximize Conversions. Maximize Conversions optimises direction rather than a specific number, and is more forgiving at low volume. Hold everything else for 28 days.
+**Standard move.** Remove the target: switch to Maximize Conversions. Maximize Conversions optimizes direction rather than a specific number, and is more forgiving at low volume. Hold everything else for 28 days.
 
 **Do not move when.** Avg CPC is also high against the campaign's own trailing 30-day median and the account's other campaigns, where Maximize Conversions is not the safe harbour and PB-08 applies instead. The campaign has been on tCPA for under 30 days. Conversion volume is low because the account is seasonally quiet (PB-31).
 
@@ -423,7 +423,7 @@ _What happened when we did it._ On the heaviest-spend campaign of a high-CPC pra
 
 **Pre-flight green.** PF-1. The CPC reading is from live campaign data, not a search-term sample, and the currency is the account's own.
 
-**Standard move.** Switch to Maximize Clicks with a CPC cap (`PROPOSED`: cap at or slightly below the campaign's trailing 30-day median CPC). The cap stops a single auction eating the daily budget; Max Clicks buys the volume needed to rebuild a conversion signal. Set an explicit 3 to 4 week revisit and watch CVR, because Max Clicks optimises for clicks, not conversions.
+**Standard move.** Switch to Maximize Clicks with a CPC cap (`PROPOSED`: cap at or slightly below the campaign's trailing 30-day median CPC). The cap stops a single auction eating the daily budget; Max Clicks buys the volume needed to rebuild a conversion signal. Set an explicit 3 to 4 week revisit and watch CVR, because Max Clicks optimizes for clicks, not conversions.
 
 **Do not move when.** Conversions are zero rather than thin: a zero-conversion campaign at high CPC with adequate impression share points at the landing page or tracking (PB-25, PB-23), not at the bidding model. The high CPC is normal for a high-value practice area and the CPA is acceptable: an expensive click that acquires a large case is not a defect. Tracking is unverified.
 
@@ -461,7 +461,7 @@ Report the poll, give the band from question 2 once there is any conversion volu
 
 **Contradiction with the original entry.** The original form forbade any CPL judgment before the floor or 30 days. Applied literally it would have blocked the correct budget decision for a month on the one launch we measured, where the direction was clear at day 3 and stable at week 1. The distinction the original missed: **a budget-capped campaign is a rationed sample, not a noisy one.** A hard daily cap makes weeks 1 and 2 near-identical by construction, which is exactly why the early read held. On an UNCAPPED new campaign, where spend and mix are still moving, the original gate stands in full.
 
-**Do not move when.** A structural error is found in the poll (wrong goals, wrong geo constant, disapproved ads, zero serving): those are corrections, not optimisations, and they run immediately under their own playbooks (PB-18, PB-23, PB-27). The distinction is: fix what is broken, judge nothing that is merely young. Do not use the early band to make an in-campaign optimisation: it is good enough to decide whether to feed the campaign or stop it, and not good enough to decide anything inside it.
+**Do not move when.** A structural error is found in the poll (wrong goals, wrong geo constant, disapproved ads, zero serving): those are corrections, not optimizations, and they run immediately under their own playbooks (PB-18, PB-23, PB-27). The distinction is: fix what is broken, judge nothing that is merely young. Do not use the early band to make an in-campaign optimization: it is good enough to decide whether to feed the campaign or stop it, and not good enough to decide anything inside it.
 
 **Expected result and verification.** The campaign reaches its readable date with no clock resets in change history. On a capped launch, expect week 2 to look like week 1 in spend and impression share; that is the cap binding, not a plateau. Verify at the readable date: GAQL 8.1 (confirm no interim changes), then the normal read.
 
@@ -807,7 +807,7 @@ playbook PB-21 (Westhollow - PMax Mediation): standard move for a PMax asset gro
 
 **Evidence.** `textbook only`. Same gap as PB-21. Zero image outcomes across every account.
 
-**Trigger.** An in-use Performance Max image asset live and unchanged for a long stretch (cross-referenced against change history) with declining signals on meaningful volume: falling CTR or rising cost per result where per-asset metrics exist, otherwise ad-group or campaign CTR decline on stable creative, explicitly labelled a proxy.
+**Trigger.** An in-use Performance Max image asset live and unchanged for a long stretch (cross-referenced against change history) with declining signals on meaningful volume: falling CTR or rising cost per result where per-asset metrics exist, otherwise ad-group or campaign CTR decline on stable creative, explicitly labeled a proxy.
 
 **Pre-flight green.** Volume is meaningful. Change history (GAQL 8.1) confirms when creative last changed.
 
@@ -823,7 +823,7 @@ playbook PB-21 (Westhollow - PMax Mediation): standard move for a PMax asset gro
 playbook PB-22 (Westhollow - PMax Probate): standard move for a long-running PMax image asset with declining CTR on real volume is a same-message refresh at the needed ratios. accept/reject
 ```
 
-**Related.** `references/creative-audit.md` section (d) and the prioritisation list; SKILL.md "Creative and asset audit". Cross-refs PB-20, PB-21.
+**Related.** `references/creative-audit.md` section (d) and the prioritization list; SKILL.md "Creative and asset audit". Cross-refs PB-20, PB-21.
 
 ---
 
@@ -907,11 +907,11 @@ _What happened when we did it._ The DIAGNOSIS is validated over roughly three mo
 
 **Pre-flight green.** PF-1 first: zero conversions with meaningful clicks is a tracking hypothesis before it is a landing-page one. Then PF-2 and PF-3.
 
-**Standard move.** Treat the landing page as the binding constraint and sequence around it: landing page first, then ad relevance, then ad copy. Do not optimise copy or bids on a page that does not convert. Because page quality is not API-assessable, the move includes the blind-spot request, phrased exactly:
+**Standard move.** Treat the landing page as the binding constraint and sequence around it: landing page first, then ad relevance, then ad copy. Do not optimize copy or bids on a page that does not convert. Because page quality is not API-assessable, the move includes the blind-spot request, phrased exactly:
 
 ```text
 BLIND SPOT: Landing page quality cannot be assessed via API.
-→ Please share a screenshot of the landing page receiving this campaign's traffic (clear CTA, message match to the ad, phone number above the fold, mobile behaviour).
+→ Please share a screenshot of the landing page receiving this campaign's traffic (clear CTA, message match to the ad, phone number above the fold, mobile behavior).
 ```
 
 **Do not move when.** The landing page is controlled by a third party and the constraint is already recorded as a standing item. Even then, note that the flag is a hypothesis with a shelf life: re-pull before re-asserting it, because a creative refresh can close a gap long blamed on the page (PB-20). Retire the flag when the data shows it no longer binds.
@@ -1032,7 +1032,7 @@ _What happened when we did it._ This pattern fires readily and was WRONG in the 
 
 - CPC rose while CVR held: check rank-lost IS. Rising rank loss alongside CPC is competitive pressure, and the move is to decide whether the account's CPA is still acceptable at the new auction price, not to reflexively bid up.
 - CVR fell while CPC held: route to the conversion-rate side, landing page and search-term mix (PB-25, PB-13).
-- Both moved: sequence CVR first, then CPC. Do not optimise cost per click on a broken funnel.
+- Both moved: sequence CVR first, then CPC. Do not optimize cost per click on a broken funnel.
 
 **Do not move when.** The prior window contained an anomaly (an outage, a tracking gap, a one-off spike) that makes it a bad baseline. The conversion count is below the reliability floor, where a single conversion can swing CPL far beyond 30 to 50%. Seasonality explains it (PB-31). The move is inside a learning window.
 
@@ -1122,7 +1122,7 @@ _Refresh 2026-09._ Locked ruling applied. Two PMax launches reached day-3 servin
 **Standard move.** Two polls, then hold. The day-3 verify-poll is validated on two launches. The day-14 full configuration and goals read is still `PROPOSED` and has never been completed.
 
 - **Day 3 poll, serving and policy only:** status and serving state, budget pacing, bid strategy, conversion goals at campaign level, asset group review state, disapprovals, spend, plus the cap block below. Nothing else. No performance judgment.
-- **Day 14 read:** the same, plus first spend and conversions, plus what the campaign is actually optimising on (which goals are reachable), plus the override block below.
+- **Day 14 read:** the same, plus first spend and conversions, plus what the campaign is actually optimizing on (which goals are reachable), plus the override block below.
 
 **Cap tracking, both polls (fold, 2026-09).** A PMax campaign launched with a fixed daily budget and a hard total-spend cap carries four extra fields at every poll: cumulative spend to date, recent pace, the estimated cap date derived from that pace, and the named cap-or-kill owner. A bounded test that reaches its cap without a decision on record becomes an unbounded park, which is the observed failure mode. Do not use short-term performance as the reason to move while the campaign is still inside its cap.
 
@@ -1178,7 +1178,7 @@ _Refresh 2026-09._ The same ramp produced one additional clean-basis 30-day read
 
 _What happened when we did it._ An account ramped spend hard over about six weeks through expansion and new campaigns. Its 30-day CPL read WORSE at every check for roughly five weeks, peaking near +68% against the prior 30 days on conversions that were flat to slightly down. Then it crossed: 30-day CPL flat at week five, about 5% better at week six, about 9% better at week seven, on spend up 58 to 80% and conversions up 73 to 88%. The weekly CPL turned about two weeks before the 30-day did. Nothing was fixed in between; the added spend simply matured. Time to signal: expect the 30-day window to look wrong for four to six weeks after a material ramp starts.
 
-**Trigger.** Account or campaign 30-day CPL up materially against the prior 30 days, WITH spend up materially over the same windows (the two moving together is the signature), during or within about six weeks of a deliberate expansion: new campaigns, new geographies, a keyword expansion, a budget programme, or any combination.
+**Trigger.** Account or campaign 30-day CPL up materially against the prior 30 days, WITH spend up materially over the same windows (the two moving together is the signature), during or within about six weeks of a deliberate expansion: new campaigns, new geographies, a keyword expansion, a budget program, or any combination.
 
 **Pre-flight green.** PF-3 change history pulled, so the ramp is established as a fact with dates rather than inferred. Windows aligned complete-to-complete. Conversions mature. Weekly series pulled alongside the 30-day, because the week turns first and is the early read.
 
@@ -1284,7 +1284,7 @@ _What happened when we did it._ An outside party with account access paused ever
 4. **Make it standing, not closed.** External-editor access is a condition, not an incident. One occurrence means the access exists and will be used again, which it was.
 5. **Quarantine the affected window** from every trend comparison that follows, and say in the card that you have done so.
 
-**Do not move when.** The change is ours or the operator's and is already recorded (that is a verification, not a finding). The change is a known and accepted vendor behaviour already carried as a standing rule, for example tracking-template tagging by an integration partner. The platform's own routine edits are documented as such: separate genuine platform intervention, like a low-activity auto-pause (PB-36), from ordinary system churn like ad-review status updates, which are noise.
+**Do not move when.** The change is ours or the operator's and is already recorded (that is a verification, not a finding). The change is a known and accepted vendor behavior already carried as a standing rule, for example tracking-template tagging by an integration partner. The platform's own routine edits are documented as such: separate genuine platform intervention, like a low-activity auto-pause (PB-36), from ordinary system churn like ad-review status updates, which are noise.
 
 **Card placement: exempt from the 3-line cap.** PB-37 is a flag-class line, not an ordinary optimization playbook: report it in the `RED FLAGS:` block or immediately after it, not in the `PLAYBOOKS:` group, and it does not count against the 3-per-account playbook cap (SKILL.md "Optimization Playbooks"). An unexpected external change is a surface-now item per the standard move above, not something to rank against spend-at-stake for a card slot.
 

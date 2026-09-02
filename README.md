@@ -24,7 +24,7 @@ Load it in Claude Code alongside a Google Ads MCP. Give it a brief, or say the a
 - **Config ground truth.** A configuration finding is a departure from a stated baseline (`references/agency-defaults.md`), not from Google's defaults and not from nothing. Matching settings are silent. Recorded overrides are one summary line. Only an unrecorded departure becomes a flag.
 - **Optimization playbooks.** 40 pattern-to-standard-move entries in `references/playbooks.md`. Each carries a trigger, the standard move, the do-not-move conditions, the verification window, and an evidence tier. The agent never executes a move.
 
-**Evidence tiers.** Every playbook carries one of `validated in practice`, `partially validated`, `textbook only`, or `unconfirmed`. Unconfirmed means general practice not yet confirmed by the operator: a candidate, never a house tactic. As of the 2026-09 refresh and the evidence-verdict pass that followed it: 40 playbooks, 13 validated, 12 partially validated, 15 textbook only. 14 `unconfirmed` markers remain across the reference files, 11 of them in the playbook library, all on windows and thresholds nobody has yet run to completion.
+**Evidence tiers.** Every playbook carries one of `validated in practice`, `partially validated`, `textbook only`, or `unconfirmed`. Unconfirmed means general practice not yet confirmed by the operator: a candidate, never a house tactic. As of the 2026-09 refresh and the evidence-verdict pass that followed it: 40 playbooks, 13 validated, 12 partially validated, 15 textbook only. 23 `unconfirmed` markers remain across the reference files, with one more in SKILL.md. 11 of the 23 sit in the playbook library, all of those on windows and thresholds nobody has yet run to completion. The rest mark broader claims in the config baseline, the knowledge base and the negative-keyword library. Counts exclude the passages that define the tier itself.
 
 **What it gets right that a general model does not:**
 
@@ -46,7 +46,9 @@ Load it in Claude Code alongside a Google Ads MCP. Give it a brief, or say the a
 
 The public skill ships the methodology, query library, config baseline, and playbooks, with fictional example notes only. The operator version additionally reads the per-account journal and rendered notes; per-account config overrides live in that journal, not in this repo.
 
-Operator mode configuration: set `PPC_JOURNAL_ROOT` to the directory holding the journal and rendered views (default `~/.legal-ppc-skill`, always outside this repo) and `PPC_JOURNAL_TZ` to your IANA timezone. Entry ids and "today" are computed in that zone.
+Operator mode configuration: set `PPC_JOURNAL_ROOT` to the directory holding the journal and rendered views, and `PPC_JOURNAL_TZ` to your IANA timezone. With no `PPC_JOURNAL_ROOT` set, the data root is this repo and journals are written to `./journal`. Anyone holding real account data should point `PPC_JOURNAL_ROOT` at a private directory outside this repo.
+
+Journal commands: `append`, `due`, `render`, `validate`, `stats`, and `migrate`. The entry schema is v2; a journal written under v1 carries retired `platform` values (`meta`, `callrail`, `ga4`, `hubspot`). `journal.py migrate <slug>` (or `--all`) rewrites those four in place after copying the file to `<slug>.jsonl.bak`, and `journal.py validate` names the command with a count per value rather than failing on the enum. Any other value outside the enum is left alone and stays a plain validation error. See `NOTATION.md` §3a. Entry ids and "today" are computed in that zone.
 
 ---
 

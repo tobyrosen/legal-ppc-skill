@@ -1,21 +1,21 @@
-# GAQL Query Library — Google Ads for Law Firms
+# GAQL Query Library: Google Ads for Law Firms
 
-Queries are organized by diagnostic task. All queries are pure GAQL — execute via `run_gaql(customer_id, query, format)` or any equivalent GAQL execution tool.
+Queries are organized by diagnostic task. All queries are pure GAQL. Execute via `run_gaql(customer_id, query, format)` or any equivalent GAQL execution tool.
 
 **Notes on values:**
 
-- `cost_micros` is in millionths of the **account's** currency. Divide by 1,000,000 to get the value in that currency — which is not necessarily dollars. Never label a converted figure a dollar value without confirming the account's currency.
-- **Pull the currency before reporting any cost figure:** `SELECT customer.currency_code FROM customer`. Report each account in its native currency (symbol or ISO code). Cross-currency totals, averages, or rankings require an operator-approved FX source, with the rate and effective date stated in the output — never sum, average, or rank raw numbers across currencies.
+- `cost_micros` is in millionths of the **account's** currency. Divide by 1,000,000 to get the value in that currency, which is not necessarily dollars. Never label a converted figure a dollar value without confirming the account's currency.
+- **Pull the currency before reporting any cost figure:** `SELECT customer.currency_code FROM customer`. Report each account in its native currency (symbol or ISO code). Cross-currency totals, averages, or rankings require an operator-approved FX source, with the rate and effective date stated in the output. Never sum, average, or rank raw numbers across currencies.
 - `metrics.average_cpc` is already in the account currency (not micros).
 - `cpc_bid_micros` on keywords/ad groups is in micros.
-- **Valid `DURING` date literals only:** `LAST_7_DAYS`, `LAST_14_DAYS`, `LAST_30_DAYS`, `THIS_MONTH`, `LAST_MONTH`, `THIS_WEEK_MON_TODAY`, `LAST_WEEK_MON_SUN`. **There is no `LAST_60_DAYS` or `LAST_90_DAYS`** — they error with `INVALID_VALUE_WITH_DURING_OPERATOR`. For a 90-day (or any custom) window, use `segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'` with explicit dates (end = today, start = today − N days).
-- GAQL does not support subqueries or calculated fields — do division (cost_micros/1e6) after retrieval.
+- **`DURING` date literals used by this library:** `LAST_7_DAYS`, `LAST_14_DAYS`, `LAST_30_DAYS`, `THIS_MONTH`, `LAST_MONTH`, `THIS_WEEK_MON_TODAY`, `LAST_WEEK_MON_SUN`. The API accepts more than these, including `TODAY`, `YESTERDAY`, `LAST_BUSINESS_WEEK`, `THIS_WEEK_SUN_TODAY` and `LAST_WEEK_SUN_SAT`. The list above is what the queries here use, not the limit of what is valid. **There is no `LAST_60_DAYS` or `LAST_90_DAYS`**. They error with `INVALID_VALUE_WITH_DURING_OPERATOR`. For a 90-day (or any custom) window, use `segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'` with explicit dates (end = today, start = today − N days). Literal set verified 2026-09-02 against the Google Ads API v25 date-ranges reference.
+- GAQL does not support subqueries or calculated fields. Do division (cost_micros/1e6) after retrieval.
 
 ---
 
 ## 1. Account Structure
 
-### 1.1 All Campaigns — Status, Budget, Bid Strategy
+### 1.1 All Campaigns: Status, Budget, Bid Strategy
 
 ```gaql
 SELECT
@@ -38,7 +38,7 @@ ORDER BY campaign.name
 
 ---
 
-### 1.2 Ad Groups — Structure and Status
+### 1.2 Ad Groups: Structure and Status
 
 ```gaql
 SELECT
@@ -86,7 +86,7 @@ WHERE campaign.status != 'REMOVED'
 ORDER BY campaign.name
 ```
 
-**Use:** Review campaign names manually for brand isolation. There is no API flag for "brand campaign" — identification is by name convention. Flag any campaign where the name suggests both branded and non-branded traffic could coexist.
+**Use:** Review campaign names manually for brand isolation. There is no API flag for "brand campaign". Identification is by name convention. Flag any campaign where the name suggests both branded and non-branded traffic could coexist.
 
 ---
 
@@ -115,11 +115,13 @@ ORDER BY conversion_action.name
 
 **What to look for:**
 
-- Multiple actions with `include_in_conversions_metric = TRUE` — are these all intentional primary actions?
+- Multiple actions with `include_in_conversions_metric = TRUE`. Are these all intentional primary actions?
 - `counting_type = ONE_PER_CLICK` on phone call or form lead actions with no recorded override: a deviation from the house standard (agency-defaults.md Sec 3.4: `MANY_PER_CLICK` is standard on lead actions, situational rather than universally correct for legal PPC, since an agency may choose `ONE_PER_CLICK` where repeat events are noise, recorded as an override)
 - Mismatched attribution models across actions
 - `type` field: `WEBPAGE` actions should have verifiable tag sources; `AD_CALL` actions are auto-tracked; `UPLOAD_CLICKS` suggests offline import
 - Any action with a suspicious name (e.g., "All Web Site Visits" set as primary)
+
+**`include_in_conversions_metric` is a counting flag, not the campaign goal selector.** It says whether an action feeds the headline `conversions` metric at account level. What a given campaign actually bids toward is assembled from the goal wiring in 14.7: the campaign's `conversion_goal_campaign_config`, the custom conversion goal where one is set, and the campaign or customer goal map with its `biddable` flag. The two can disagree in both directions. An action can count in the account metric while a campaign's goals exclude it, and a campaign running a custom goal can bid toward an action the account-level default would not. Do not conclude from this query alone that an action is or is not driving a campaign's bidding: read 14.7 first.
 
 ---
 
@@ -136,8 +138,8 @@ WHERE segments.date DURING LAST_30_DAYS
 ORDER BY metrics.conversions DESC
 ```
 
-**Why this segments off `customer`, not `conversion_action`:** `metrics.conversions` is PROHIBITED on the `conversion_action` resource (`PROHIBITED_METRIC_IN_SELECT_OR_WHERE_CLAUSE` — only `metrics.all_conversions` is allowed there). To get true `conversions` volume per action you must segment a metrics-bearing resource: `FROM customer` for account-wide per-action totals, or `FROM campaign` (add `campaign.name`) to also see which campaign drove each action. Cross-reference `segments.conversion_action_name` against the config from 2.1 (status, `include_in_conversions_metric`) — those config fields are not available alongside segmented metrics.
-**What to look for:** Actions with high `all_conversions` but low/zero `conversions` (e.g. an `ENGAGEMENT`-category action) are secondary/soft actions, not real leads — they should not be primary. An action that is `include_in_conversions_metric = TRUE` (per 2.1) but shows zero `conversions` over 30 days is either broken or misconfigured.
+**Why this segments off `customer`, not `conversion_action`:** `metrics.conversions` is PROHIBITED on the `conversion_action` resource (`PROHIBITED_METRIC_IN_SELECT_OR_WHERE_CLAUSE`, only `metrics.all_conversions` is allowed there). To get true `conversions` volume per action you must segment a metrics-bearing resource: `FROM customer` for account-wide per-action totals, or `FROM campaign` (add `campaign.name`) to also see which campaign drove each action. Cross-reference `segments.conversion_action_name` against the config from 2.1 (status, `include_in_conversions_metric`). Those config fields are not available alongside segmented metrics.
+**What to look for:** Actions with high `all_conversions` but low/zero `conversions` (e.g. an `ENGAGEMENT`-category action) are secondary/soft actions, not real leads. They should not be primary. An action that is `include_in_conversions_metric = TRUE` (per 2.1) but shows zero `conversions` over 30 days is either broken or misconfigured. Campaign-level biddability is not readable here either: that comes from the goal wiring in 14.7.
 
 ---
 
@@ -191,18 +193,18 @@ WHERE ad_group_criterion.type = 'KEYWORD'
 ORDER BY campaign.name, ad_group.name
 ```
 
-**What to look for:** Quality scores below 5 on important keywords — check which QS component is below average (`BELOW_AVERAGE`): `search_predicted_ctr` = ad copy problem; `creative_quality_score` = ad relevance problem; `post_click_quality_score` = landing page problem.
+**What to look for:** the current quality-score picture on the spending keywords, with no cutoff applied. This query is a snapshot: `quality_info.*` carries today's value and no history, so it cannot show a trend on its own. Pull 3.5 for the week-by-week series, then come back here for the component labels. Where the score is falling, check which QS component is below average (`BELOW_AVERAGE`): `search_predicted_ctr` = ad copy problem; `creative_quality_score` = ad relevance problem; `post_click_quality_score` = landing page problem.
 
-**Required filter:** `ad_group_criterion.negative = FALSE` is mandatory. `ad_group_criterion` returns both positive and negative keywords — omitting this filter causes ad-group-level negatives to appear as positive keywords, producing false BROAD match flags and misidentified waste (P6).
+**Required filter:** `ad_group_criterion.negative = FALSE` is mandatory. `ad_group_criterion` returns both positive and negative keywords. Omitting this filter causes ad-group-level negatives to appear as positive keywords, producing false BROAD match flags and misidentified waste (P6).
 
-**Output-format note (verified live 2026-06-05):** `quality_info.*` are nested message fields. A plain table formatter can silently DROP them — the keyword shows but `quality_score` is absent, making QS look unavailable when it actually sources fine. Pull this query with `format='json'` (or read the nested `qualityInfo` object) to get `qualityScore` plus the three component labels (`creativeQualityScore`, `postClickQualityScore`, `searchPredictedCtr`). Confirmed live: brand keywords returned QS 7–10 with `ABOVE_AVERAGE`/`AVERAGE` labels.
+**Output-format note (verified live 2026-06-05):** `quality_info.*` are nested message fields. A plain table formatter can silently DROP them. The keyword shows but `quality_score` is absent, making QS look unavailable when it actually sources fine. Pull this query with `format='json'` (or read the nested `qualityInfo` object) to get `qualityScore` plus the three component labels (`creativeQualityScore`, `postClickQualityScore`, `searchPredictedCtr`). Confirmed live: brand keywords returned QS 7–10 with `ABOVE_AVERAGE`/`AVERAGE` labels.
 
 ---
 
 ### 3.2 Match Type Distribution
 
 ```text
--- ILLUSTRATIVE ONLY — not runnable: GAQL does not support COUNT().
+-- ILLUSTRATIVE ONLY, not runnable: GAQL does not support COUNT().
 SELECT
   campaign.name,
   ad_group_criterion.keyword.match_type,
@@ -214,7 +216,7 @@ WHERE ad_group_criterion.type = 'KEYWORD'
 ORDER BY campaign.name, ad_group_criterion.keyword.match_type
 ```
 
-**Note:** GAQL does not support `COUNT()` — retrieve all rows and aggregate after retrieval. This query structure is a guide; pull without the COUNT and count by match type from results.
+**Note:** GAQL does not support `COUNT()`. Retrieve all rows and aggregate after retrieval. This query structure is a guide; pull without the COUNT and count by match type from results.
 
 **Actual query:**
 
@@ -239,11 +241,11 @@ ORDER BY campaign.name, ad_group_criterion.keyword.match_type
 
 **What to look for:** Any `BROAD` match type keywords outside of a deliberate SKAG test structure. Broad match in legal is almost always a mistake.
 
-**Required filter:** `ad_group_criterion.negative = FALSE` is mandatory here for the same reason as 3.1 — negatives have match types too, and without this filter ad-group-level negative BROAD keywords appear as positive BROADs.
+**Required filter:** `ad_group_criterion.negative = FALSE` is mandatory here for the same reason as 3.1. Negatives have match types too, and without this filter ad-group-level negative BROAD keywords appear as positive BROADs.
 
 ---
 
-### 3.3 Keyword Performance — Long-Term Bleed Detection (90-day)
+### 3.3 Keyword Performance: Long-Term Bleed Detection (90-day)
 
 ```gaql
 SELECT
@@ -268,11 +270,11 @@ WHERE segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'
 ORDER BY metrics.cost_micros DESC
 ```
 
-**What to look for:** Keywords with significant cost and zero conversions over 90 days. This is the long-term bleed pattern — keywords that survive short-term reviews because individually they don't look catastrophic, but collectively represent consistent waste. Evaluate against the account's actual cost-per-lead target before pausing — context matters.
+**What to look for:** Keywords with significant cost and zero conversions over 90 days. This is the long-term bleed pattern: keywords that survive short-term reviews because individually they don't look catastrophic, but collectively represent consistent waste. Evaluate against the account's actual cost-per-lead target before pausing. Context matters.
 
 ---
 
-### 3.4 Keyword Performance — 30-day for Current Period
+### 3.4 Keyword Performance: 30-day for Current Period
 
 ```gaql
 SELECT
@@ -295,6 +297,60 @@ WHERE segments.date DURING LAST_30_DAYS
   AND ad_group_criterion.negative = FALSE
 ORDER BY metrics.cost_micros DESC
 ```
+
+---
+
+### 3.5 Keyword Quality-Score Trend (weekly series)
+
+The query behind the quality-score throttling read in SKILL.md. 3.1 gives today's
+score, this one gives the direction of travel.
+
+```gaql
+SELECT
+  campaign.name,
+  ad_group.name,
+  keyword_view.resource_name,
+  segments.week,
+  metrics.historical_quality_score,
+  metrics.historical_search_predicted_ctr,
+  metrics.historical_creative_quality_score,
+  metrics.historical_landing_page_quality_score,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.average_cpc
+FROM keyword_view
+WHERE segments.date BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'
+  AND campaign.status = 'ENABLED'
+  AND ad_group.status = 'ENABLED'
+ORDER BY campaign.name, ad_group.name, segments.week
+```
+
+**What to look for:** the throttling shape. `metrics.historical_quality_score`
+falling week over week while `metrics.impressions` collapses, on a campaign with
+available budget, and with the bid steady. That combination is a finding. No
+cutoff is applied to the score itself: the direction and the coincidence are what
+make the shape, and a low but flat score with steady impressions is not it.
+
+**Where each signal comes from.** Score and its three components: this query.
+Impressions: this query. Bid: `ad_group_criterion.effective_cpc_bid_micros` from
+3.1 for the current value, or `metrics.average_cpc` here as the paid proxy over
+the same weeks.
+
+> ⚠️ **BLIND SPOT: keyword-level Ad Rank is not exposed by the API**
+> There is no keyword Ad Rank metric. The nearest readable signal is
+> `metrics.search_rank_lost_impression_share` at campaign level (5.1), which tells
+> you whether the campaign as a whole is losing auctions on rank. Read it as
+> context for the keyword series, never as the keyword's own rank.
+> → Where the distinction decides the call, please share a screenshot of the
+> keyword's status and diagnostics from the Google Ads UI.
+
+**Field constraint (verified 2026-09-02 against the Google Ads API v25
+`keyword_view` field reference, not yet run live):** the four `historical_*`
+quality metrics are selectable only with `ad_group`, `campaign`, `customer` and
+`keyword_view` fields plus the date segments. `ad_group_criterion` fields are not
+selectable alongside them, so the keyword text cannot be pulled in this query.
+Join it back from 3.1 or 3.4 on the criterion id, which is the tail of
+`keyword_view.resource_name` (`.../keywordViews/{ad_group_id}~{criterion_id}`).
 
 ---
 
@@ -328,13 +384,13 @@ LIMIT 150
 
 **What to look for:** Search terms that are irrelevant to the firm's practice areas. Cross-reference against the negative keyword library.
 
-**Status meaning (mandatory — matches SKILL.md "Search term queries"):** `search_term_view.status = 'NONE'` means the term matched **historically** and is not currently served by any keyword. `NONE` is **never** an active finding — not current waste, not a current structure problem. Do not flag it, and do not treat it as a review candidate. Only terms whose status describes their present state are eligible for active review: `ADDED` (a keyword currently matches it — review its performance) and `EXCLUDED` (already blocked — no action needed). `ADDED_EXCLUDED` counts as excluded.
+**Status meaning (mandatory, matches SKILL.md "Search term queries"):** `search_term_view.status = 'NONE'` means the term matched **historically** and is not currently served by any keyword. `NONE` is **never** an active finding: not current waste, not a current structure problem. Do not flag it, and do not treat it as a review candidate. Only terms whose status describes their present state are eligible for active review: `ADDED` (a keyword currently matches it, review its performance) and `EXCLUDED` (already blocked, no action needed). `ADDED_EXCLUDED` counts as excluded.
 
 **Required filter:** `ad_group.status = 'ENABLED'` is mandatory. Without it, results include historical terms from paused/removed ad groups, producing false findings (P8).
 
 ---
 
-### 4.2 Search Terms — 90-day, All Traffic (for negative mining)
+### 4.2 Search Terms: 90-day, All Traffic (for negative mining)
 
 ```gaql
 SELECT
@@ -396,7 +452,7 @@ ORDER BY metrics.cost_micros DESC
 
 ## 6. Performance Over Time
 
-### 6.1 Campaign Performance — 30-day
+### 6.1 Campaign Performance: 30-day
 
 ```gaql
 SELECT
@@ -420,7 +476,7 @@ ORDER BY metrics.cost_micros DESC
 
 ---
 
-### 6.2 Campaign Performance — 90-day (for trend comparison)
+### 6.2 Campaign Performance: 90-day (for trend comparison)
 
 ```gaql
 SELECT
@@ -492,7 +548,7 @@ WHERE segments.date DURING LAST_30_DAYS
 ORDER BY metrics.impressions DESC
 ```
 
-**What to look for:** Ads with very low CTR relative to campaign average. `ad_strength` values (`POOR`, `AVERAGE`, `GOOD`, `EXCELLENT`) reflect Google's preference for creative flexibility — treat as a signal only, not as a performance proxy. Low impression share on a specific ad within an ad group suggests the rotation settings may be set to "optimize" despite account-level settings.
+**What to look for:** Ads with very low CTR relative to campaign average. `ad_strength` values (`POOR`, `AVERAGE`, `GOOD`, `EXCELLENT`) reflect Google's preference for creative flexibility. Treat as a signal only, not as a performance proxy. Low impression share on a specific ad within an ad group suggests the rotation settings may be set to "optimize" despite account-level settings.
 
 ---
 
@@ -537,13 +593,13 @@ WHERE ad_group_ad.status != 'REMOVED'
 ORDER BY campaign.name, ad_group.name
 ```
 
-**What to look for:** Ad approval and review status are API-accessible — pull them here first, do not default to a screenshot. Flag any ad where `ad_group_ad.policy_summary.approval_status` is `DISAPPROVED` (ad is not serving) or `APPROVED_LIMITED` (serving with restrictions — limited reach, geography, or audience), OR where `ad_group_ad.policy_summary.review_status` is `UNDER_REVIEW` or `REVIEW_IN_PROGRESS` (approval pending — the ad may not be fully serving yet; the live API commonly returns `REVIEW_IN_PROGRESS` for ads still under review). `DISAPPROVED` is the most urgent: a disapproved ad in an otherwise-serving campaign silently starves that ad group of eligible creative. `APPROVED_LIMITED` is the common trap on a campaign whose `serving_status` reads `SERVING` at the campaign level while individual ads are throttled by policy. Cross-reference flagged ads against the campaign's `serving_status` (query 1.1) — a normal campaign serving_status does NOT clear ad-level policy issues. A screenshot of the Policy Manager is the fallback only for the human-readable disapproval reason, which the API summary does not fully expand.
+**What to look for:** Ad approval and review status are API-accessible. Pull them here first, do not default to a screenshot. Flag any ad where `ad_group_ad.policy_summary.approval_status` is `DISAPPROVED` (ad is not serving) or `APPROVED_LIMITED` (serving with restrictions, limited reach, geography, or audience), OR where `ad_group_ad.policy_summary.review_status` is `UNDER_REVIEW` or `REVIEW_IN_PROGRESS` (approval pending, the ad may not be fully serving yet; the live API commonly returns `REVIEW_IN_PROGRESS` for ads still under review). `DISAPPROVED` is the most urgent: a disapproved ad in an otherwise-serving campaign silently starves that ad group of eligible creative. `APPROVED_LIMITED` is the common trap on a campaign whose `serving_status` reads `SERVING` at the campaign level while individual ads are throttled by policy. Cross-reference flagged ads against the campaign's `serving_status` (query 1.1). A normal campaign serving_status does NOT clear ad-level policy issues. A screenshot of the Policy Manager is the fallback only for the human-readable disapproval reason, which the API summary does not fully expand.
 
 ---
 
 ## 8. Change History
 
-### 8.1 Recent Changes — Last 30 Days
+### 8.1 Recent Changes: Last 30 Days
 
 ```gaql
 SELECT
@@ -561,16 +617,16 @@ ORDER BY change_event.change_date_time DESC
 LIMIT 500
 ```
 
-**`change_event` has three hard constraints — all required, or the query errors:**
+**`change_event` has three hard constraints, all required, or the query errors:**
 
-1. **Bounded date range.** Filter `change_event.change_date_time` with BOTH a `>=` start and a `<=` end (or `BETWEEN`). A bare `>=` errors with `CHANGE_DATE_RANGE_INFINITE`. Do NOT use `DURING LAST_30_DAYS` — its start resolves to exactly 30 days ago and trips `START_DATE_TOO_OLD` (the window must be _strictly inside_ 30 days). Set start = today − 29 days, end = today.
+1. **Bounded date range.** Filter `change_event.change_date_time` with BOTH a `>=` start and a `<=` end (or `BETWEEN`). A bare `>=` errors with `CHANGE_DATE_RANGE_INFINITE`. Do NOT use `DURING LAST_30_DAYS`. Its start resolves to exactly 30 days ago and trips `START_DATE_TOO_OLD` (the window must be _strictly inside_ 30 days). Set start = today − 29 days, end = today.
 2. **A `LIMIT` is mandatory** (≤ 10000), or the query errors with `LIMIT_NOT_SPECIFIED`.
-3. **30-day ceiling.** Change history older than 30 days is unavailable — `LAST_60_DAYS` / `LAST_90_DAYS` do not exist and would error regardless.
+3. **30-day ceiling.** Change history older than 30 days is unavailable: `LAST_60_DAYS` / `LAST_90_DAYS` do not exist and would error regardless.
    **What to look for:**
 
-- `client_type = 'GOOGLE_ADS_AUTOMATED_RULE'` or `'GOOGLE_ADS_RECOMMENDATIONS'` — auto-applied changes from Google. Each one is worth reviewing.
-- Gaps of weeks with no changes — neglected account.
-- Bursts of many changes in a short window — potential algorithm instability from repeated adjustments.
+- `client_type = 'GOOGLE_ADS_AUTOMATED_RULE'` or `'GOOGLE_ADS_RECOMMENDATIONS'`: auto-applied changes from Google. Each one is worth reviewing.
+- Gaps of weeks with no changes: neglected account.
+- Bursts of many changes in a short window: potential algorithm instability from repeated adjustments.
 - Changes to bid strategy, budgets, or targeting during what should be a smart bidding learning phase.
 
 ---
@@ -615,7 +671,7 @@ WHERE shared_set.type = 'NEGATIVE_KEYWORDS'
 ORDER BY shared_set.name
 ```
 
-**What to look for:** Whether any shared negative lists exist at all. No shared negative lists = one of the clearest signs of an unmanaged account.
+**What to look for:** Whether any shared negative lists exist at all. No shared negative list is a config item, never a red flag (agency-defaults 4.1). Whether the account needs one, and which categories belong in it, is decided against the account's own search-term data.
 
 ---
 
@@ -710,7 +766,7 @@ WHERE segments.date DURING LAST_30_DAYS
 ORDER BY metrics.cost_micros DESC
 ```
 
-**Required SELECT field:** `geographic_view` and `user_location_view` reject a `campaign.status` filter unless `campaign.status` is also in the SELECT clause (`EXPECTED_REFERENCED_FIELD_IN_SELECT_CLAUSE`). Both queries above include it for this reason — don't remove it.
+**Required SELECT field:** `geographic_view` and `user_location_view` reject a `campaign.status` filter unless `campaign.status` is also in the SELECT clause (`EXPECTED_REFERENCED_FIELD_IN_SELECT_CLAUSE`). Both queries above include it for this reason. Don't remove it.
 
 ---
 
@@ -733,7 +789,7 @@ WHERE segments.date DURING LAST_30_DAYS
 ORDER BY campaign.name, segments.device
 ```
 
-**What to look for:** Disproportionate spend on mobile with significantly lower conversion rates than desktop. Legal clients frequently research on mobile but convert (call or fill a form) on desktop or by phone — device bid adjustments may be warranted.
+**What to look for:** Disproportionate spend on mobile with significantly lower conversion rates than desktop. Legal clients frequently research on mobile but convert (call or fill a form) on desktop or by phone. Device bid adjustments may be warranted.
 
 ---
 
@@ -755,7 +811,7 @@ WHERE segments.date DURING LAST_30_DAYS
 ORDER BY campaign.name, segments.day_of_week, segments.hour
 ```
 
-**Use:** Identifies whether spend is concentrated during hours when the firm can actually answer calls. Call extensions should be scheduled to office hours — this query helps verify alignment and identify off-hours waste.
+**Use:** Identifies whether spend is concentrated during hours when the firm can actually answer calls. Call extensions should be scheduled to office hours. This query helps verify alignment and identify off-hours waste.
 
 ---
 
@@ -797,7 +853,7 @@ FROM bidding_strategy
 ORDER BY bidding_strategy.name
 ```
 
-**What to look for:** Shared bidding strategies that pool multiple campaigns together. In legal, campaigns often have different economics (branded vs. non-branded, different practice areas) — pooling them into a shared strategy can degrade performance by mixing signals.
+**What to look for:** Shared bidding strategies that pool multiple campaigns together. In legal, campaigns often have different economics (branded vs. non-branded, different practice areas). Pooling them into a shared strategy can degrade performance by mixing signals.
 
 ---
 
@@ -820,7 +876,7 @@ WHERE segments.date DURING LAST_30_DAYS
 ORDER BY campaign.name
 ```
 
-**Use:** Verify that ads are pointing to the correct URLs. Spot ads going to the homepage when they should go to a practice-area-specific landing page. Flag any `/404` or redirect chains by checking URLs manually — GAQL cannot verify landing page status.
+**Use:** Verify that ads are pointing to the correct URLs. Spot ads going to the homepage when they should go to a practice-area-specific landing page. Flag any `/404` or redirect chains by checking URLs manually. GAQL cannot verify landing page status.
 
 ---
 
@@ -895,7 +951,7 @@ Structure queries: no date segmentation, no metrics.
 3. **`campaign.url_expansion_opt_out` is gone.** Final URL expansion is read from
    `campaign.asset_automation_settings`.
 
-Two more API behaviours to expect in the results:
+Two more API behaviors to expect in the results:
 
 - **Boolean fields are omitted, not returned as `false`.** `campaign_conversion_goal.biddable` and
   `customer_conversion_goal.biddable` are absent when not true. Absence is the negative case, not
@@ -1099,7 +1155,7 @@ WHERE campaign.status = 'ENABLED'
 ORDER BY campaign.name
 ```
 
-**What to check:** a list existing at all (§4.1, red flag if none), and every serving campaign
+**What to check:** a list existing at all (§4.1, config item if none), and every serving campaign
 appearing in the second result set (§4.2). A serving campaign absent from the second query
 references no shared list. `shared_set.reference_count` gives the same information in aggregate but
 does not say _which_ campaigns are missing.
@@ -1217,7 +1273,7 @@ FROM custom_conversion_goal
    someone select one.
 
 The biddable map names _categories_, not actions. Translate it into actions by joining the biddable
-category and origin pairs against the §14.6 result: the actions the campaign can optimise toward
+category and origin pairs against the §14.6 result: the actions the campaign can optimize toward
 are the ENABLED, `include_in_conversions_metric = true` actions whose category and origin are
 biddable. That join is the check, and it is where a page-view or content-download category
 quietly widens the goal set (§3.2).
@@ -1459,7 +1515,7 @@ DURING LAST_MONTH
 BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'
 ```
 
-There is no `LAST_60_DAYS` or `LAST_90_DAYS` literal — for any window longer than 30 days (or any custom range), use `BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'` with explicit dates.
+There is no `LAST_60_DAYS` or `LAST_90_DAYS` literal. For any window longer than 30 days (or any custom range), use `BETWEEN 'YYYY-MM-DD' AND 'YYYY-MM-DD'` with explicit dates.
 
 **Filtering by status:**
 
@@ -1474,6 +1530,6 @@ There is no `LAST_60_DAYS` or `LAST_90_DAYS` literal — for any window longer t
 
 **Resources that do NOT support date segmentation:**
 
-- `campaign` (structure queries, section 1) — omit date filter for structural queries
-- `conversion_action` — omit date filter for the action list; add for metrics queries
-- `shared_set` / `shared_criterion` — no date segmentation available
+- `campaign` (structure queries, section 1): omit date filter for structural queries
+- `conversion_action`: omit date filter for the action list; add for metrics queries
+- `shared_set` / `shared_criterion`: no date segmentation available

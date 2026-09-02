@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Append, validate, query, render, and summarize Google Ads journals."""
+"""Append, validate, query, render, and summarize Google Ads journals.
+
+Journals, rendered notes, and session logs live under a data root. Set
+PPC_JOURNAL_ROOT to put that root wherever you keep account data, which
+for an operator is normally a private directory outside this repo. With
+no override the root is the repo itself, so journals land in ./journal.
+"""
 
 from __future__ import annotations
 
@@ -16,20 +22,18 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-# Where journals, rendered notes, and session logs live: always OUTSIDE the
-# skill repo. Operators set PPC_JOURNAL_ROOT; otherwise a sibling
-# `RA-Clients/GoogleAds` layout is used if present, else ~/.legal-ppc-skill.
+REPO_ROOT = SCRIPT_DIR.parent
+# Where journals, rendered notes, and session logs live. PPC_JOURNAL_ROOT
+# overrides, and an operator holding real account data should set it to a
+# private directory outside this repo. The default root is the repo itself,
+# so an unconfigured run writes ./journal/<slug>.jsonl next to this file.
 
 
 def _data_root() -> Path:
     env = os.environ.get("PPC_JOURNAL_ROOT")
     if env:
         return Path(env).expanduser()
-    if len(SCRIPT_DIR.parents) > 3:
-        legacy = SCRIPT_DIR.parents[3] / "RA-Clients" / "GoogleAds"
-        if legacy.is_dir():
-            return legacy
-    return Path.home() / ".legal-ppc-skill"
+    return REPO_ROOT
 
 
 DATA_ROOT = _data_root()
@@ -53,6 +57,17 @@ LOCAL_TZ = _operator_tz()
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 TYPE_ORDER = ("obs", "flag", "decision", "change", "outcome", "rule", "context")
 VERDICT_ORDER = ("met", "not_met", "mixed", "unclear")
+
+# Schema v1 platform values. They are not valid under schema v2 and are kept
+# here only so `migrate` can carry an old journal forward. This map is the
+# complete set migrate will touch: any other out-of-enum value is a mistake to
+# look at, not something to rewrite silently.
+LEGACY_PLATFORMS = {
+    "meta": "other",
+    "callrail": "call-tracking",
+    "ga4": "analytics",
+    "hubspot": "crm",
+}
 
 
 class JournalError(Exception):
@@ -176,6 +191,12 @@ def load_schema() -> dict[str, Any]:
     return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 
+def platform_values(schema: dict[str, Any] | None = None) -> set[str]:
+    """The platform values the current schema accepts."""
+    resolved = schema if schema is not None else load_schema()
+    return set(resolved["properties"]["platform"]["enum"])
+
+
 def vocab_path() -> Path:
     data_vocab = DATA_ROOT / "journal" / "vocab.json"
     return data_vocab if data_vocab.exists() else BUNDLED_VOCAB_PATH
@@ -250,16 +271,40 @@ def validate_records(
     path: Path,
     records: list[tuple[dict[str, Any], int]],
     vocab: set[str] | None = None,
+    unsaved_lines: set[int] | None = None,
 ) -> list[str]:
+    """Validate records for one journal.
+
+    `unsaved_lines` names the line numbers of records that are not on disk yet,
+    such as the candidate an append is about to write. Those never get the
+    'run journal.py migrate <slug>' hint, because migrate rewrites files and
+    cannot help an entry that has not been written. They get the ordinary enum
+    error.
+    """
     errors: list[str] = []
+    pending = unsaved_lines or set()
     schema = load_schema()
+    platforms = platform_values(schema)
+    legacy_platforms: Counter[str] = Counter()
     known_tags = vocab if vocab is not None else load_vocab()
     slug = path.stem
     ids: dict[str, int] = {}
 
     for entry, line_number in records:
         prefix = f"{path}:line {line_number}"
+        entry_platform = entry.get("platform")
+        is_legacy_platform = False
+        if (
+            line_number not in pending
+            and isinstance(entry_platform, str)
+            and entry_platform not in platforms
+            and entry_platform in LEGACY_PLATFORMS
+        ):
+            is_legacy_platform = True
+            legacy_platforms[entry_platform] += 1
         for error in _schema_errors(entry, schema):
+            if is_legacy_platform and error.startswith("$.platform: must be one of"):
+                continue
             errors.append(f"{prefix}: {error}")
 
         entry_id = entry.get("id")
@@ -323,6 +368,15 @@ def validate_records(
         for target in entry.get("re", []):
             if isinstance(target, str) and target not in known_ids:
                 errors.append(f"{prefix}: re target does not exist: {target!r}")
+
+    if legacy_platforms:
+        detail = ", ".join(
+            f"{name}={count}" for name, count in sorted(legacy_platforms.items())
+        )
+        errors.append(
+            f"{path}: legacy platform values found: "
+            f"run journal.py migrate {slug}. {detail}"
+        )
     return errors
 
 
@@ -349,6 +403,39 @@ def validate_paths(paths: Iterable[Path]) -> tuple[list[str], int]:
             else:
                 global_ids[entry_id] = (path, line_number)
     return errors, count
+
+
+def migrate_journal(path: Path) -> Counter[str]:
+    """Rewrite schema v1 platform values in place, writing <name>.bak first.
+
+    Only the values named in LEGACY_PLATFORMS are rewritten. Any other value
+    outside the enum is left alone so that validate keeps reporting it as an
+    ordinary schema error. Returns a count per rewrite, keyed 'old -> new'. A
+    journal with nothing to migrate is left untouched and no backup is written.
+    """
+    records, parse_errors = read_journal(path)
+    if parse_errors:
+        raise JournalError("\n".join(parse_errors))
+    platforms = platform_values()
+    changed: Counter[str] = Counter()
+    for entry, _ in records:
+        platform = entry.get("platform")
+        if not isinstance(platform, str) or platform in platforms:
+            continue
+        replacement = LEGACY_PLATFORMS.get(platform)
+        if replacement is None:
+            continue
+        entry["platform"] = replacement
+        changed[f"{platform} -> {replacement}"] += 1
+    if not changed:
+        return changed
+    path.with_name(path.name + ".bak").write_bytes(path.read_bytes())
+    lines = [
+        json.dumps(entry, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+        for entry, _ in records
+    ]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+    return changed
 
 
 def list_journals() -> list[Path]:
@@ -443,8 +530,9 @@ def append_entry(slug: str, entry: dict[str, Any]) -> dict[str, Any]:
     candidate.setdefault("ts", datetime.now(LOCAL_TZ).isoformat(timespec="seconds"))
     candidate.setdefault("id", _next_id(slug, candidate["ts"], records))
 
-    combined = records + [(candidate, len(records) + 1)]
-    errors = validate_records(path, combined)
+    candidate_line = len(records) + 1
+    combined = records + [(candidate, candidate_line)]
+    errors = validate_records(path, combined, unsaved_lines={candidate_line})
     if errors:
         raise JournalError("\n".join(errors))
 
@@ -505,9 +593,9 @@ def _single_line(value: str) -> str:
 
 
 def _entry_markdown(entry: dict[str, Any], include_verdict: bool = False) -> list[str]:
-    heading = f"### `{entry['id']}` — {entry['type']}"
+    heading = f"### `{entry['id']}`: {entry['type']}"
     if include_verdict:
-        heading += f" — {entry['verdict']}"
+        heading += f", {entry['verdict']}"
     lines = [heading, "", f"Scope: {_scope_one_liner(entry)}"]
     if entry.get("tags"):
         lines.append(f"Tags: {', '.join(entry['tags'])}")
@@ -587,9 +675,9 @@ def _note_markdown(slug: str, entries: list[dict[str, Any]]) -> str:
     )
 
     lines = [
-        f"<!-- GENERATED FILE — DO NOT HAND-EDIT. Source: {source} -->",
+        f"<!-- GENERATED FILE: DO NOT HAND-EDIT. Source: {source} -->",
         "",
-        f"# Account Notes — {slug}",
+        f"# Account Notes: {slug}",
         "",
         "## Config overrides",
         "",
@@ -659,9 +747,9 @@ def _session_markdown(
 ) -> str:
     ordered = sorted(entries, key=lambda item: (item["ts"], item["id"]))
     lines = [
-        f"<!-- GENERATED FILE — DO NOT HAND-EDIT. Source: {journal_source} -->",
+        f"<!-- GENERATED FILE: DO NOT HAND-EDIT. Source: {journal_source} -->",
         "",
-        f"# Session Log — {session}",
+        f"# Session Log: {session}",
         "",
     ]
     for entry_type in TYPE_ORDER:
@@ -748,7 +836,7 @@ def build_parser() -> argparse.ArgumentParser:
     append_parser.add_argument("--review-by")
     append_parser.add_argument("--re", action="append")
     append_parser.add_argument("--verdict", choices=VERDICT_ORDER)
-    append_parser.add_argument("--source-actor", default="ra-clients")
+    append_parser.add_argument("--source-actor", default="operator")
     append_parser.add_argument("--source-ref")
     append_parser.add_argument("--session")
     append_parser.add_argument("--metrics-json")
@@ -761,6 +849,12 @@ def build_parser() -> argparse.ArgumentParser:
     validate_parser = subparsers.add_parser("validate", help="validate journals")
     validate_parser.add_argument("slug", nargs="?")
     validate_parser.add_argument("--all", action="store_true")
+
+    migrate_parser = subparsers.add_parser(
+        "migrate", help="rewrite schema v1 platform values to the current enum"
+    )
+    migrate_parser.add_argument("slug", nargs="?")
+    migrate_parser.add_argument("--all", action="store_true")
 
     due_parser = subparsers.add_parser("due", help="show due decisions and changes")
     due_parser.add_argument("slug")
@@ -817,6 +911,26 @@ def main(argv: list[str] | None = None) -> int:
                     print(error, file=sys.stderr)
                 return 1
             print(f"valid: {len(paths)} journal(s), {count} entries")
+            return 0
+
+        if args.command == "migrate":
+            paths = _select_paths(args.slug, args.all)
+            total = 0
+            for path in paths:
+                changed = migrate_journal(path)
+                if not changed:
+                    print(f"{path}: no legacy platform values")
+                    continue
+                moved = sum(changed.values())
+                total += moved
+                detail = ", ".join(
+                    f"{name} ({count})" for name, count in sorted(changed.items())
+                )
+                print(
+                    f"{path}: {moved} entries rewritten: {detail}. "
+                    f"backup at {path.name}.bak"
+                )
+            print(f"migrated: {total} entries across {len(paths)} journal(s)")
             return 0
 
         if args.command == "due":

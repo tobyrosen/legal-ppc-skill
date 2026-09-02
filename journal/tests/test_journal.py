@@ -29,7 +29,7 @@ class JournalTests(unittest.TestCase):
             "platform": "google",
             "type": "obs",
             "status": "closed",
-            "source": {"actor": "ra-clients", "ref": None},
+            "source": {"actor": "operator", "ref": None},
             "session": "2026-07-01-example-family-law",
             "tags": ["watch"],
             "body": "Synthetic observation.",
@@ -173,7 +173,7 @@ class JournalTests(unittest.TestCase):
         )
         self.assertIn("account `PRESENCE` (baseline `PRESENCE_OR_INTEREST`)", rendered)
         self.assertIn("scope: Search - Family Law", rendered)
-        self.assertIn("approved by ra-clients on 2026-07-01", rendered)
+        self.assertIn("approved by operator on 2026-07-01", rendered)
         overrides_block, rules_block = rendered.split("## Standing Rules", 1)
         self.assertIn("example-family-law-20260701-01", overrides_block)
         self.assertNotIn("example-family-law-20260701-01", rules_block)
@@ -184,6 +184,134 @@ class JournalTests(unittest.TestCase):
         rendered = note_path.read_text(encoding="utf-8")
         self.assertIn("## Config overrides", rendered)
         self.assertIn("agency-defaults.md", rendered)
+
+    def legacy_journal(self):
+        """A journal carrying schema v1 platform values, plus one valid entry."""
+        path = journal.DATA_ROOT / "journal" / "example-family-law.jsonl"
+        entries = [
+            self.entry(id="example-family-law-20260701-01", platform="callrail"),
+            self.entry(id="example-family-law-20260701-02", platform="ga4"),
+            self.entry(id="example-family-law-20260701-03", platform="hubspot"),
+            self.entry(id="example-family-law-20260701-04", platform="meta"),
+            self.entry(id="example-family-law-20260701-05", platform="google"),
+        ]
+        path.write_text(
+            "".join(json.dumps(entry, sort_keys=True) + "\n" for entry in entries),
+            encoding="utf-8",
+        )
+        return path
+
+    def test_validate_names_migrate_instead_of_a_bare_enum_failure(self):
+        path = self.legacy_journal()
+        records, parse_errors = journal.read_journal(path)
+        self.assertEqual(parse_errors, [])
+        errors = journal.validate_records(path, records)
+        self.assertTrue(
+            any(
+                "run journal.py migrate example-family-law" in error for error in errors
+            ),
+            "the hint names the slug, so it can be run as written",
+        )
+        self.assertTrue(any("callrail=1" in error for error in errors))
+        self.assertTrue(any("hubspot=1" in error for error in errors))
+        self.assertFalse(
+            any("$.platform: must be one of" in error for error in errors),
+            "the legacy summary replaces the per-line enum failure",
+        )
+
+    def test_migrate_rewrites_legacy_platforms_and_backs_up(self):
+        path = self.legacy_journal()
+        original = path.read_bytes()
+
+        changed = journal.migrate_journal(path)
+        self.assertEqual(changed["callrail -> call-tracking"], 1)
+        self.assertEqual(changed["ga4 -> analytics"], 1)
+        self.assertEqual(changed["hubspot -> crm"], 1)
+        self.assertEqual(changed["meta -> other"], 1)
+        self.assertEqual(sum(changed.values()), 4)
+
+        backup = path.with_name(path.name + ".bak")
+        self.assertTrue(backup.exists())
+        self.assertEqual(backup.read_bytes(), original)
+
+        records, parse_errors = journal.read_journal(path)
+        self.assertEqual(parse_errors, [])
+        self.assertEqual(journal.validate_records(path, records), [])
+        self.assertEqual(
+            [entry["platform"] for entry, _ in records],
+            ["call-tracking", "analytics", "crm", "other", "google"],
+        )
+
+    def test_append_with_retired_platform_is_a_plain_enum_error(self):
+        """migrate rewrites files, so it cannot help an entry not yet written."""
+        with self.assertRaises(journal.JournalError) as caught:
+            journal.append_entry("example-family-law", self.entry(platform="callrail"))
+        message = str(caught.exception)
+        self.assertIn("$.platform: must be one of", message)
+        self.assertNotIn("run journal.py migrate", message)
+        path = journal.DATA_ROOT / "journal" / "example-family-law.jsonl"
+        self.assertFalse(path.exists(), "a rejected append writes nothing")
+
+    def test_append_still_names_migrate_for_records_already_on_disk(self):
+        self.legacy_journal()
+        candidate = self.entry()
+        del candidate["id"]
+        with self.assertRaises(journal.JournalError) as caught:
+            journal.append_entry("example-family-law", candidate)
+        message = str(caught.exception)
+        self.assertIn("run journal.py migrate example-family-law", message)
+        self.assertIn("callrail=1", message)
+
+    def test_unknown_platform_stays_a_plain_validation_error(self):
+        """migrate handles the four v1 values only; anything else is a real error."""
+        path = journal.DATA_ROOT / "journal" / "example-family-law.jsonl"
+        entries = [
+            self.entry(id="example-family-law-20260701-01", platform="sms"),
+            self.entry(id="example-family-law-20260701-02", platform="callrail"),
+            self.entry(id="example-family-law-20260701-03", platform="google"),
+        ]
+        path.write_text(
+            "".join(json.dumps(entry, sort_keys=True) + "\n" for entry in entries),
+            encoding="utf-8",
+        )
+
+        records, _ = journal.read_journal(path)
+        errors = journal.validate_records(path, records)
+        self.assertTrue(
+            any("$.platform: must be one of" in error for error in errors),
+            "an unknown platform keeps its ordinary enum error",
+        )
+        hints = [error for error in errors if "run journal.py migrate" in error]
+        self.assertEqual(len(hints), 1)
+        self.assertIn("run journal.py migrate example-family-law", hints[0])
+        self.assertIn("callrail=1", hints[0])
+        self.assertNotIn("sms", hints[0])
+
+        changed = journal.migrate_journal(path)
+        self.assertEqual(dict(changed), {"callrail -> call-tracking": 1})
+
+        records, _ = journal.read_journal(path)
+        self.assertEqual(
+            [entry["platform"] for entry, _ in records],
+            ["sms", "call-tracking", "google"],
+        )
+        remaining = journal.validate_records(path, records)
+        self.assertTrue(
+            any("$.platform: must be one of" in error for error in remaining),
+            "migrate must not silently make the unknown value valid",
+        )
+        self.assertFalse(
+            any("run journal.py migrate" in error for error in remaining),
+            "no migrate hint once the known values are gone",
+        )
+
+    def test_migrate_leaves_a_clean_journal_untouched(self):
+        journal.append_entry("example-family-law", self.entry())
+        path = journal.DATA_ROOT / "journal" / "example-family-law.jsonl"
+        before = path.read_bytes()
+        self.assertEqual(journal.migrate_journal(path), {})
+        self.assertFalse(path.with_name(path.name + ".bak").exists())
+        self.assertEqual(path.read_bytes(), before)
 
     def test_jsonl_parse_error_has_line_number(self):
         path = journal.DATA_ROOT / "journal" / "example-family-law.jsonl"

@@ -1,9 +1,9 @@
 # Standard polyglot pre-commit config
 # Source of truth: shared dev-foundations templates
 # Propagated by: propagate.py
-# Updated: 2026-05-22 (v2 — polyglot rebuild after fleet survey)
+# Updated: 2026-05-22 (v2, polyglot rebuild after fleet survey)
 #
-# All hooks gate on file types — a Python-only repo won't run JS hooks because
+# All hooks gate on file types: a Python-only repo won't run JS hooks because
 # no JS files are staged, and vice versa. This is the single root config for
 # every repo using these templates.
 
@@ -30,7 +30,7 @@ repos:
       - id: mixed-line-ending
         args: [--fix=lf]
 
-  # Secrets scan (universal — blocks tokens, keys, credentials)
+  # Secrets scan (universal, blocks tokens, keys, credentials)
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.21.2
     hooks:
@@ -41,7 +41,7 @@ repos:
   # (duplicate-heading) are disabled here in addition to the fleet baseline.
   # This is a prose-heavy Google Ads skill repo whose bold labels ("GAQL: 2.1",
   # "Step 0/1/2…", parentheticals) are intentional emphasis, not section
-  # headings — MD036 fired 33 false positives on them. Correctness rules
+  # headings: MD036 fired 33 false positives on them. Correctness rules
   # (MD040 fenced-code-language, etc.) stay ON. Do not let re-propagation
   # overwrite this line without re-applying the MD036/MD024 disable.
   - repo: https://github.com/igorshubovych/markdownlint-cli
@@ -69,7 +69,7 @@ repos:
 
   # Pyright (type checker). Each Python repo gets a [tool.pyright] section
   # in its pyproject.toml at basic mode. The hook runs ONLY on staged files
-  # (pass_filenames: true) — pre-existing type debt in unchanged files won't
+  # (pass_filenames: true), pre-existing type debt in unchanged files won't
   # block commits. Full project type check belongs in CI, not pre-commit.
   - repo: local
     hooks:
@@ -93,7 +93,7 @@ repos:
           - prettier@3.4.2
           - prettier-plugin-astro@0.14.1
 
-  # ESLint via locally-installed npx eslint (no auto-install — fail loud if missing).
+  # ESLint via locally-installed npx eslint (no auto-install, fail loud if missing).
   # Repos with JS/TS code need: npm install --save-dev eslint typescript-eslint eslint-config-prettier
   # And an eslint.config.mjs (the propagation script copies a shared base into JS repos).
   - repo: local
@@ -106,7 +106,7 @@ repos:
         require_serial: true
 
   # ─────────────────────────────────────────────────────────────
-  # Rust (only fires on .rs files staged — silent in non-Rust repos)
+  # Rust (only fires on .rs files staged, silent in non-Rust repos)
   #
   # Cargo.toml location is auto-detected so the hooks work in both layouts:
   #   - Standard Rust repo: Cargo.toml at the repo root
@@ -124,7 +124,7 @@ repos:
 
       - id: clippy
         name: clippy
-        # Warn-only by default — surfaces clippy findings without blocking commits.
+        # Warn-only by default: surfaces clippy findings without blocking commits.
         # Repos can ratchet up by changing `-- -W warnings` to `-- -D warnings` in
         # their own .pre-commit-config.yaml once their Rust baseline is clean.
         entry: bash -c 'if [ -f src-tauri/Cargo.toml ] && [ ! -f Cargo.toml ]; then cd src-tauri; fi; cargo clippy --all-targets -- -W warnings'

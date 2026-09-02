@@ -1,4 +1,4 @@
-# Legacy account notes — frozen
+# Legacy account notes: frozen
 
 This directory is retained for migration history only. Do not add or edit account data here.
 

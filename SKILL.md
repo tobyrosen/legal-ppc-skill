@@ -27,7 +27,7 @@ These are prerequisites to the tactics, not presentation preferences.
 
 **Aligned windows only, no partial-vs-full comparisons.** Every comparison compares like with like: complete week against complete week, or the same elapsed weekday count on both sides. A Thursday Mon-Thu period is compared against the prior Mon-Thu, never against a full prior Mon-Sun. Comparing a partial window with a full one shorts the numerator by days, and the resulting decline is an artifact of the calendar, not the account.
 
-**Conversion lag: label immature windows provisional.** Form and call conversions keep posting for days after the click (assume a 72-hour lag unless the account's own data says otherwise). A current or partial window's conversion count is a floor, not a final number. The conversion count, the conversion percentage move, and the CPL from any window still inside the lag period are labelled provisional, with the reason stated. Spend is mature immediately; conversions and CPL are not. No trend conclusion is drawn from an immature window.
+**Conversion lag: label immature windows provisional.** Form and call conversions keep posting for days after the click (assume a 72-hour lag unless the account's own data says otherwise). A current or partial window's conversion count is a floor, not a final number. The conversion count, the conversion percentage move, and the CPL from any window still inside the lag period are labeled provisional, with the reason stated. Spend is mature immediately; conversions and CPL are not. No trend conclusion is drawn from an immature window.
 
 **Zero-conversion comparison periods: CPL percentage is `n/a`, never invented.** When either side of a comparison has 0 conversions, the CPL percentage move is undefined. Report `CPL n/a`. Never write "infinite", never manufacture "100% better", never silently drop CPL. Report spend direction as normal, state the conversion change in absolute terms ("conversions 0 to 2", not a percentage), give the current period's CPL if it is defined, and attach the low-volume caveat. Moving off a zero-conversion period is not evidence of improvement.
 
@@ -99,7 +99,7 @@ The API returns both positive and negative keywords in the same result set, for 
 3. **Always SELECT and filter `ad_group.status`.** Keywords in paused ad groups are not serving and are not optimization targets.
 4. **Also SELECT `campaign.status`.** A keyword in a paused campaign is not a live problem.
 
-If a keyword query lacks `ad_group_criterion.negative = FALSE`, stop and re-run the library query. Do not analyse an incomplete result.
+If a keyword query lacks `ad_group_criterion.negative = FALSE`, stop and re-run the library query. Do not analyze an incomplete result.
 
 ### Search term queries (`search_term_view`)
 
@@ -107,7 +107,7 @@ If a keyword query lacks `ad_group_criterion.negative = FALSE`, stop and re-run 
 
 1. **Always include `ad_group.status = 'ENABLED'`** in the WHERE clause.
 2. **Always SELECT `search_term_view.status`.** If the field is missing, the query is incomplete. Do not flag any term without it.
-3. **Never flag a term with `status = NONE` as an active finding.** `NONE` means the term matched historically but is no longer served by any keyword, often from a broad keyword since tightened or paused. Confirmed misdiagnosis: a fictional "quiet title action westhollow" term was flagged as active waste when it was status NONE from a paused broad keyword.
+3. **Never flag a term with `status = NONE` as an active finding.** `NONE` means the term matched historically but is no longer served by any keyword, often from a broad keyword since tightened or paused. Confirmed misdiagnosis: a fictional "uncontested divorce westhollow" term was flagged as active waste when it was status NONE from a paused broad keyword.
 4. **Check which ad group a term came from.** A term from a paused or removed ad group is historical, not an active waste source.
 
 Root cause: the API scopes data by account and date, not by serving status.
@@ -263,7 +263,7 @@ Quality score is a watched signal. A falling quality score with impressions coll
 
 The UI shows a "limited by quality score" label for severely underperforming keywords. The API does not expose it: `system_serving_status` returns `ELIGIBLE` even for a throttled keyword. This section is detection only.
 
-**Throttled keyword pattern:** quality score of 2 or less, AND all three components below average (`search_predicted_ctr`, `creative_quality_score`, `post_click_quality_score`), AND zero or near-zero impressions over the most recent 7 to 14 days on an active campaign with available budget. This shape has a real observed case behind it: quality score 1, all three components below average, zero impressions.
+**Throttled keyword pattern:** a falling quality score with all three components below average (`search_predicted_ctr`, `creative_quality_score`, `post_click_quality_score`), AND impressions collapsing to zero or near zero over the most recent 7 to 14 days, on an active campaign with available budget and with bid holding. Pull the weekly series with GAQL 3.5. Ad rank is not exposed per keyword, so read campaign rank-lost impression share (GAQL 5.1) as context rather than as the keyword's own rank. No quality-score cutoff is asserted: the finding is the direction of travel and the coincidence of the signals, not any particular number. There is a real observed case behind the shape, where the score sat at the bottom of the scale with all three components below average and zero impressions.
 
 **No fix is prescribed.** The rebuild tactic that used to sit here, pausing the keyword and building a fresh variant to get a clean quality signal, was retired in 2026-09 along with the playbook that encoded it (PB-15). Report the detection and hand the decision back.
 

@@ -1,14 +1,20 @@
-# Internal files — not included in public release
+# Internal files, not included in public release
 account-notes/
 # ...except the synthetic template example referenced by SKILL.md's Accounts table
 !account-notes/example-family-law.md
 # ...except the committed synthetic eval fixtures (real account-notes/ stays ignored)
 !evals/fixtures/account-notes/
 session-logs/
+notes/
+# Journals written by a run with no PPC_JOURNAL_ROOT set: the default data
+# root is this repo, so ./journal/<slug>.jsonl must never be committed.
+# .bak files are the backups journal.py migrate leaves behind.
+/journal/*.jsonl
+/journal/*.bak
 references/learnings.md
 skills/
 __pycache__/
 *.pyc
 
-# Internal operations overlay - runbook, other-platform drafts. Never released.
+# Private local files. Never released.
 internal/

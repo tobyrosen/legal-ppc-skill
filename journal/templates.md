@@ -14,7 +14,7 @@ Blocks below are pretty-printed for reading and pipe as-is; the appended journal
   "scope": { "level": "account", "ids": [], "names": [] },
   "tags": ["cpl-direction"],
   "body": "<one factual data point>",
-  "source": { "actor": "ra-clients", "ref": null },
+  "source": { "actor": "operator", "ref": null },
   "session": "YYYY-MM-DD-<slug>"
 }
 ```
@@ -33,7 +33,7 @@ Blocks below are pretty-printed for reading and pipe as-is; the appended journal
   },
   "tags": ["watch"],
   "body": "<anomaly, consequence, and what needs a decision>",
-  "source": { "actor": "ra-clients", "ref": null },
+  "source": { "actor": "operator", "ref": null },
   "session": "YYYY-MM-DD-<slug>"
 }
 ```
@@ -91,7 +91,7 @@ Blocks below are pretty-printed for reading and pipe as-is; the appended journal
   "body": "<what happened versus the expectation>",
   "re": ["<decision-or-change-id>"],
   "verdict": "met",
-  "source": { "actor": "ra-clients", "ref": null },
+  "source": { "actor": "operator", "ref": null },
   "session": "YYYY-MM-DD-<slug>"
 }
 ```
@@ -175,7 +175,7 @@ the original line.
   "scope": { "level": "account", "ids": [], "names": [] },
   "tags": [],
   "body": "<durable backstory needed to interpret future checks>",
-  "source": { "actor": "ra-clients", "ref": null },
+  "source": { "actor": "operator", "ref": null },
   "session": "YYYY-MM-DD-<slug>"
 }
 ```

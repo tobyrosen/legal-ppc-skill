@@ -6,25 +6,25 @@
       "id": "T1",
       "type": "should-trigger",
       "prompt": "Run a full account review on our Google Ads account.",
-      "rationale": "Explicit Google Ads mention + audit intent — clearest possible trigger."
+      "rationale": "Explicit Google Ads mention + audit intent, clearest possible trigger."
     },
     {
       "id": "T2",
       "type": "should-trigger",
       "prompt": "Our CPA has gone up a lot this month. Can you take a look?",
-      "rationale": "Implicit trigger — no mention of Google Ads, but CPA is a PPC metric. Should activate."
+      "rationale": "Implicit trigger: no mention of Google Ads, but CPA is a PPC metric. Should activate."
     },
     {
       "id": "T3",
       "type": "should-trigger",
       "prompt": "Leads are down this week compared to last week. What's going on?",
-      "rationale": "Implicit trigger — no platform named. In a law firm PPC context, this routes to Google Ads diagnosis."
+      "rationale": "Implicit trigger: no platform named. In a law firm PPC context, this routes to Google Ads diagnosis."
     },
     {
       "id": "T4",
       "type": "should-trigger",
       "prompt": "This account feels off. Can you dig in?",
-      "rationale": "Vague brief but PPC-context phrase. Listed as trigger phrase in prior description — should still activate."
+      "rationale": "Vague brief but PPC-context phrase. Listed as trigger phrase in prior description, should still activate."
     },
     {
       "id": "T5",
@@ -48,12 +48,12 @@
       "id": "T8",
       "type": "should-trigger",
       "prompt": "Check if our conversion tracking is set up correctly.",
-      "rationale": "Implicit — conversion tracking audit is a core skill task. No platform named but routing is clear in law firm PPC context."
+      "rationale": "Implicit: conversion tracking audit is a core skill task. No platform named but routing is clear in law firm PPC context."
     },
     {
       "id": "T9",
       "type": "should-trigger",
-      "prompt": "We just onboarded a new client — can you do a first review of their account?",
+      "prompt": "We just onboarded a new client, can you do a first review of their account?",
       "rationale": "New account audit (Tree 5). No platform named but 'account' in law firm PPC agency context = Google Ads."
     },
     {

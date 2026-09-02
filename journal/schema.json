@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.com/schemas/google-ads-journal-entry-v1.json",
-  "title": "Google Ads journal entry v1.0",
+  "$id": "https://example.com/schemas/google-ads-journal-entry-v2.json",
+  "title": "Google Ads journal entry v2.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -30,10 +30,9 @@
     "platform": {
       "enum": [
         "google",
-        "meta",
-        "callrail",
-        "ga4",
-        "hubspot",
+        "call-tracking",
+        "analytics",
+        "crm",
         "site",
         "admin",
         "other"
@@ -154,7 +153,8 @@
       "required": ["actor", "ref"],
       "properties": {
         "actor": {
-          "enum": ["operator", "toby", "ra-clients", "ra-proj", "automation"]
+          "type": "string",
+          "minLength": 1
         },
         "ref": {
           "type": ["string", "null"],

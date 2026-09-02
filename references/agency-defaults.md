@@ -87,7 +87,7 @@ Override: the case where a different value is legitimate.
 - **config item**: real, decide it at the next check. Reported below the red-flag block.
 - **info**: recorded, surfaced only on request or during a full audit.
 
-**Status**: entries are STANDARD unless labelled PROPOSED. A PROPOSED entry may be reported as a
+**Status**: entries are STANDARD unless labeled PROPOSED. A PROPOSED entry may be reported as a
 config item at most, never as a red flag, until the operator confirms it.
 
 **Readability**: every entry names the GAQL field where the setting is readable. Where a setting
@@ -297,7 +297,7 @@ DEVIATION, config item:
 - A PMax campaign, including a PMax test, at `CUSTOMER`: it is inheriting the account default. That is not a MATCH. Pinning to campaign-level goals is the standard for PMax; `CUSTOMER` on PMax is the finding.
 - A Search campaign at `CAMPAIGN` with no recorded override.
 
-Search campaigns share the account's goal set. A PMax test does not: it optimises toward whatever
+Search campaigns share the account's goal set. A PMax test does not: it optimizes toward whatever
 is biddable, and the account default is usually wider than the lead set. Pinning the test to
 campaign-level goals is what keeps it aimed at leads.
 Override: a Search campaign with a deliberate campaign-level goal set, recorded with the reason.
@@ -404,7 +404,7 @@ A primary action that has gone quiet is either a broken tag or a dead intake pat
 invalidate the CPL the account is being judged on.
 Override: an action known to be dormant, recorded so it stops being re-flagged. Note that a quiet
 action is not automatically a break: where a call tracker forwards only qualified leads, silence on
-low volume is the designed behaviour, and that belongs in the account's rules.
+low volume is the designed behavior, and that belongs in the account's rules.
 
 ---
 
@@ -475,7 +475,7 @@ date.
 **`campaign.asset_automation_settings`**, standard: every automation type `OPTED_OUT`, config item on any `OPTED_IN`
 Automatically generated text, image extraction, image enhancement, and enhanced video put creative
 we did not write in front of legal prospects, under bar-association advertising rules that make
-"Google generated it" an unhelpful defence. The relevant types include text asset automation, image
+"Google generated it" an unhelpful defense. The relevant types include text asset automation, image
 extraction, image enhancement, enhanced YouTube video, and final URL expansion.
 Override: an explicit creative-automation test, recorded, on an account whose firm has approved it.
 
@@ -492,9 +492,9 @@ Override: an expansion test with recorded exclusions.
 
 ### 5.4 Brand guidelines
 
-**`campaign.brand_guidelines_enabled`**, standard `true`, with main colour, accent colour, and font
+**`campaign.brand_guidelines_enabled`**, standard `true`, with main color, accent color, and font
 family set, config item if disabled or unset
-With brand guidelines off, generated layouts pick their own colours and type. A law firm's ads are
+With brand guidelines off, generated layouts pick their own colors and type. A law firm's ads are
 part of its brand and, in several states, part of its regulated advertising.
 Override: none expected.
 
@@ -639,7 +639,7 @@ Override: none.
 `('GOOGLE_ADS_AUTOMATED_RULE', 'GOOGLE_ADS_RECOMMENDATIONS')`, standard: OFF, therefore zero
 auto-applied changes in the window, red flag on any auto-applied change to keywords, match types,
 budgets, bidding, or targeting
-Auto-apply lets Google make the changes Google's incentives favour, most often broad match
+Auto-apply lets Google make the changes Google's incentives favor, most often broad match
 expansion and budget increases, without review. An auto-applied change is generally a red flag and
 every one of them is checked, individually, against the account. A long auto-applied list is a
 finding regardless of whether the individual changes look harmless, because it means the account is
