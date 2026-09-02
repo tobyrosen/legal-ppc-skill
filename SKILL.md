@@ -263,7 +263,7 @@ Quality score is a watched signal. A falling quality score with impressions coll
 
 The UI shows a "limited by quality score" label for severely underperforming keywords. The API does not expose it: `system_serving_status` returns `ELIGIBLE` even for a throttled keyword. This section is detection only.
 
-**Throttled keyword pattern:** quality score of 2 or less, AND all three components below average (`search_predicted_ctr`, `creative_quality_score`, `post_click_quality_score`), AND zero or near-zero impressions over the most recent 7 to 14 days on an active campaign with available budget. This shape has a real observed case behind it: quality score 1, all three components below average, zero impressions.
+**Throttled keyword pattern:** a falling quality score with all three components below average (`search_predicted_ctr`, `creative_quality_score`, `post_click_quality_score`), AND impressions collapsing to zero or near zero over the most recent 7 to 14 days, on an active campaign with available budget and with ad rank and bid holding. No quality-score cutoff is asserted: the finding is the direction of travel and the coincidence of the signals, not any particular number. There is a real observed case behind the shape, where the score sat at the bottom of the scale with all three components below average and zero impressions.
 
 **No fix is prescribed.** The rebuild tactic that used to sit here, pausing the keyword and building a fresh variant to get a clean quality signal, was retired in 2026-09 along with the playbook that encoded it (PB-15). Report the detection and hand the decision back.
 

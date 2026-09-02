@@ -58,6 +58,11 @@ SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 TYPE_ORDER = ("obs", "flag", "decision", "change", "outcome", "rule", "context")
 VERDICT_ORDER = ("met", "not_met", "mixed", "unclear")
 
+# Schema v1 platform values. They are not valid under schema v2 and are kept
+# here only so `migrate` can carry an old journal forward.
+LEGACY_PLATFORMS = {"callrail": "call-tracking", "ga4": "analytics", "hubspot": "crm"}
+LEGACY_PLATFORM_FALLBACK = "other"
+
 
 class JournalError(Exception):
     """A user-fixable journal error."""
@@ -180,6 +185,12 @@ def load_schema() -> dict[str, Any]:
     return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 
+def platform_values(schema: dict[str, Any] | None = None) -> set[str]:
+    """The platform values the current schema accepts."""
+    resolved = schema if schema is not None else load_schema()
+    return set(resolved["properties"]["platform"]["enum"])
+
+
 def vocab_path() -> Path:
     data_vocab = DATA_ROOT / "journal" / "vocab.json"
     return data_vocab if data_vocab.exists() else BUNDLED_VOCAB_PATH
@@ -257,13 +268,22 @@ def validate_records(
 ) -> list[str]:
     errors: list[str] = []
     schema = load_schema()
+    platforms = platform_values(schema)
+    legacy_platforms: Counter[str] = Counter()
     known_tags = vocab if vocab is not None else load_vocab()
     slug = path.stem
     ids: dict[str, int] = {}
 
     for entry, line_number in records:
         prefix = f"{path}:line {line_number}"
+        entry_platform = entry.get("platform")
+        is_legacy_platform = False
+        if isinstance(entry_platform, str) and entry_platform not in platforms:
+            is_legacy_platform = True
+            legacy_platforms[entry_platform] += 1
         for error in _schema_errors(entry, schema):
+            if is_legacy_platform and error.startswith("$.platform: must be one of"):
+                continue
             errors.append(f"{prefix}: {error}")
 
         entry_id = entry.get("id")
@@ -327,6 +347,14 @@ def validate_records(
         for target in entry.get("re", []):
             if isinstance(target, str) and target not in known_ids:
                 errors.append(f"{prefix}: re target does not exist: {target!r}")
+
+    if legacy_platforms:
+        detail = ", ".join(
+            f"{name}={count}" for name, count in sorted(legacy_platforms.items())
+        )
+        errors.append(
+            f"{path}: legacy platform values found: run journal.py migrate. {detail}"
+        )
     return errors
 
 
@@ -353,6 +381,35 @@ def validate_paths(paths: Iterable[Path]) -> tuple[list[str], int]:
             else:
                 global_ids[entry_id] = (path, line_number)
     return errors, count
+
+
+def migrate_journal(path: Path) -> Counter[str]:
+    """Rewrite schema v1 platform values in place, writing <name>.bak first.
+
+    Returns a count per rewrite, keyed 'old -> new'. A journal with nothing to
+    migrate is left untouched and no backup is written.
+    """
+    records, parse_errors = read_journal(path)
+    if parse_errors:
+        raise JournalError("\n".join(parse_errors))
+    platforms = platform_values()
+    changed: Counter[str] = Counter()
+    for entry, _ in records:
+        platform = entry.get("platform")
+        if not isinstance(platform, str) or platform in platforms:
+            continue
+        replacement = LEGACY_PLATFORMS.get(platform, LEGACY_PLATFORM_FALLBACK)
+        entry["platform"] = replacement
+        changed[f"{platform} -> {replacement}"] += 1
+    if not changed:
+        return changed
+    path.with_name(path.name + ".bak").write_bytes(path.read_bytes())
+    lines = [
+        json.dumps(entry, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+        for entry, _ in records
+    ]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+    return changed
 
 
 def list_journals() -> list[Path]:
@@ -766,6 +823,12 @@ def build_parser() -> argparse.ArgumentParser:
     validate_parser.add_argument("slug", nargs="?")
     validate_parser.add_argument("--all", action="store_true")
 
+    migrate_parser = subparsers.add_parser(
+        "migrate", help="rewrite schema v1 platform values to the current enum"
+    )
+    migrate_parser.add_argument("slug", nargs="?")
+    migrate_parser.add_argument("--all", action="store_true")
+
     due_parser = subparsers.add_parser("due", help="show due decisions and changes")
     due_parser.add_argument("slug")
     due_parser.add_argument("--as-of")
@@ -821,6 +884,26 @@ def main(argv: list[str] | None = None) -> int:
                     print(error, file=sys.stderr)
                 return 1
             print(f"valid: {len(paths)} journal(s), {count} entries")
+            return 0
+
+        if args.command == "migrate":
+            paths = _select_paths(args.slug, args.all)
+            total = 0
+            for path in paths:
+                changed = migrate_journal(path)
+                if not changed:
+                    print(f"{path}: no legacy platform values")
+                    continue
+                moved = sum(changed.values())
+                total += moved
+                detail = ", ".join(
+                    f"{name} ({count})" for name, count in sorted(changed.items())
+                )
+                print(
+                    f"{path}: {moved} entries rewritten: {detail}. "
+                    f"backup at {path.name}.bak"
+                )
+            print(f"migrated: {total} entries across {len(paths)} journal(s)")
             return 0
 
         if args.command == "due":

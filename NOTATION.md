@@ -40,7 +40,9 @@ One JSON object per line. Required: `id`, `ts`, `account`, `platform`, `type`, `
 - `id`: `<slug>-<YYYYMMDD>-<NN>` (per-account, per-day sequence). Unique per file.
 - `ts`: ISO 8601 with offset (`2026-08-10T09:15:00+07:00`).
 - `account`: account slug.
-- `platform`: `google | call-tracking | analytics | crm | site | admin | other`.
+- `platform`: `google | call-tracking | analytics | crm | site | admin | other`. Journals written
+  under schema v1 carry `meta`, `callrail`, `ga4` or `hubspot`; `journal.py migrate` moves them
+  forward. See §3a.
 - `type`: the event kind:
   - `obs`: data point / observation, no action implied
   - `flag`: anomaly raised for a decision
@@ -65,6 +67,21 @@ One JSON object per line. Required: `id`, `ts`, `account`, `platform`, `type`, `
   digit. Decisions belong to the operator unless recorded otherwise.
 - `session`: check id, `YYYY-MM-DD-<slug>` (matches the rendered session-log filename).
 - `migrated`: `true` only on backfilled entries parsed from the legacy md ledgers.
+
+## 3a. Schema version and migration
+
+`schema.json` is **v2**. The v1 `platform` values (`meta`, `callrail`, `ga4`, `hubspot`) are no
+longer accepted, and they are never coming back to the enum.
+
+`journal.py migrate <slug>` (or `--all`) carries an old journal forward in place: `callrail` to
+`call-tracking`, `ga4` to `analytics`, `hubspot` to `crm`, and any other value outside the enum
+to `other`. It copies the journal to `<slug>.jsonl.bak` before writing, and it does nothing at
+all to a journal that has no legacy values.
+
+Because append, render and validate all read the whole file, one v1 record would otherwise block
+every operation on that account. So `journal.py validate` does not fail with a bare enum error on
+these: it reports `legacy platform values found: run journal.py migrate` with a count per value,
+and the fix is one command.
 
 ## 4. The outcome loop (why this beats prose notes)
 

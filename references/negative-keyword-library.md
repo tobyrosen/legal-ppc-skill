@@ -11,7 +11,7 @@ Candidate negative-keyword patterns for family, immigration, and elder law Googl
 
 ## How to Use This Library
 
-**Account-level shared list.** Sections 1 to 4 are candidate categories. Whether an account needs a shared list at all, and which categories belong in it, is decided against that account's own search-term data. The absence of a shared list is not a red flag on its own.
+**Account-level shared list.** Sections 1 to 4 are candidate categories. Whether an account needs a shared list at all, and which categories belong in it, is decided against that account's own search-term data. The absence of a shared list is a config item, never a red flag on its own.
 
 **Campaign-level negatives.** Apply the practice-area cross-exclusions in section 5 at the campaign level, and only for practice areas the firm demonstrably does not handle. Never cross-exclude family, immigration, or elder work from one another without confirming the firm does not take those matters: a firm running all three would be blocking its own clients.
 

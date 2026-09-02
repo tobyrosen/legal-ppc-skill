@@ -615,7 +615,7 @@ WHERE shared_set.type = 'NEGATIVE_KEYWORDS'
 ORDER BY shared_set.name
 ```
 
-**What to look for:** Whether any shared negative lists exist at all. No shared negative lists = one of the clearest signs of an unmanaged account.
+**What to look for:** Whether any shared negative lists exist at all. No shared negative list is a config item, never a red flag (agency-defaults 4.1). Whether the account needs one, and which categories belong in it, is decided against the account's own search-term data.
 
 ---
 
@@ -1099,7 +1099,7 @@ WHERE campaign.status = 'ENABLED'
 ORDER BY campaign.name
 ```
 
-**What to check:** a list existing at all (§4.1, red flag if none), and every serving campaign
+**What to check:** a list existing at all (§4.1, config item if none), and every serving campaign
 appearing in the second result set (§4.2). A serving campaign absent from the second query
 references no shared list. `shared_set.reference_count` gives the same information in aggregate but
 does not say _which_ campaigns are missing.

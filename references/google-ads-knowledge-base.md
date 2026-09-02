@@ -91,7 +91,7 @@ Phrase and exact match are the defaults. Broad is not banned: it is tested delib
 
 Broad match is only tested in rare cases, often in SKAG (single keyword ad group) structure to isolate its behavior.
 
-**Negative keyword structure:** An account-level shared negative keyword list is useful where the account's own search-term data supports one. Its absence is not a red flag on its own. Such a list blocks irrelevant traffic categories at scale: job seekers, people looking for DIY legal resources, people in the wrong geography. The hierarchy follows scope of the exclusion:
+**Negative keyword structure:** An account-level shared negative keyword list is useful where the account's own search-term data supports one. Its absence is a config item, never a red flag on its own. Such a list blocks irrelevant traffic categories at scale: job seekers, people looking for DIY legal resources, people in the wrong geography. The hierarchy follows scope of the exclusion:
 
 - Irrelevant to the entire account → account-level negative
 - Irrelevant to a campaign → campaign-level negative

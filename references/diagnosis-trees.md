@@ -418,7 +418,7 @@ Flag: broad match keywords, keywords with 90-day cost and zero conversions (long
 
 Pull: GAQL 9.1 (shared negative lists), GAQL 9.3 (campaign-level negatives), GAQL 9.4 (ad group negatives)
 
-The absence of a shared negative list is a config item at most, never a red flag on its own (agency-defaults 4.1, negative-keyword-library "How to Use This Library"). Record it as info. Whether the account needs one, and which categories belong in it, is decided against the account's own search-term data. Compare contents of any existing lists against the negative keyword library. Identify obvious gaps.
+The absence of a shared negative list is a config item, never a red flag (agency-defaults 4.1, negative-keyword-library "How to Use This Library"). Whether the account needs one, and which categories belong in it, is decided against the account's own search-term data. Compare contents of any existing lists against the negative keyword library. Identify obvious gaps.
 
 ---
 

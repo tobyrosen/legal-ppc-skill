@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.com/schemas/google-ads-journal-entry-v1.json",
-  "title": "Google Ads journal entry v1.0",
+  "$id": "https://example.com/schemas/google-ads-journal-entry-v2.json",
+  "title": "Google Ads journal entry v2.0",
   "type": "object",
   "additionalProperties": false,
   "required": [

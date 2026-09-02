@@ -185,6 +185,66 @@ class JournalTests(unittest.TestCase):
         self.assertIn("## Config overrides", rendered)
         self.assertIn("agency-defaults.md", rendered)
 
+    def legacy_journal(self):
+        """A journal carrying schema v1 platform values, plus one valid entry."""
+        path = journal.DATA_ROOT / "journal" / "example-family-law.jsonl"
+        entries = [
+            self.entry(id="example-family-law-20260701-01", platform="callrail"),
+            self.entry(id="example-family-law-20260701-02", platform="ga4"),
+            self.entry(id="example-family-law-20260701-03", platform="hubspot"),
+            self.entry(id="example-family-law-20260701-04", platform="meta"),
+            self.entry(id="example-family-law-20260701-05", platform="google"),
+        ]
+        path.write_text(
+            "".join(json.dumps(entry, sort_keys=True) + "\n" for entry in entries),
+            encoding="utf-8",
+        )
+        return path
+
+    def test_validate_names_migrate_instead_of_a_bare_enum_failure(self):
+        path = self.legacy_journal()
+        records, parse_errors = journal.read_journal(path)
+        self.assertEqual(parse_errors, [])
+        errors = journal.validate_records(path, records)
+        self.assertTrue(any("run journal.py migrate" in error for error in errors))
+        self.assertTrue(any("callrail=1" in error for error in errors))
+        self.assertTrue(any("hubspot=1" in error for error in errors))
+        self.assertFalse(
+            any("$.platform: must be one of" in error for error in errors),
+            "the legacy summary replaces the per-line enum failure",
+        )
+
+    def test_migrate_rewrites_legacy_platforms_and_backs_up(self):
+        path = self.legacy_journal()
+        original = path.read_bytes()
+
+        changed = journal.migrate_journal(path)
+        self.assertEqual(changed["callrail -> call-tracking"], 1)
+        self.assertEqual(changed["ga4 -> analytics"], 1)
+        self.assertEqual(changed["hubspot -> crm"], 1)
+        self.assertEqual(changed["meta -> other"], 1)
+        self.assertEqual(sum(changed.values()), 4)
+
+        backup = path.with_name(path.name + ".bak")
+        self.assertTrue(backup.exists())
+        self.assertEqual(backup.read_bytes(), original)
+
+        records, parse_errors = journal.read_journal(path)
+        self.assertEqual(parse_errors, [])
+        self.assertEqual(journal.validate_records(path, records), [])
+        self.assertEqual(
+            [entry["platform"] for entry, _ in records],
+            ["call-tracking", "analytics", "crm", "other", "google"],
+        )
+
+    def test_migrate_leaves_a_clean_journal_untouched(self):
+        journal.append_entry("example-family-law", self.entry())
+        path = journal.DATA_ROOT / "journal" / "example-family-law.jsonl"
+        before = path.read_bytes()
+        self.assertEqual(journal.migrate_journal(path), {})
+        self.assertFalse(path.with_name(path.name + ".bak").exists())
+        self.assertEqual(path.read_bytes(), before)
+
     def test_jsonl_parse_error_has_line_number(self):
         path = journal.DATA_ROOT / "journal" / "example-family-law.jsonl"
         path.write_text(json.dumps(self.entry()) + "\n{broken\n", encoding="utf-8")

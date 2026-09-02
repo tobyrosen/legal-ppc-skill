@@ -8,7 +8,9 @@ session-logs/
 notes/
 # Journals written by a run with no PPC_JOURNAL_ROOT set: the default data
 # root is this repo, so ./journal/<slug>.jsonl must never be committed.
+# .bak files are the backups journal.py migrate leaves behind.
 /journal/*.jsonl
+/journal/*.bak
 references/learnings.md
 skills/
 __pycache__/
