@@ -271,8 +271,17 @@ def validate_records(
     path: Path,
     records: list[tuple[dict[str, Any], int]],
     vocab: set[str] | None = None,
+    unsaved_lines: set[int] | None = None,
 ) -> list[str]:
+    """Validate records for one journal.
+
+    `unsaved_lines` names the line numbers of records that are not on disk yet,
+    such as the candidate an append is about to write. Those never get the
+    'run journal.py migrate' hint, because migrate rewrites files and cannot
+    help an entry that has not been written. They get the ordinary enum error.
+    """
     errors: list[str] = []
+    pending = unsaved_lines or set()
     schema = load_schema()
     platforms = platform_values(schema)
     legacy_platforms: Counter[str] = Counter()
@@ -285,7 +294,8 @@ def validate_records(
         entry_platform = entry.get("platform")
         is_legacy_platform = False
         if (
-            isinstance(entry_platform, str)
+            line_number not in pending
+            and isinstance(entry_platform, str)
             and entry_platform not in platforms
             and entry_platform in LEGACY_PLATFORMS
         ):
@@ -518,8 +528,9 @@ def append_entry(slug: str, entry: dict[str, Any]) -> dict[str, Any]:
     candidate.setdefault("ts", datetime.now(LOCAL_TZ).isoformat(timespec="seconds"))
     candidate.setdefault("id", _next_id(slug, candidate["ts"], records))
 
-    combined = records + [(candidate, len(records) + 1)]
-    errors = validate_records(path, combined)
+    candidate_line = len(records) + 1
+    combined = records + [(candidate, candidate_line)]
+    errors = validate_records(path, combined, unsaved_lines={candidate_line})
     if errors:
         raise JournalError("\n".join(errors))
 

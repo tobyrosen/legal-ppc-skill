@@ -237,6 +237,26 @@ class JournalTests(unittest.TestCase):
             ["call-tracking", "analytics", "crm", "other", "google"],
         )
 
+    def test_append_with_retired_platform_is_a_plain_enum_error(self):
+        """migrate rewrites files, so it cannot help an entry not yet written."""
+        with self.assertRaises(journal.JournalError) as caught:
+            journal.append_entry("example-family-law", self.entry(platform="callrail"))
+        message = str(caught.exception)
+        self.assertIn("$.platform: must be one of", message)
+        self.assertNotIn("run journal.py migrate", message)
+        path = journal.DATA_ROOT / "journal" / "example-family-law.jsonl"
+        self.assertFalse(path.exists(), "a rejected append writes nothing")
+
+    def test_append_still_names_migrate_for_records_already_on_disk(self):
+        self.legacy_journal()
+        candidate = self.entry()
+        del candidate["id"]
+        with self.assertRaises(journal.JournalError) as caught:
+            journal.append_entry("example-family-law", candidate)
+        message = str(caught.exception)
+        self.assertIn("run journal.py migrate", message)
+        self.assertIn("callrail=1", message)
+
     def test_unknown_platform_stays_a_plain_validation_error(self):
         """migrate handles the four v1 values only; anything else is a real error."""
         path = journal.DATA_ROOT / "journal" / "example-family-law.jsonl"
