@@ -103,5 +103,15 @@
     "tag": "undated",
     "meaning": "A migrated legacy item with no reliable date in its source text.",
     "when_to_use": "Use only during migration when ts must use the source file's earliest plausible date."
+  },
+  {
+    "tag": "predicted",
+    "meaning": "The entry states, before the fact, what the change is expected to do: which metric moves, in which direction, by how much, over what window, and when that is read back.",
+    "when_to_use": "Use on a change entry that carries the predicted object (metric, direction, magnitude or band, window_days, review_by). Added 2026-09-07 for the paid-ads bench gate: a prediction recorded ahead of the outcome is what makes the decision measurable later."
+  },
+  {
+    "tag": "realized",
+    "meaning": "The measured outcome of an earlier prediction, recorded when its review_by comes due.",
+    "when_to_use": "Use on the entry that carries the realized object (the predicted shape plus measured_on and match of yes, no, or partial). Requires the predicted object on the same entry. Never overwrite the prediction with the result: the pair is the evidence."
   }
 ]
