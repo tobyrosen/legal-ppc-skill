@@ -1,7 +1,16 @@
 ---
 name: google-ads-analysis
 description: >-
-  Use this skill to improve the performance of Google Ads Search and Performance Max campaigns for family law, immigration law, and elder law firms. It encodes the tactics used to diagnose and fix a live account: conversion-tracking integrity, bidding targets and direction, budget and impression-share routing, keyword and match-type remediation, search-term waste, geo control, creative and asset checks, and configuration-baseline verification. Triggers include explicit requests (account audit, search term review, GAQL query, conversion tracking check, negative keyword review, impression share analysis, config-baseline verification, optimization playbook matching) and implicit ones (why is CPA high, leads are down, this campaign feels off, something changed this week, why is this not spending, performance is down). Use even if the request does not say "Google Ads": "check the campaigns", "run an audit", "performance seems off", and "why are leads down" all activate it. Does NOT cover campaign creation, keyword research for new accounts, or any advertising platform other than Google Ads.
+  Use this skill to improve the performance of Google Ads Search and Performance Max campaigns for
+  family law, immigration law, and elder law firms. It encodes the tactics used to diagnose and fix a
+  live account: conversion tracking, bidding targets, budget and impression-share routing, keywords
+  and match types, search-term waste, geo, and creative and assets. Triggers include explicit requests
+  (account audit, search term review, GAQL query, conversion tracking check, negative keyword review,
+  impression share analysis, config-baseline verification, optimization playbook matching) and
+  implicit ones (why is CPA high, leads are down, this campaign feels off, something changed this
+  week, why is this not spending, performance is down). Use even if the request does not say "Google
+  Ads": "check the campaigns" or "run an audit" activate it. Does NOT cover campaign creation, keyword
+  research for new accounts, or any advertising platform other than Google Ads.
 compatibility: Requires a GAQL execution tool with Google Ads API access. Designed for Claude Code.
 ---
 
@@ -34,6 +43,9 @@ These are prerequisites to the tactics, not presentation preferences.
 **Direction ships with every figure.** A spend, conversion, or CPL number is never reported bare. Week-over-week and 30-day-versus-prior-30-day direction ships with it every time, even when the request is a one-line ask for a single number.
 
 **Currency: report native, never assume dollars.** `cost_micros` and every cost, CPC, and CPL figure are denominated in the account's currency. Pull it (`SELECT customer.currency_code FROM customer`) and report each account in its own currency. No cross-currency total, average, or ranking without an approved FX source; when one is supplied, the rate and its effective date appear in the output. Two accounts both reading "200" in different currencies are not tied.
+
+- **`cost_micros` is micros: divide by 1,000,000 before any reporting or arithmetic.** Every cost, CPC, and CPL pulled from the API starts as `metrics.cost_micros`, denominated in millionths of the account's currency. Divide by 1,000,000 to reach standard currency amounts; the result carries the account's native currency under the currency rule above. A raw micros figure is never reported, compared, or averaged.
+- **Impression-share fields arrive as decimals or the string `"< 0.10"`, never as percentages.** `metrics.search_impression_share`, `metrics.search_rank_lost_impression_share`, and `metrics.search_budget_lost_impression_share` return as decimals (0.35 = 35%) or as the formatted string `"< 0.10"` (under 10%). Multiply decimals by 100 for reporting. `"< 0.10"` is a bound, not a number: report it as under 10%, never parse it into arithmetic, never average or subtract across it, and never rest a direction claim on its exact value.
 
 **Campaign to ad group path is mandatory in every finding.** Every keyword, search term, ad, or ad group finding leads with the full path so the item can be located in the UI:
 
@@ -68,17 +80,24 @@ It is a gate on the recommendation, not an output section. Surface it only when 
 
 ## Reference files
 
-| File                                      | Purpose                                                                              |
-| ----------------------------------------- | ------------------------------------------------------------------------------------ |
-| `references/playbooks.md`                 | The optimization playbook library: trigger, standard move, do-not-move, verification |
-| `references/agency-defaults.md`           | Configuration baseline: the standard value per setting, with severity                |
-| `references/diagnosis-trees.md`           | Symptom-to-action routing for the common account problems                            |
-| `references/google-ads-knowledge-base.md` | Why legal PPC behaves differently from general PPC                                   |
-| `references/negative-keyword-library.md`  | Negative-keyword patterns by category, with the do-not-negate rules                  |
-| `references/creative-audit.md`            | Search image-asset and PMax asset audit procedure                                    |
-| `references/gaql-query-library.md`        | Pre-built GAQL queries by diagnostic task                                            |
+| File                                      | Purpose                                                                                                                                      |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `references/playbooks.md`                 | The optimization playbook library: trigger, standard move, do-not-move, verification                                                         |
+| `references/agency-defaults.md`           | Configuration baseline: the standard value per setting, with severity                                                                        |
+| `references/google-api-ops.md`            | Operational GAQL lifted verbatim from Google's public Ads API skill: offline-upload health, multi-account discovery, first-pass segmentation |
+| `references/diagnosis-trees.md`           | Symptom-to-action routing for the common account problems                                                                                    |
+| `references/google-ads-knowledge-base.md` | Why legal PPC behaves differently from general PPC                                                                                           |
+| `references/negative-keyword-library.md`  | Negative-keyword patterns by category, with the do-not-negate rules                                                                          |
+| `references/creative-audit.md`            | Search image-asset and PMax asset audit procedure                                                                                            |
+| `references/gaql-query-library.md`        | Pre-built GAQL queries by diagnostic task                                                                                                    |
 
 ---
+
+## Related fleet skills (added 2026-09-04)
+
+- GA4 is measurement, Google Ads is spend: for GA4 report pulls load `google-analytics-data-api-basics`; for GA4 account, property, or key-event (conversion-event) configuration load `google-analytics-admin-api-basics`. Key-event checks run alongside the PPC cadence, never instead of it.
+- The offline conversion upload health check in `references/google-api-ops.md` reads upload health from the Google Ads API side. The write side, offline conversions and enhanced conversions for leads plus Customer Match audience uploads sourced from HubSpot or Brevo, is the Data Manager API: `data-manager-api-event-ingestion` and `data-manager-api-audience-ingestion`. Real uploads are live-account writes and follow the same human-review gate as every other account write, never a direct agent mutate.
+- For Google Ads API, GAQL, GA4, or Data Manager API doc lookups while writing client code, use `retrieving-developer-knowledge` (see also `source-driven-development`).
 
 ## Execution note
 

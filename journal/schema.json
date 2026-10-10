@@ -124,6 +124,49 @@
         "review_by": { "type": "string", "format": "date" }
       }
     },
+    "predicted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric", "direction", "window_days", "review_by"],
+      "properties": {
+        "metric": { "type": "string", "minLength": 1 },
+        "direction": { "enum": ["up", "down", "flat"] },
+        "magnitude": { "type": "string", "minLength": 1 },
+        "band": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "type": "number" }
+        },
+        "window_days": { "type": "integer" },
+        "review_by": { "type": "string", "format": "date" }
+      }
+    },
+    "realized": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "metric",
+        "direction",
+        "window_days",
+        "review_by",
+        "measured_on",
+        "match"
+      ],
+      "properties": {
+        "metric": { "type": "string", "minLength": 1 },
+        "direction": { "enum": ["up", "down", "flat"] },
+        "magnitude": { "type": "string", "minLength": 1 },
+        "band": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "type": "number" }
+        },
+        "window_days": { "type": "integer" },
+        "review_by": { "type": "string", "format": "date" },
+        "measured_on": { "type": "string", "format": "date" },
+        "match": { "enum": ["yes", "no", "partial"] }
+      }
+    },
     "re": {
       "type": "array",
       "minItems": 1,
@@ -189,6 +232,14 @@
       },
       "then": {
         "required": ["re", "verdict"]
+      }
+    },
+    {
+      "if": {
+        "required": ["realized"]
+      },
+      "then": {
+        "required": ["predicted"]
       }
     },
     {
