@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.15"
       - name: Generic PII shape check (customer-ID/phone/email)
         run: python3 scripts/ci-generic-leak-check.py
 
@@ -63,7 +63,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.15"
       - uses: actions/setup-node@v6
         with:
           node-version: "20"
